@@ -1,0 +1,7 @@
+{
+  "name": "multiple-choice",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
