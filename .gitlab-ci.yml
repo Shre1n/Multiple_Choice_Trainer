@@ -1,0 +1,28 @@
+stages:
+    - lint
+    - sec_scan
+
+lint:
+    stage: lint
+    tags:
+    - docker
+    image: node:lts-bullseye-slim
+    allow_failure: true
+    before_script:
+        cd app
+    script:
+    - npm install
+    - npm run lint
+
+sec_scan:
+    stage: sec_scan
+    tags:
+    - docker
+    image: node:lts-bullseye-slim
+    allow_failure: true
+    before_script:
+        cd app
+    script:
+    - npm install
+    - npm install -g npm-check
+    - npm-check --skip-unused
