@@ -9,7 +9,7 @@ lint:
     image: node:lts-bullseye-slim
     allow_failure: true
     before_script:
-        cd app
+        cd multiple-choice/app
     script:
     - npm install
     - npm run lint
@@ -21,7 +21,7 @@ sec_scan:
     image: node:lts-bullseye-slim
     allow_failure: true
     before_script:
-        cd app
+        cd multiple-choice/app
     script:
     - npm install
     - npm install -g npm-check
