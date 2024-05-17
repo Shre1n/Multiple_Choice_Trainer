@@ -2,7 +2,6 @@
 stages:
     - lint
     - sec_scan
-    - build
     - deploy
 
 # Language Syntax Job for
@@ -31,17 +30,6 @@ sec_scan:
     - npm install
     - npm install -g npm-check
     - npm-check --skip-unused
-
-# Build Job für die Android-App
-build:android:
-    stage: build
-    script:
-        - npm ci
-        - ionic cordova build android --release
-    artifacts:
-        paths:
-            - platforms/android/app/build/outputs/apk/release/app-release.apk
-        expire_in: 7 days
 
 # Gemeinsame Deploy-Konfiguration
 .deploy: &deploy
