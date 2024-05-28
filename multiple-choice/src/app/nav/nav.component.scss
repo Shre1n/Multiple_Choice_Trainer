@@ -1,0 +1,11 @@
+.icon-col {
+  margin: 0 1.5em; /* Adjust the margin as needed */
+}
+
+ion-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100; /* Ensure it is above other content */
+}
