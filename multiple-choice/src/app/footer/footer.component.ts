@@ -1,23 +1,26 @@
 import { Component, OnInit } from '@angular/core';
 import {IonicModule} from "@ionic/angular";
-import {homeSharp, statsChartSharp, bookSharp, trophySharp}  from "ionicons/icons";
-import {addIcons} from "ionicons";
 import {Router} from "@angular/router";
+import {homeSharp, statsChartSharp, bookSharp, trophySharp} from "ionicons/icons";
+import {addIcons} from "ionicons";
 
 @Component({
-  selector: 'app-nav',
-  templateUrl: './nav.component.html',
-  styleUrls: ['./nav.component.scss'],
+  selector: 'app-footer',
+  templateUrl: './footer.component.html',
+  styleUrls: ['./footer.component.scss'],
   imports: [
     IonicModule
   ],
   standalone: true
 })
-export class NavComponent  implements OnInit {
+export class FooterComponent  implements OnInit {
 
   constructor(private router: Router) {
     addIcons({homeSharp, statsChartSharp, bookSharp, trophySharp})
+
   }
+
+  ngOnInit() {}
 
 
   navToHome(){
@@ -36,10 +39,5 @@ export class NavComponent  implements OnInit {
     this.router.navigate(['/achivements'])
   }
 
-
-
-
-
-  ngOnInit() {}
 
 }
