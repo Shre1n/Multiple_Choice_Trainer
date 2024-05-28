@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
   selector: 'app-card-list',
   templateUrl: './card-list.component.html',
   styleUrls: ['./card-list.component.scss'],
+  standalone: true
 })
 export class CardListComponent  implements OnInit {
 

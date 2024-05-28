@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
   selector: 'app-statistik',
   templateUrl: './statistik.component.html',
   styleUrls: ['./statistik.component.scss'],
+  standalone: true
 })
 export class StatistikComponent  implements OnInit {
 
