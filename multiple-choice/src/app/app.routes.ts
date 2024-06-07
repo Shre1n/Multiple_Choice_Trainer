@@ -4,9 +4,13 @@ import {CardComponent} from "./card/card.component";
 import {StatistikComponent} from "./statistik/statistik.component";
 import {HomeComponent} from "./home/home.component";
 import {AchivementsComponent} from "./achivements/achivements.component";
-import {RegisterSignupComponent} from "./register-signup/register-signup.component";
+import {LoginComponent} from "./login/login.component";
+import {RegisterComponent} from "./login/register/register.component";
+import {ForgetPasswordComponent} from "./login/forget-password/forget-password.component";
 import {CardListComponent} from "./card/card-list/card-list.component";
 import {CardDetailComponent} from "./card/card-detail/card-detail.component";
+import {SessionStatistikComponent} from "./statistik/session-statistik/session-statistik.component";
+
 
 export const routes: Routes = [
 
@@ -14,8 +18,11 @@ export const routes: Routes = [
   { path: 'statistik', component: StatistikComponent },
   { path: 'cards', component: CardComponent },
   { path: 'achivements', component: AchivementsComponent },
-  { path: 'register', component: RegisterSignupComponent},
+  { path: 'login', component: LoginComponent },
+  { path: 'forget-password', component: ForgetPasswordComponent },
+  { path: 'register', component: RegisterComponent },
   { path: 'card-list', component: CardListComponent },
+  { path: 'sessionStatistik', component: SessionStatistikComponent },
   { path: 'card-detail', component: CardDetailComponent },
   { path: '**', redirectTo: '' } // Wildcard route for a 404 page
 ];
