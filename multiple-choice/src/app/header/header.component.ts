@@ -12,7 +12,7 @@ import {addIcons} from "ionicons";
   ],
   standalone: true
 })
-export class HeaderComponent  implements OnInit {
+export class HeaderComponent  {
 
   @Output() openRegisterForm: EventEmitter<void> = new EventEmitter<void>();
 
@@ -20,7 +20,6 @@ export class HeaderComponent  implements OnInit {
     addIcons({personOutline});
   }
 
-  ngOnInit() {}
 
   emitOpenRegisterForm(): void {
     this.openRegisterForm.emit();

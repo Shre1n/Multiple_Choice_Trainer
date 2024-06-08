@@ -14,7 +14,5 @@ import {Router} from "@angular/router";
 export class AppComponent {
   constructor(private router: Router) {}
 
-  openRegisterForm(): void {
-    this.router.navigate(['/register']);
-  }
+
 }

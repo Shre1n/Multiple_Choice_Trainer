@@ -12,39 +12,6 @@ export class AuthService {
 
   constructor(private auth: Auth, private firestore: Firestore) {}
 
-  // async createSession(userId: string, module: string, cards: string[]): Promise<void> {
-  //   try {
-  //
-  //     const selectedCards = this.shuffle(allCards).slice(0, 30);
-  //
-  //     // Füge eine neue Lernsession für den Benutzer hinzu
-  //     const sessionRef = await addDoc(collection(this.firestore, `users/${userId}/sessions`), {
-  //       module: module,
-  //       cards: selectedCards,
-  //       // Hier kannst du weitere Session-Daten hinzufügen, die du speichern möchtest
-  //     });
-  //   } catch (error: unknown) {
-  //     if (error instanceof Error) {
-  //       throw new Error(`Create session: ${error.message}`);
-  //     }
-  //   }
-  // }
-  //
-  // // Funktion zum Mischen von Karten (Fisher-Yates Algorithmus)
-  // private shuffle(cards: string[]): string[] {
-  //   let currentIndex = cards.length;
-  //   let randomIndex: number;
-  //
-  //   while (currentIndex !== 0) {
-  //     randomIndex = Math.floor(Math.random() * currentIndex);
-  //     currentIndex--;
-  //
-  //     [cards[currentIndex], cards[randomIndex]] = [cards[randomIndex], cards[currentIndex]];
-  //   }
-  //
-  //   return cards;
-  // }
-
 
   async login(email: string, password: string) {
     try {
@@ -67,8 +34,10 @@ export class AuthService {
       return user;
     } catch (error: unknown) {
       if (error instanceof Error) {
+        console.error('Registration error:', error);
         throw new Error(`Registration failed: ${error.message}`);
       } else {
+        console.error('Unknown registration error');
         throw new Error('An unknown error occurred during registration.');
       }
     }
