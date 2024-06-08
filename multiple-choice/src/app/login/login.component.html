@@ -1,3 +1,16 @@
-<p>
-  login works!
-</p>
+<ion-content>
+  <form (ngSubmit)="login()">
+    <ion-item>
+      <ion-label position="floating">Email</ion-label>
+      <ion-input [(ngModel)]="email" name="email" type="email" required></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Password</ion-label>
+      <ion-input [(ngModel)]="password" name="password" type="password" required></ion-input>
+    </ion-item>
+    <ion-button expand="full" type="submit">Login</ion-button>
+  </form>
+  @if (errorMessage){
+    <p>{{errorMessage}}</p>
+  }
+</ion-content>

@@ -1,9 +1,12 @@
+import { NgModule } from '@angular/core';
 import {enableProdMode} from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { RouteReuseStrategy, provideRouter } from '@angular/router';
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { provideAuth, getAuth } from '@angular/fire/auth';
+import { provideFirestore, getFirestore } from '@angular/fire/firestore';
+
 import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalone';
-import {initializeApp, provideFirebaseApp} from '@angular/fire/app';
-import {getFirestore, provideFirestore}    from '@angular/fire/firestore';
 import {environment} from 'src/environments/environment';
 
 import { routes } from './app/app.routes';
@@ -17,6 +20,7 @@ bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
+    provideAuth(() => getAuth()),
     provideFirestore(() => getFirestore()),
     provideIonicAngular(),
     provideRouter(routes),
