@@ -11,10 +11,9 @@ import {IonicModule} from "@ionic/angular";
   ],
   standalone: true
 })
-export class HomeComponent  implements OnInit {
+export class HomeComponent {
 
   constructor() { }
 
-  ngOnInit() {}
 
 }
