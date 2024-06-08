@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import {IonApp, IonContent, IonRouterOutlet} from '@ionic/angular/standalone';
 import {HeaderComponent} from "./header/header.component";
 import {FooterComponent} from "./footer/footer.component";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-root',
@@ -11,5 +12,9 @@ import {FooterComponent} from "./footer/footer.component";
 
 })
 export class AppComponent {
-  constructor() {}
+  constructor(private router: Router) {}
+
+  openRegisterForm(): void {
+    this.router.navigate(['/register']);
+  }
 }
