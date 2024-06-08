@@ -8,6 +8,7 @@ import {FooterComponent} from "./footer/footer.component";
   templateUrl: 'app.component.html',
   standalone: true,
   imports: [IonApp, IonRouterOutlet, HeaderComponent, FooterComponent, IonContent],
+
 })
 export class AppComponent {
   constructor() {}
