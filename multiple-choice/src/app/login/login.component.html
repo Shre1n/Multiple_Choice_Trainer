@@ -10,6 +10,8 @@
     </ion-item>
     <ion-button expand="full" type="submit">Login</ion-button>
   </form>
+
+  <ion-button expand="full" (click)="openRegisterForm()">No Account? Register Now!</ion-button>
   @if (errorMessage){
     <p>{{errorMessage}}</p>
   }

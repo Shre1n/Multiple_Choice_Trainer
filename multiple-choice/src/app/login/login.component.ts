@@ -25,11 +25,16 @@ export class LoginComponent{
   async login() {
     try {
       const user = await this.authService.login(this.email, this.password);
+      this.router.navigate(['/home']);
     } catch (error: unknown) {
       if (error instanceof Error) {
         throw new Error(`Login failed: ${error.message}`);
       }
     }
+  }
+
+  openRegisterForm(): void {
+    this.router.navigate(['/register']);
   }
 
 }

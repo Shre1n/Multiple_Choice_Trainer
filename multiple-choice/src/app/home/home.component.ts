@@ -16,8 +16,8 @@ export class HomeComponent {
   constructor(private router: Router, public navCtrl: NavController) { }
 
 
-  openRegisterForm(): void {
-    this.router.navigate(['/register']);
+  openLoginForm(): void {
+    this.router.navigate(['/login']);
   }
 
 }
