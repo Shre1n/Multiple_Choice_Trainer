@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import { Router } from '@angular/router';
-import {IonicModule} from "@ionic/angular";
+import {IonicModule, NavController} from "@ionic/angular";
 
 @Component({
   selector: 'app-home',
@@ -11,10 +11,13 @@ import {IonicModule} from "@ionic/angular";
   ],
   standalone: true
 })
-export class HomeComponent  implements OnInit {
+export class HomeComponent {
 
-  constructor() { }
+  constructor(private router: Router, public navCtrl: NavController) { }
 
-  ngOnInit() {}
+
+  openLoginForm(): void {
+    this.router.navigate(['/login']);
+  }
 
 }
