@@ -21,16 +21,6 @@ export class CardComponent implements OnInit{
 
   loadModules(): void {
     // Laden von externen Modulen
-    this.moduleService.loadExternalModule().subscribe(
-      response => {
-        console.log('External Module:', response);
-      },
-      error => {
-        console.error('Error loading external module:', error);
-      }
-    );
-
-    // Laden von lokalen Modulen
     const moduleName = 'module1'; // Êxample
     this.moduleService.loadLocalModule(moduleName).subscribe(
       response => {

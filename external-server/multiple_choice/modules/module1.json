@@ -1,0 +1,21 @@
+{
+  "name": "Module 1",
+  "description": "This is module 1",
+  "answeredCorrectlyCount": 0,
+  "answeredIncorrectlyCount": 0,
+  "answers": [
+    {
+      "0": 1,
+      "1": 2,
+      "2": 3,
+      "3": 4
+    }
+  ],
+  "category": "Mathematics",
+  "correctAnswers": [
+    {
+      "question": "What is 2+2?",
+      "answer": 3
+    }
+  ]
+}
