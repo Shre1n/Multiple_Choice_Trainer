@@ -1,5 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, UserCredential } from '@angular/fire/auth';
+import {
+  Auth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  UserCredential,
+  sendPasswordResetEmail
+} from '@angular/fire/auth';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 import {addDoc, collection, doc, Firestore, getDoc, setDoc} from "@angular/fire/firestore";
 import { User } from 'firebase/auth';
@@ -11,6 +18,18 @@ import { User } from 'firebase/auth';
 export class AuthService {
 
   constructor(private auth: Auth, private firestore: Firestore) {}
+
+  async resetPassword(email: string): Promise<void> {
+    try {
+      await sendPasswordResetEmail(this.auth, email);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw new Error(`Password reset failed: ${error.message}`);
+      } else {
+        throw new Error('An unknown error occurred during password reset.');
+      }
+    }
+  }
 
 
   async login(email: string, password: string) {

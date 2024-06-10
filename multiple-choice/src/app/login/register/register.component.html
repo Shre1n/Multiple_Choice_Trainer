@@ -1,18 +1,45 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/login"></ion-back-button>
+    </ion-buttons>
+    <ion-title slot="start">Register</ion-title>
+  </ion-toolbar>
+</ion-header>
+
 <ion-content>
-  <form (ngSubmit)="register()">
+  <form (ngSubmit)="register()" #registerForm="ngForm">
     <ion-item>
       <ion-label position="floating">Email</ion-label>
       <ion-input [(ngModel)]="email" name="email" type="email" required></ion-input>
     </ion-item>
+    @if (registerForm.submitted && !email) {
+      <ion-note color="danger">
+        Email is required.
+      </ion-note>
+    }
     <ion-item>
       <ion-label position="floating">Password</ion-label>
       <ion-input [(ngModel)]="password" name="password" type="password" required></ion-input>
     </ion-item>
+
+    @if (registerForm.submitted && !password) {
+      <ion-note color="danger">
+        Password is required.
+      </ion-note>
+    }
+
     <ion-item>
       <ion-label position="floating">Name</ion-label>
       <ion-input [(ngModel)]="additionalData.name" name="name" required></ion-input>
     </ion-item>
-    <!-- Füge hier weitere Felder hinzu, falls nötig -->
+
+    @if (registerForm.submitted && !additionalData.name) {
+      <ion-note color="danger">
+        Username is required.
+      </ion-note>
+    }
+
     <ion-button expand="full" type="submit">Register</ion-button>
   </form>
   @if (errorMessage) {
