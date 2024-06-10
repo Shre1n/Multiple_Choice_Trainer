@@ -15,13 +15,22 @@ import {ToastController} from "@ionic/angular/standalone";
   ],
   standalone: true
 })
-export class ForgetPasswordComponent  {
+export class ForgetPasswordComponent implements OnInit {
   email: string = '';
   errorMessage: string = '';
   successMessage: string = '';
   isToastOpen = false;
 
   constructor(private authService: AuthService, private router: Router, private toastController: ToastController) {}
+
+  ngOnInit() {
+    this.resetForm();
+  }
+  resetForm() {
+    this.email = '';
+    this.errorMessage = '';
+    this.isToastOpen = false;
+  }
 
   setOpen(isOpen: boolean) {
     this.isToastOpen = isOpen;

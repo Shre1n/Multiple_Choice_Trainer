@@ -1,4 +1,4 @@
-import {Component, NgModule} from '@angular/core';
+import {Component, NgModule, OnInit} from '@angular/core';
 import {AuthService} from "../../services/auth.service";
 import {Router} from "@angular/router";
 import {IonicModule} from "@ionic/angular";
@@ -15,7 +15,7 @@ import {ToastController} from "@ionic/angular/standalone";
   ],
   standalone: true
 })
-export class RegisterComponent{
+export class RegisterComponent implements OnInit {
 
   email: string = '';
   password: string = '';
@@ -24,6 +24,17 @@ export class RegisterComponent{
   isToastOpen = false;
 
   constructor(private authService: AuthService, private router: Router, private toastController: ToastController) {}
+
+  ngOnInit() {
+    this.resetForm();
+  }
+  resetForm() {
+    this.email = '';
+    this.password = '';
+    this.additionalData.name = '';
+    this.errorMessage = '';
+    this.isToastOpen = false;
+  }
 
   setOpen(isOpen: boolean) {
     this.isToastOpen = isOpen;

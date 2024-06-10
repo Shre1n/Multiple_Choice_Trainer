@@ -1,8 +1,8 @@
-import {Component} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {AuthService} from '../services/auth.service'
 import {Router} from "@angular/router";
 import {IonicModule} from "@ionic/angular";
-import {FormsModule} from "@angular/forms";
+import {FormsModule, NgForm} from "@angular/forms";
 import {ToastController} from "@ionic/angular/standalone";
 
 @Component({
@@ -15,7 +15,9 @@ import {ToastController} from "@ionic/angular/standalone";
   ],
   standalone: true
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit{
+
+  @ViewChild('loginForm') loginForm!: NgForm;
 
   email: string = '';
   password: string = '';
@@ -23,6 +25,19 @@ export class LoginComponent {
   isToastOpen = false;
 
   constructor(private authService: AuthService, private router: Router, private toastController: ToastController) {
+  }
+
+  ngOnInit() {
+    this.resetForm();
+  }
+  resetForm() {
+    if (this.loginForm) {
+      this.loginForm.reset();
+    }
+    this.email = '';
+    this.password = '';
+    this.errorMessage = '';
+    this.isToastOpen = false;
   }
 
   setOpen(isOpen: boolean) {
@@ -65,10 +80,12 @@ export class LoginComponent {
   }
 
   openRegisterForm(): void {
+    this.resetForm();
     this.router.navigate(['/register']);
   }
 
   openForgotPassword(): void{
+    this.resetForm();
     this.router.navigate(['/forget-password'])
   }
 
