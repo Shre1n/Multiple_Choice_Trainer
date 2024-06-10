@@ -1,4 +1,4 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {Component} from '@angular/core';
 import { Router } from '@angular/router';
 import {IonicModule, NavController} from "@ionic/angular";
 
@@ -11,7 +11,8 @@ import {IonicModule, NavController} from "@ionic/angular";
   ],
   standalone: true
 })
-export class HomeComponent {
+export class HomeComponent{
+
 
   constructor(private router: Router, public navCtrl: NavController) { }
 
@@ -19,5 +20,6 @@ export class HomeComponent {
   openLoginForm(): void {
     this.router.navigate(['/login']);
   }
+
 
 }

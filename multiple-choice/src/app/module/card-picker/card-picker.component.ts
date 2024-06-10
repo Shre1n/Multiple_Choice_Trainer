@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {IonicModule} from "@ionic/angular";
+import {ModuleService} from "../../services/module.service";
 
 @Component({
   selector: 'app-card-picker',
@@ -10,9 +11,11 @@ import {IonicModule} from "@ionic/angular";
   ],
   standalone: true
 })
-export class CardPickerComponent {
+export class CardPickerComponent{
 
   constructor() { }
+
+
 
 
 }
