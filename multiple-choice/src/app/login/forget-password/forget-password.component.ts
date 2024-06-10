@@ -57,8 +57,9 @@ export class ForgetPasswordComponent implements OnInit {
 
     try {
       await this.authService.resetPassword(this.email);
+      await this.navController.pop()
       this.successMessage = 'Password reset email sent. Check your inbox.';
-      this.presentToast(this.successMessage, 'success');
+      await this.presentToast(this.successMessage, 'success');
       await this.navController.pop();
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -66,7 +67,7 @@ export class ForgetPasswordComponent implements OnInit {
       } else {
         this.errorMessage = 'An unknown error occurred during password reset.';
       }
-      this.presentToast(this.errorMessage, 'danger');
+      await this.presentToast(this.errorMessage, 'danger');
 
     }
   }

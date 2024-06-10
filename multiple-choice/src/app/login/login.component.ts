@@ -67,7 +67,8 @@ export class LoginComponent implements OnInit{
 
     try {
       const user = await this.authService.login(this.email, this.password);
-      this.router.navigate(['/home']);
+      await this.navController.pop();
+      await this.router.navigate(['/home']);
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.errorMessage = `Login failed: No login found.`;
@@ -75,7 +76,7 @@ export class LoginComponent implements OnInit{
         this.errorMessage = 'An unknown error occurred during login.';
       }
       this.setOpen(true);
-      this.presentToast('middle');
+      await this.presentToast('middle');
     }
   }
 
