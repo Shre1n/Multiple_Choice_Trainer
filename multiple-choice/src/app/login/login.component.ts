@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {AuthService} from '../services/auth.service'
 import {Router} from "@angular/router";
-import {IonicModule} from "@ionic/angular";
+import {IonicModule, NavController} from "@ionic/angular";
 import {FormsModule, NgForm} from "@angular/forms";
 import {ToastController} from "@ionic/angular/standalone";
 
@@ -24,7 +24,7 @@ export class LoginComponent implements OnInit{
   errorMessage: string = '';
   isToastOpen = false;
 
-  constructor(private authService: AuthService, private router: Router, private toastController: ToastController) {
+  constructor(private authService: AuthService, private router: Router, private toastController: ToastController, private navController: NavController) {
   }
 
   ngOnInit() {
@@ -81,11 +81,13 @@ export class LoginComponent implements OnInit{
 
   openRegisterForm(): void {
     this.resetForm();
+    this.navController.pop();
     this.router.navigate(['/register']);
   }
 
   openForgotPassword(): void{
     this.resetForm();
+    this.navController.pop();
     this.router.navigate(['/forget-password'])
   }
 

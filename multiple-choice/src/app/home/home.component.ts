@@ -22,6 +22,7 @@ export class HomeComponent {
 
   openLoginForm(): void {
     this.router.navigate(['/login']);
+    this.navCtrl.pop();
   }
 
 }

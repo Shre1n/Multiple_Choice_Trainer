@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {IonicModule} from "@ionic/angular";
+import {IonicModule, NavController} from "@ionic/angular";
 import {FormsModule} from "@angular/forms";
 import {AuthService} from "../../services/auth.service";
 import {Router} from "@angular/router";
@@ -21,7 +21,7 @@ export class ForgetPasswordComponent implements OnInit {
   successMessage: string = '';
   isToastOpen = false;
 
-  constructor(private authService: AuthService, private router: Router, private toastController: ToastController) {}
+  constructor(private authService: AuthService, private router: Router, private toastController: ToastController, private navController: NavController) {}
 
   ngOnInit() {
     this.resetForm();
@@ -58,8 +58,8 @@ export class ForgetPasswordComponent implements OnInit {
     try {
       await this.authService.resetPassword(this.email);
       this.successMessage = 'Password reset email sent. Check your inbox.';
-      this.router.navigate(['/login']);
       this.presentToast(this.successMessage, 'success');
+      await this.navController.pop();
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.errorMessage = `Password reset failed: ${error.message}`;
