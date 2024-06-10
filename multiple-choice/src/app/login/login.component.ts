@@ -1,5 +1,5 @@
-import { Component} from '@angular/core';
-import { AuthService } from '../services/auth.service'
+import {Component} from '@angular/core';
+import {AuthService} from '../services/auth.service'
 import {Router} from "@angular/router";
 import {IonicModule} from "@ionic/angular";
 import {FormsModule} from "@angular/forms";
@@ -15,14 +15,15 @@ import {ToastController} from "@ionic/angular/standalone";
   ],
   standalone: true
 })
-export class LoginComponent{
+export class LoginComponent {
 
   email: string = '';
   password: string = '';
   errorMessage: string = '';
   isToastOpen = false;
 
-  constructor(private authService: AuthService, private router: Router, private toastController: ToastController) {}
+  constructor(private authService: AuthService, private router: Router, private toastController: ToastController) {
+  }
 
   setOpen(isOpen: boolean) {
     this.isToastOpen = isOpen;
@@ -55,6 +56,10 @@ export class LoginComponent{
 
   openRegisterForm(): void {
     this.router.navigate(['/register']);
+  }
+
+  openForgotPassword(): void{
+    this.router.navigate(['/forget-password'])
   }
 
 }
