@@ -40,6 +40,16 @@ export class LoginComponent {
   }
 
   async login() {
+    if (!this.email || !this.password) {
+      if (!this.email) {
+        this.setOpen(false);
+      }
+      if (!this.password) {
+        this.setOpen(false);
+      }
+      return;
+    }
+
     try {
       const user = await this.authService.login(this.email, this.password);
       this.router.navigate(['/home']);
