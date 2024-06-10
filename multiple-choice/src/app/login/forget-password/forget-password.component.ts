@@ -19,8 +19,13 @@ export class ForgetPasswordComponent  {
   email: string = '';
   errorMessage: string = '';
   successMessage: string = '';
+  isToastOpen = false;
 
   constructor(private authService: AuthService, private router: Router, private toastController: ToastController) {}
+
+  setOpen(isOpen: boolean) {
+    this.isToastOpen = isOpen;
+  }
 
   async presentToast(message: string, color: string) {
     const toast = await this.toastController.create({
@@ -33,6 +38,14 @@ export class ForgetPasswordComponent  {
   }
 
   async resetPassword() {
+    if (!this.email){
+      if (!this.email) {
+        this.setOpen(false);
+      }
+      return;
+    }
+
+
     try {
       await this.authService.resetPassword(this.email);
       this.successMessage = 'Password reset email sent. Check your inbox.';
