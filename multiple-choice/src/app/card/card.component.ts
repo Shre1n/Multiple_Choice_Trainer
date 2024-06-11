@@ -21,6 +21,7 @@ export class CardComponent implements OnInit{
 
   ngOnInit(): void {
     this.loadModules();
+    this.checkForUpdates();
   }
 
   async presentToast(position: 'middle') {
@@ -31,6 +32,21 @@ export class CardComponent implements OnInit{
     });
 
     await toast.present();
+  }
+
+  checkForUpdates(): void {
+    this.moduleService.checkForUpdates().subscribe(
+      (response) => {
+        if (response.updatesAvailable) {
+          console.log('Updates available, reloading modules...');
+        } else {
+          console.log('No updates available');
+        }
+      },
+      (error) => {
+        console.error('Error checking for updates:', error);
+      }
+    );
   }
 
   loadModules(): void {

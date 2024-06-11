@@ -7,10 +7,18 @@ import {Observable} from "rxjs";
 })
 export class ModuleService {
 
+  private baseUrl = "http://localhost:8888";
+
   constructor(private http: HttpClient) { }
 
 
   loadExternalModule(): Observable<any> {
-    return this.http.get<any>('http://localhost:8888/load-all-modules');
+    const url: string = `${this.baseUrl}/load-all-modules`;
+    return this.http.get<any>(url);
+  }
+
+  checkForUpdates(): Observable<{ updatesAvailable: boolean }> {
+    const url = `${this.baseUrl}/check-updates`;
+    return this.http.get<{ updatesAvailable: boolean }>(url);
   }
 }
