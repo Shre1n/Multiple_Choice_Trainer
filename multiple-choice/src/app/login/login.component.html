@@ -8,7 +8,7 @@
 </ion-header>
 
 
-<ion-content>
+<ion-content class="ion-padding">
   <form (ngSubmit)="login()" #loginForm="ngForm">
     <ion-item>
       <ion-label position="floating">Email</ion-label>
@@ -30,18 +30,9 @@
       </ion-note>
     }
 
-    <ion-grid>
-      <ion-row>
-        <ion-col>
-          <ion-button expand="full" type="submit">Login</ion-button>
-        </ion-col>
-        <ion-col>
-          <ion-button expand="full" type="button" (click)="openForgotPassword()">Forgot Password?</ion-button>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-
-    <ion-button expand="full" color="light" (click)="openRegisterForm()">Register</ion-button>
+    <ion-button expand="block" type="submit" color="primary" class="ion-margin-top">Login</ion-button>
+    <ion-button expand="block" type="button" color="medium" (click)="openForgotPassword()" class="ion-margin-top">Forgot Password?</ion-button>
+    <ion-button expand="block" color="light" (click)="openRegisterForm()" class="ion-margin-top">Register</ion-button>
 
   </form>
 </ion-content>
