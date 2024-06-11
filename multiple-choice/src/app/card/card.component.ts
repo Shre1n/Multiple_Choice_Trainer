@@ -13,21 +13,22 @@ import {ModuleService} from "../services/module.service";
 })
 export class CardComponent implements OnInit{
 
+  modules: any[] = [];
+
   constructor(private moduleService: ModuleService) { }
 
   ngOnInit(): void {
-    this.loadModules();
+    this.loadModules(); // Beispiel: Laden des Mathematik-Moduls
   }
 
   loadModules(): void {
-    // Laden von externen Modulen
-    const moduleName = 'module1'; // Êxample
-    this.moduleService.loadLocalModule(moduleName).subscribe(
+    this.moduleService.loadExternalModule().subscribe(
       response => {
-        console.log('Local Module:', response);
+        console.log('Modules loaded:', response);
+        this.modules = response;
       },
       error => {
-        console.error('Error loading local module:', error);
+        console.error('Error loading modules:', error);
       }
     );
   }
