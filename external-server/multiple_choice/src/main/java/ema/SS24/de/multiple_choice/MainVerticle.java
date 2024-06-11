@@ -47,7 +47,6 @@ public class MainVerticle extends AbstractVerticle {
       // Vergleiche die Anzahl der aktuellen Dateien mit der vorherigen Anzahl
       if (currentFileCount != previousFileCount) {
         System.out.println("Updates available!");
-        // Hier kannst du weitere Aktionen ausführen, z. B. Benachrichtigungen senden oder die Dateien herunterladen
       }
 
       // Aktualisiere previousFileCount mit der aktuellen Anzahl
