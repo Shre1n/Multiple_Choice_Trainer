@@ -42,8 +42,6 @@ public class MainVerticle extends AbstractVerticle {
       .allowedMethod(HttpMethod.OPTIONS)
       .allowedHeader("Content-Type"));
 
-    // Load achievements from file
-    loadAchievements();
 
     // Timer, der alle 24 Stunden ausgeführt wird
     vertx.setPeriodic(24 * 60 * 60 * 1000, timerId -> {
@@ -91,16 +89,6 @@ public class MainVerticle extends AbstractVerticle {
         loadAchievements();
         previousAchievementsHash = currentHash;
       }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  private void loadAchievements() {
-    try {
-      String content = new String(Files.readAllBytes(Paths.get(ACHIEVEMENTS_FILE)));
-      achievements = new JsonArray(content);
-      System.out.println(achievements.encodePrettily());
     } catch (IOException e) {
       e.printStackTrace();
     }
