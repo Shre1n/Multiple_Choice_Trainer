@@ -4,7 +4,7 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { RouteReuseStrategy, provideRouter } from '@angular/router';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
-import { AngularFireAuthModule } from '@angular/fire/compat/auth'; // Importiere AngularFireAuthModule
+import {provideHttpClient} from "@angular/common/http";
 
 
 import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalone';
@@ -26,5 +26,6 @@ bootstrapApplication(AppComponent, {
     provideFirestore(() => getFirestore()),
     provideIonicAngular(),
     provideRouter(routes),
+    provideHttpClient()
   ],
 });

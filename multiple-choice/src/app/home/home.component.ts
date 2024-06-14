@@ -1,6 +1,8 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {Component} from '@angular/core';
 import { Router } from '@angular/router';
 import {IonicModule, NavController} from "@ionic/angular";
+import {addIcons} from "ionicons";
+import {personOutline} from "ionicons/icons";
 
 @Component({
   selector: 'app-home',
@@ -11,13 +13,18 @@ import {IonicModule, NavController} from "@ionic/angular";
   ],
   standalone: true
 })
-export class HomeComponent {
+export class HomeComponent{
 
-  constructor(private router: Router, public navCtrl: NavController) { }
+
+  constructor(private router: Router, public navCtrl: NavController) {
+    addIcons({personOutline});
+  }
 
 
   openLoginForm(): void {
     this.router.navigate(['/login']);
+    this.navCtrl.pop();
   }
+
 
 }
