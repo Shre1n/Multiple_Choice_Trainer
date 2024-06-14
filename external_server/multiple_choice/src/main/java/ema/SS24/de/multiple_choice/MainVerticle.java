@@ -86,7 +86,7 @@ public class MainVerticle extends AbstractVerticle {
       assert currentHash != null;
       if (!currentHash.equals(previousAchievementsHash)) {
         System.out.println("Achievements updates available!");
-        loadAchievements();
+
         previousAchievementsHash = currentHash;
       }
     } catch (IOException e) {
