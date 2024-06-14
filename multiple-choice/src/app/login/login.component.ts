@@ -4,6 +4,7 @@ import {Router} from "@angular/router";
 import {IonicModule, NavController} from "@ionic/angular";
 import {FormsModule, NgForm} from "@angular/forms";
 import {ToastController} from "@ionic/angular/standalone";
+import {AchievementsService} from "../services/achievements.service";
 
 @Component({
   selector: 'app-login',
@@ -24,7 +25,11 @@ export class LoginComponent implements OnInit{
   errorMessage: string = '';
   isToastOpen = false;
 
-  constructor(private authService: AuthService, private router: Router, private toastController: ToastController, private navController: NavController) {
+  constructor(private authService: AuthService,
+              private router: Router,
+              private toastController: ToastController,
+              private navController: NavController,
+              private achievements: AchievementsService) {
   }
 
   ngOnInit() {
@@ -67,6 +72,7 @@ export class LoginComponent implements OnInit{
 
     try {
       const user = await this.authService.login(this.email, this.password);
+      await this.achievements.setIndexAchievement(user.uid, 1);
       await this.navController.pop();
       await this.router.navigate(['/home']);
     } catch (error: unknown) {

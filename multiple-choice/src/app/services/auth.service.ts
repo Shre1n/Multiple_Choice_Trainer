@@ -10,19 +10,28 @@ import {
   onAuthStateChanged,
   User
 } from '@angular/fire/auth';
-import { Firestore, collection, doc, getDoc, setDoc } from "@angular/fire/firestore";
+import {Firestore, collection, doc, getDoc, setDoc, updateDoc} from "@angular/fire/firestore";
 import { initializeApp } from "@angular/fire/app";
 import { environment } from "../../environments/environment";
+import {HttpClient} from "@angular/common/http";
+import {Observable } from "rxjs";
+import {Achievement} from "./achievements.service";
+
+interface AchievementsResponse {
+  achievements: {
+    [key: string]: Achievement; // Jeder Key ist eine Achievement-ID, Wert ist ein Achievement-Objekt
+  };
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-
-  private auth: Auth;
   private currentUser: User | null = null;
 
-  constructor(private firestore: Firestore) {
+  private readonly achievementsBaseUrl = 'http://localhost:8888/achievements';
+
+  constructor(private firestore: Firestore, private auth: Auth, private http: HttpClient) {
     const firebaseApp = initializeApp(environment.firebaseConfig);
     this.auth = getAuth(firebaseApp);
 
@@ -104,29 +113,4 @@ export class AuthService {
     await setDoc(userRef, { email: user.email, ...additionalData });
   }
 
-  async getUserData(uid: string): Promise<any> {
-    const userRef = doc(this.firestore, `users/${uid}`);
-    const userDoc = await getDoc(userRef);
-    if (userDoc.exists()) {
-      return userDoc.data();
-    } else {
-      throw new Error('User not found');
-    }
-  }
-
-  async saveUserAchievements(uid: string, achievements: any): Promise<void> {
-    const userRef = doc(this.firestore, `users/${uid}`);
-    await setDoc(userRef, { achievements }, { merge: true });
-  }
-
-  async getUserAchievements(uid: string): Promise<any[]> {
-    const userRef = doc(this.firestore, `users/${uid}`);
-    const userDoc = await getDoc(userRef);
-    if (userDoc.exists()) {
-      const data = userDoc.data();
-      return data?.['achievements'] || [];
-    } else {
-      throw new Error('User not found');
-    }
-  }
 }

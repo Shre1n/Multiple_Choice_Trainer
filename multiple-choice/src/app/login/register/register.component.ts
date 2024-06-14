@@ -4,6 +4,7 @@ import {Router} from "@angular/router";
 import {IonicModule, NavController} from "@ionic/angular";
 import {FormsModule} from "@angular/forms";
 import {ToastController} from "@ionic/angular/standalone";
+import {AchievementsService} from "../../services/achievements.service";
 
 @Component({
   selector: 'app-register',
@@ -23,7 +24,11 @@ export class RegisterComponent implements OnInit {
   errorMessage: string = '';
   isToastOpen = false;
 
-  constructor(private authService: AuthService, private router: Router, private toastController: ToastController, private navController: NavController) {}
+  constructor(private authService: AuthService,
+              private router: Router,
+              private toastController: ToastController,
+              private navController: NavController,
+              private achievements: AchievementsService) {}
 
   ngOnInit() {
     this.resetForm();
@@ -65,6 +70,7 @@ export class RegisterComponent implements OnInit {
     }
     try {
       const user = await this.authService.register(this.email, this.password, this.additionalData);
+      await this.achievements.initAchivements(user.uid);
       await this.authService.login(this.email, this.password);
       await this.navController.pop();
       await this.router.navigate(['/home']);

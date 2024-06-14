@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { map } from 'rxjs/operators';
+import {collection, doc, Firestore, getDoc, setDoc, updateDoc} from "@angular/fire/firestore";
+import {user} from "@angular/fire/auth";
 
 export interface Achievement {
   id: string;
@@ -18,34 +20,8 @@ export class AchievementsService {
   private achievements: Achievement[] = [];
   private userId: string | null = null;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private firestore: Firestore) {}
 
-
-  getUserAchievements(userId: string): Observable<any[]> {
-    const url = `${this.baseUrl}/${userId}`;
-    return this.http.get<any[]>(url);
-  }
-
-  generateUserAchievements(userId: string): Observable<any> {
-    const url = `${this.baseUrl}/generate/${userId}`;
-    return this.http.post<any>(url, {});
-  }
-
-  // Set the current user ID
-  setUserId(userId: string) {
-    this.userId = userId;
-  }
-
-  // Load achievements for the current user
-  loadAchievements(): Observable<Achievement[]> {
-    const url = `${this.baseUrl}/${this.userId}`;
-    return this.http.get<Achievement[]>(url).pipe(
-      map(achievements => {
-        this.achievements = achievements;
-        return achievements;
-      })
-    );
-  }
 
   // Load all achievements from the server
   getAllServerAchievements(): Observable<Achievement[]> {
@@ -53,20 +29,76 @@ export class AchievementsService {
     return this.http.get<Achievement[]>(url);
   }
 
-  // Update the status of a specific achievement
-  updateAchievementStatus(id: string, achieved: boolean): void {
-    const achievement = this.achievements.find(a => a.id === id);
-    if (achievement) {
-      achievement.achieved = achieved;
-      this.saveAchievements();
+
+  async getAchievements(userID: string) {
+    try {
+      const docRef = await getDoc(doc(this.firestore, `users/${userID}`));
+      if (docRef.exists()) {
+        const data = docRef.data();
+        this.achievements = data['achievements'] || [];
+      }
+    } catch (error) {
+      console.log(error);
     }
   }
 
-  // Save achievements for the current user
-  saveAchievements(): void {
-    const url = `${this.baseUrl}/${this.userId}`;
-    this.http.post(url, this.achievements).subscribe();
+  async initAchivements(userID: string){
+    const serverAchievements = await this.getAllServerAchievements().toPromise();
+    const userRef = doc(this.firestore, `users/${userID}`);
+    try{
+     await setDoc(userRef, {
+       serverAchievements
+     }, { merge: true });
+    }catch (error) {
+      console.log(error)
+    }
   }
+
+  async updateAchivement(userID: string, achievement: Achievement){
+    const userRef = doc(this.firestore, `users/${userID}`);
+    try{
+      await updateDoc(userRef, {
+        achievements: this.http.get<Achievement[]>(this.baseUrl)
+      });
+    }catch (error) {
+      console.log(error)
+    }
+  }
+
+  async setIndexAchievement(userID: string, index: number) {
+    const userRef = doc(this.firestore, `users/${userID}`);
+    const serverAchievements = await this.getAllServerAchievements().toPromise();
+    try{
+      // Holen Sie die aktuellen Daten des Benutzers
+      const userDoc = await getDoc(userRef);
+      const userData = userDoc.data();
+
+      if (userData) {
+        const serverAchievements = userData['serverAchievements'] || {};
+        const updatedAchievements = {
+          ...serverAchievements,
+          achievements: {
+            ...serverAchievements.achievements,
+            [index]: {
+              ...serverAchievements.achievements[index],
+              achieved: true
+            }
+          }
+        };
+        await updateDoc(userRef, {
+          serverAchievements: updatedAchievements
+        });
+
+        console.log(`Achievement ${index} für Benutzer ${userID} aktualisiert.`);
+      } else {
+        console.error(`Benutzer ${userID} nicht gefunden.`);
+      }
+    } catch (error){
+      console.log(error)
+    }
+  }
+
+
 
   // Get a specific achievement by ID
   getAchievementById(id: string): Achievement | undefined {

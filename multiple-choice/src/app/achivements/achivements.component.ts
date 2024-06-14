@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import {IonicModule} from "@ionic/angular";
-import {AchievementsService, Achievement} from "../services/achievements.service";
-import {ToastController} from "@ionic/angular/standalone";
-
-import 'firebase/auth';
-import {AuthService} from "../services/auth.service";
+import { IonicModule } from "@ionic/angular";
+import { ToastController } from "@ionic/angular";
+import { Achievement, AchievementsService } from "../services/achievements.service";
+import { AuthService } from "../services/auth.service";
+import {doc, getDoc} from "@angular/fire/firestore";
 
 @Component({
-  selector: 'app-achivements',
+  selector: 'app-achievements',
   templateUrl: './achivements.component.html',
   styleUrls: ['./achivements.component.scss'],
   imports: [
@@ -15,20 +14,18 @@ import {AuthService} from "../services/auth.service";
   ],
   standalone: true
 })
-export class AchivementsComponent implements OnInit{
+export class AchivementsComponent implements OnInit {
 
   achievements: Achievement[] = [];
   errorMessage: string = 'No Connection to Achievement Server! 😢';
 
-
-  constructor(private achievementsService: AchievementsService,private authService: AuthService, private toastCtrl: ToastController) {}
+  constructor(private achievementsService: AchievementsService, private authService: AuthService, private toastCtrl: ToastController) {}
 
   ngOnInit(): void {
     this.authService.getAuth().onAuthStateChanged(async user => {
       if (user) {
-        this.achievementsService.setUserId(user.uid);
         try {
-          this.achievements = await this.authService.getUserAchievements(user.uid);
+          // hier laden von user spezifischen Achievements
         } catch (error) {
           console.error('Failed to load user achievements', error);
           await this.presentToast('middle');
@@ -38,44 +35,27 @@ export class AchivementsComponent implements OnInit{
       }
     });
 
-
     // Lade Achievements, falls bereits eine UserID vorhanden ist (z.B. bei page refresh)
     this.authService.getCurrentUserId().then(userId => {
       if (userId) {
-        this.loadAchievements();
+        // this.loadAchievements(userId);
       }
     });
 
-
     this.loadServerAchievements();
-    // this.achievementsService.loadAchievements().subscribe(data => this.achievements = data);
   }
 
-  loadServerAchievements() {
-    this.achievementsService.getAllServerAchievements().subscribe(
-      (response) => {
-        console.log('Achievements Loaded:', response); // Log the actual response
-        this.achievements = response;
-      },
-      (error) => {
-        console.error('Error loading achievements:', error);
-        this.presentToast('middle');
-      }
-    );
+  async loadServerAchievements() {
+    try {
+      const achievements = await this.achievementsService.getAllServerAchievements().toPromise();
+      console.log('Server Achievements Loaded:', achievements);
+      this.achievements = achievements || [];
+    } catch (error) {
+      console.error('Error loading server achievements:', error);
+      await this.presentToast('middle');
+    }
   }
 
-  loadAchievements() {
-    this.achievementsService.loadAchievements().subscribe(
-      (response) => {
-        console.log('Achievements Loaded for user:', response); // Log the actual response
-        this.achievements = response;
-      },
-      (error) => {
-        console.error('Error loading achievements:', error);
-        this.presentToast('middle');
-      }
-    );
-  }
 
   async presentToast(position: 'middle') {
     const toast = await this.toastCtrl.create({
@@ -85,14 +65,6 @@ export class AchivementsComponent implements OnInit{
     });
 
     await toast.present();
-  }
-
-  onAchievementComplete(id: string): void {
-    const achievement = this.achievementsService.getAchievementById(id);
-    if (achievement) {
-      achievement.achieved = true;
-      this.achievementsService.updateAchievementStatus(id, true);
-    }
   }
 
 }

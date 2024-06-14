@@ -56,8 +56,6 @@ public class MainVerticle extends AbstractVerticle {
     router.get("/load-all-modules").handler(this::handleLoadAllModules);
     router.get("/check-updates").handler(this::handleCheckUpdates);
     router.get("/achievements").handler(this::handleGetAchievements);
-    router.get("/achievements/:userId").handler(this::handleGetUserAchievements);
-    router.post("/achievements/generate/:userId").handler(this::handleGenerateUserAchievements);
 
     vertx.createHttpServer()
       .requestHandler(router)
@@ -97,14 +95,14 @@ public class MainVerticle extends AbstractVerticle {
   }
 
   // Methode zum Abrufen der Achievements
+  // Methode zum Abrufen der Achievements
   private void handleGetAchievements(RoutingContext routingContext) {
     FileSystem fileSystem = vertx.fileSystem();
-    JsonObject achievements = new JsonObject();
     fileSystem.readFile(ACHIEVEMENTS_FILE, result -> {
       if (result.succeeded()) {
         try {
           JsonObject json = new JsonObject(result.result());
-          achievements.put(ACHIEVEMENTS_FILE, json);
+          JsonObject achievements = new JsonObject().put("achievements", json);
           routingContext.response()
             .putHeader("content-type", "application/json")
             .end(achievements.encodePrettily());
