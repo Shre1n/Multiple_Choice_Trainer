@@ -31,6 +31,8 @@ public class MainVerticle extends AbstractVerticle {
   private static final String ACHIEVEMENTS_FILE = "achievements/achievements.json";
   private JsonArray achievements = new JsonArray();
 
+  private Map<String, JsonObject> userAchievements = new HashMap<>();
+
   @Override
   public void start() {
     Router router = Router.router(vertx);
@@ -41,7 +43,6 @@ public class MainVerticle extends AbstractVerticle {
       .allowedMethod(HttpMethod.PUT)
       .allowedMethod(HttpMethod.OPTIONS)
       .allowedHeader("Content-Type"));
-
 
     // Timer, der alle 24 Stunden ausgeführt wird
     vertx.setPeriodic(24 * 60 * 60 * 1000, timerId -> {
@@ -55,6 +56,8 @@ public class MainVerticle extends AbstractVerticle {
     router.get("/load-all-modules").handler(this::handleLoadAllModules);
     router.get("/check-updates").handler(this::handleCheckUpdates);
     router.get("/achievements").handler(this::handleGetAchievements);
+    router.get("/achievements/:userId").handler(this::handleGetUserAchievements);
+    router.post("/achievements/generate/:userId").handler(this::handleGenerateUserAchievements);
 
     vertx.createHttpServer()
       .requestHandler(router)
@@ -86,7 +89,6 @@ public class MainVerticle extends AbstractVerticle {
       assert currentHash != null;
       if (!currentHash.equals(previousAchievementsHash)) {
         System.out.println("Achievements updates available!");
-
         previousAchievementsHash = currentHash;
       }
     } catch (IOException e) {
@@ -114,6 +116,63 @@ public class MainVerticle extends AbstractVerticle {
       }
     });
   }
+
+
+  // Methode zum Abrufen der Achievements
+  private void handleGetUserAchievements(RoutingContext routingContext) {
+    String userId = routingContext.pathParam("userId");
+
+    JsonObject achievements = userAchievements.getOrDefault(userId, new JsonObject().put("achievements", new JsonArray()));
+    routingContext.response()
+      .putHeader("content-type", "application/json")
+      .end(achievements.encodePrettily());
+  }
+
+  private void handleGenerateUserAchievements(RoutingContext routingContext) {
+    String userId = routingContext.pathParam("userId");
+
+    // Generate achievements for the user
+    JsonObject generatedAchievements = generateAchievementsForUser(userId);
+
+    // Store or update achievements for the user
+    userAchievements.put(userId, generatedAchievements);
+
+    routingContext.response()
+      .putHeader("content-type", "application/json")
+      .end(generatedAchievements.encodePrettily());
+  }
+
+  // Generiere Achievements für einen bestimmten Benutzer basierend auf der achievements.json Datei
+  private JsonObject generateAchievementsForUser(String userId) {
+    JsonArray userAchievementsArray = new JsonArray();
+    try {
+      byte[] fileContent = Files.readAllBytes(Paths.get(ACHIEVEMENTS_FILE));
+      JsonArray allAchievements = new JsonArray(new String(fileContent));
+
+      for (int i = 0; i < allAchievements.size(); i++) {
+        JsonObject achievement = allAchievements.getJsonObject(i);
+
+        // Erstelle ein neues Achievement für den spezifischen Benutzer
+        JsonObject userAchievement = new JsonObject();
+        userAchievement.put("id", achievement.getString("id"));
+        userAchievement.put("name", achievement.getString("name"));
+        userAchievement.put("description", achievement.getString("description"));
+        userAchievement.put("achieved", false); // Default-Wert für achieved
+
+        // Füge das Achievement zum Array der Benutzerachievements hinzu
+        userAchievementsArray.add(userAchievement);
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    // Erstelle ein JsonObject, das alle Benutzerachievements enthält
+    JsonObject userAchievementsJson = new JsonObject();
+    userAchievementsJson.put("achievements", userAchievementsArray);
+
+    return userAchievementsJson;
+  }
+
 
 
   private void checkForUpdates() {

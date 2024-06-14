@@ -65,10 +65,9 @@ export class RegisterComponent implements OnInit {
     }
     try {
       const user = await this.authService.register(this.email, this.password, this.additionalData);
+      await this.authService.login(this.email, this.password);
       await this.navController.pop();
       await this.router.navigate(['/home']);
-      this.setOpen(true);
-      await this.presentToast('middle');
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.errorMessage = error.message;

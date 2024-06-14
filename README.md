@@ -78,6 +78,9 @@ Beispiel:
 > export M2_HOME="/Users/pankaj/Downloads/apache-maven-3.6.3"
 PATH="${M2_HOME}/bin:${PATH}"
 export PATH
+>
+
+Mehr unter [How to install maven on macos](https://www.digitalocean.com/community/tutorials/install-maven-mac-os)
 
 
 Nun können Sie den Vertx Server, welcher sich im external_server/multiple_choice befindet starten.
