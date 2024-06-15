@@ -281,8 +281,10 @@ public class MainVerticle extends AbstractVerticle {
       if (file.isFile() && file.getName().endsWith(".json")) {
         vertx.fileSystem().readFile(file.getAbsolutePath(), res -> {
           if (res.succeeded()) {
+            String fileName = file.getName();
+            String moduleName = fileName.substring(0, fileName.lastIndexOf('.'));
             JsonObject json = new JsonObject(res.result());
-            modulesArray.put(file.getName(), json);
+            modulesArray.put(moduleName, json);
             if (count.decrementAndGet() == 0) {
               routingContext.response()
                 .putHeader("content-type", "application/json")
@@ -292,7 +294,17 @@ public class MainVerticle extends AbstractVerticle {
             routingContext.response().setStatusCode(500).end("Could not load modules");
           }
         });
+      } else {
+          count.decrementAndGet();
       }
     }
-  }
+
+    if (count.get() == 0) {
+      // Handle case where no .json files are found
+      routingContext.response()
+          .putHeader("content-type", "application/json")
+          .end(modulesArray.encodePrettily());
+    }
+
+}
 }
