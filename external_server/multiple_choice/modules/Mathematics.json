@@ -2,7 +2,9 @@
   "category": "Mathematics",
   "modules": [
     {
+
       "name": "Module 1",
+      "question": "What is 2+2?",
       "description": "This is module 1",
       "answeredCorrectlyCount": 0,
       "answeredIncorrectlyCount": 0,
@@ -14,12 +16,7 @@
           "3": 4
         }
       ],
-      "correctAnswers": [
-        {
-          "question": "What is 2+2?",
-          "answer": 3
-        }
-      ]
+      "correctAnswer": 3
     },
     {
       "name": "Module 2",
