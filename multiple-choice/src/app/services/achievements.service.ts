@@ -75,6 +75,12 @@ export class AchievementsService {
 
       if (userData) {
         const serverAchievements = userData['serverAchievements'] || {};
+
+        // Überprüfen, ob das Achievement bereits erreicht wurde
+        if (serverAchievements.achievements[index].achieved) {
+          return;
+        }
+
         const updatedAchievements = {
           ...serverAchievements,
           achievements: {
