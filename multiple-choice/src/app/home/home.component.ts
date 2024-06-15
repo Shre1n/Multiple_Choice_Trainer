@@ -1,8 +1,9 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import { Router } from '@angular/router';
 import {IonicModule, NavController} from "@ionic/angular";
 import {addIcons} from "ionicons";
-import {personOutline} from "ionicons/icons";
+import {personOutline,logOutOutline} from "ionicons/icons";
+import {AuthService} from "../services/auth.service";
 
 @Component({
   selector: 'app-home',
@@ -13,13 +14,33 @@ import {personOutline} from "ionicons/icons";
   ],
   standalone: true
 })
-export class HomeComponent{
+export class HomeComponent implements OnInit{
+
+  isLoggedIn: boolean = false;
 
 
-  constructor(private router: Router, public navCtrl: NavController) {
-    addIcons({personOutline});
+  constructor(private router: Router,
+              public navCtrl: NavController,
+              private authService: AuthService,) {
+    addIcons({personOutline, logOutOutline});
   }
 
+  ngOnInit() {
+    this.checkLoginStatus();
+  }
+
+
+  checkLoginStatus() {
+    const user = this.authService.getCurrentUser();
+    this.isLoggedIn = user !== null;
+    console.log(this.isLoggedIn)
+  }
+
+  async logout() {
+    await this.authService.logout();
+    this.isLoggedIn = false;
+    await this.navCtrl.navigateRoot(['/home']);
+  }
 
   openLoginForm(): void {
     this.router.navigate(['/login']);

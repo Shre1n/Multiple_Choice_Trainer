@@ -29,8 +29,6 @@ interface AchievementsResponse {
 export class AuthService {
   private currentUser: User | null = null;
 
-  private readonly achievementsBaseUrl = 'http://localhost:8888/achievements';
-
   constructor(private firestore: Firestore, private auth: Auth, private http: HttpClient) {
     const firebaseApp = initializeApp(environment.firebaseConfig);
     this.auth = getAuth(firebaseApp);
@@ -43,6 +41,18 @@ export class AuthService {
 
   getAuth(): Auth {
     return this.auth;
+  }
+
+  async getCurrentUser(): Promise<User | null> {
+    if (this.currentUser === null) {
+      this.currentUser = await new Promise<User | null>((resolve) => {
+        const unsubscribe = onAuthStateChanged(this.auth, (user) => {
+          unsubscribe();
+          resolve(user);
+        });
+      });
+    }
+    return this.currentUser;
   }
 
   async getCurrentUserId(): Promise<string | null> {
@@ -85,14 +95,8 @@ export class AuthService {
       const user = userCredential.user;
       await this.saveUserData(user, additionalData);
       return user;
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error('Registration error:', error);
-        throw new Error(`Registration failed: ${error.message}`);
-      } else {
-        console.error('Unknown registration error');
-        throw new Error('An unknown error occurred during registration.');
-      }
+    } catch (error) {
+      throw error;
     }
   }
 
