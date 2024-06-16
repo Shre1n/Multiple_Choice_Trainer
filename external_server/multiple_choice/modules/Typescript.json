@@ -3,7 +3,8 @@
   "modules": [
     {
       "name": "Module 1",
-      "description": "This is TypeScript module 2",
+      "question": "TypeScript is a ___ of JavaScript.",
+      "description": "This is TypeScript module 1",
       "answeredCorrectlyCount": 0,
       "answeredIncorrectlyCount": 0,
       "answers": [
@@ -14,16 +15,12 @@
           "3": "A database query language"
         }
       ],
-      "correctAnswers": [
-        {
-          "question": "TypeScript is a ___ of JavaScript.",
-          "answer": 1
-        }
-      ]
+      "correctAnswer": "A superset of JavaScript"
     },
     {
       "name": "Module 2",
-      "description": "This is TypeScript module 3",
+      "question": "When was TypeScript first released?",
+      "description": "This is TypeScript module 2",
       "answeredCorrectlyCount": 0,
       "answeredIncorrectlyCount": 0,
       "answers": [
@@ -34,12 +31,7 @@
           "3": "2010"
         }
       ],
-      "correctAnswers": [
-        {
-          "question": "When was TypeScript first released?",
-          "answer": 2
-        }
-      ]
+      "correctAnswer": "2012"
     }
   ]
 }

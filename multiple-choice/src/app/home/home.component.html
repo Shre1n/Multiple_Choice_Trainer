@@ -10,8 +10,23 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
+  <ion-grid>
+    <ion-row>
+      @for (category of categories; track categories) {
+        <ion-col size="6">
+          <ion-card button [ngStyle]="{'background-color': getCategoryBackground(category)}">
+            <ion-card-header class="ion-text-center">
+              <ion-card-title>{{ category }}</ion-card-title>
+            </ion-card-header>
+            <ion-card-content class="ion-text-center">
+              <ion-icon [name]="getCategoryIcon(category)" style="color: #f6f7f9"></ion-icon>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      }
+    </ion-row>
+  </ion-grid>
 
-  <p>home works</p>
 
   <ion-fab horizontal="end" vertical="bottom" slot="fixed">
     @if (!isLoggedIn) {
@@ -22,8 +37,6 @@
       </ion-fab-button>
     }
   </ion-fab>
-
-
 
 
 </ion-content>
