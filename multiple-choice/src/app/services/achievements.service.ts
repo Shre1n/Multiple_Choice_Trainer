@@ -18,7 +18,6 @@ export interface Achievement {
 export class AchievementsService {
   private baseUrl = 'http://localhost:8888/achievements';
   private achievements: Achievement[] = [];
-  private userId: string | null = null;
 
   constructor(private http: HttpClient, private firestore: Firestore) {}
 
@@ -54,22 +53,10 @@ export class AchievementsService {
     }
   }
 
-  async updateAchivement(userID: string, achievement: Achievement){
-    const userRef = doc(this.firestore, `users/${userID}`);
-    try{
-      await updateDoc(userRef, {
-        achievements: this.http.get<Achievement[]>(this.baseUrl)
-      });
-    }catch (error) {
-      console.log(error)
-    }
-  }
-
   async setIndexAchievement(userID: string, index: number) {
     const userRef = doc(this.firestore, `users/${userID}`);
-    const serverAchievements = await this.getAllServerAchievements().toPromise();
     try{
-      // Holen Sie die aktuellen Daten des Benutzers
+      // Hole die aktuellen Daten des Benutzers
       const userDoc = await getDoc(userRef);
       const userData = userDoc.data();
 
@@ -95,24 +82,17 @@ export class AchievementsService {
           serverAchievements: updatedAchievements
         });
 
-        console.log(`Achievement ${index} für Benutzer ${userID} aktualisiert.`);
       } else {
         console.error(`Benutzer ${userID} nicht gefunden.`);
+        // No User found maybe throw error to frontend
       }
     } catch (error){
       console.log(error)
     }
   }
 
-
-
   // Get a specific achievement by ID
   getAchievementById(id: string): Achievement | undefined {
     return this.achievements.find(a => a.id === id);
-  }
-
-  // Get all achievements for the current user
-  getAllAchievements(): Achievement[] {
-    return this.achievements;
   }
 }

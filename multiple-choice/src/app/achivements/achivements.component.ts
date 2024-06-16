@@ -25,7 +25,7 @@ export class AchivementsComponent implements OnInit {
     this.authService.getAuth().onAuthStateChanged(async user => {
       if (user) {
         try {
-          // hier laden von user spezifischen Achievements
+          // load achievements from user in firestore /users/{userId}
         } catch (error) {
           console.error('Failed to load user achievements', error);
           await this.presentToast('middle');
@@ -38,7 +38,7 @@ export class AchivementsComponent implements OnInit {
     // Lade Achievements, falls bereits eine UserID vorhanden ist (z.B. bei page refresh)
     this.authService.getCurrentUserId().then(userId => {
       if (userId) {
-        // this.loadAchievements(userId);
+        // load achievements from user in firestore /users/{userId}
       }
     });
 
