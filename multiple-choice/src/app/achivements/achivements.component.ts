@@ -1,9 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { IonicModule } from "@ionic/angular";
-import { ToastController } from "@ionic/angular";
-import { Achievement, AchievementsService } from "../services/achievements.service";
-import { AuthService } from "../services/auth.service";
-import {doc, getDoc} from "@angular/fire/firestore";
+import {Component, OnInit} from '@angular/core';
+import {IonicModule, ToastController} from "@ionic/angular";
+import {Achievement, AchievementsService} from "../services/achievements.service";
+import {AuthService} from "../services/auth.service";
 
 @Component({
   selector: 'app-achievements',
@@ -17,15 +15,16 @@ import {doc, getDoc} from "@angular/fire/firestore";
 export class AchivementsComponent implements OnInit {
 
   achievements: Achievement[] = [];
+  serverAchievements: Achievement[] = [];
   errorMessage: string = 'No Connection to Achievement Server! 😢';
 
   constructor(private achievementsService: AchievementsService, private authService: AuthService, private toastCtrl: ToastController) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.authService.getAuth().onAuthStateChanged(async user => {
       if (user) {
         try {
-          // load achievements from user in firestore /users/{userId}
+          this.achievements = await this.achievementsService.getAchievements(user.uid);
         } catch (error) {
           console.error('Failed to load user achievements', error);
           await this.presentToast('middle');
@@ -35,27 +34,30 @@ export class AchivementsComponent implements OnInit {
       }
     });
 
-    // Lade Achievements, falls bereits eine UserID vorhanden ist (z.B. bei page refresh)
-    this.authService.getCurrentUserId().then(userId => {
+    this.authService.getCurrentUserId().then(async userId => {
       if (userId) {
-        // load achievements from user in firestore /users/{userId}
+        try {
+          this.achievements = await this.achievementsService.getAchievements(userId);
+        } catch (error) {
+          console.error('Failed to load user achievements', error);
+          await this.presentToast('middle');
+        }
       }
     });
 
-    this.loadServerAchievements();
+    await this.loadServerAchievements();
   }
 
   async loadServerAchievements() {
     try {
       const achievements = await this.achievementsService.getAllServerAchievements().toPromise();
       console.log('Server Achievements Loaded:', achievements);
-      this.achievements = achievements || [];
+      this.serverAchievements = achievements || [];
     } catch (error) {
       console.error('Error loading server achievements:', error);
       await this.presentToast('middle');
     }
   }
-
 
   async presentToast(position: 'middle') {
     const toast = await this.toastCtrl.create({

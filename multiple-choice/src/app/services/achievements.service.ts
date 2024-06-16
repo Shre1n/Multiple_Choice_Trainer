@@ -4,6 +4,7 @@ import { Observable } from "rxjs";
 import { map } from 'rxjs/operators';
 import {collection, doc, Firestore, getDoc, setDoc, updateDoc} from "@angular/fire/firestore";
 import {user} from "@angular/fire/auth";
+import {logoFacebook} from "ionicons/icons";
 
 export interface Achievement {
   id: string;
@@ -29,15 +30,28 @@ export class AchievementsService {
   }
 
 
-  async getAchievements(userID: string) {
+  async getAchievements(userID: string): Promise<Achievement[]> {
     try {
       const docRef = await getDoc(doc(this.firestore, `users/${userID}`));
       if (docRef.exists()) {
         const data = docRef.data();
-        this.achievements = data['achievements'] || [];
+        this.achievements = data['serverAchievements']['achievements'] || [];
+        return Object.values(this.achievements)
+          .filter((achievement: Achievement) => achievement.achieved)
+          .map((achievement: Achievement) => ({
+            id: achievement.id,
+            name: achievement.name,
+            description: achievement.description,
+            achieved: achievement.achieved,
+          }));
+
+      }else {
+        console.error(`No document found for user ${userID}`);
+        return []; // Return an empty array if document does not exist
       }
     } catch (error) {
       console.log(error);
+      return [];
     }
   }
 
