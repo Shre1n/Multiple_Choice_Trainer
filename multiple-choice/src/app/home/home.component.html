@@ -14,12 +14,12 @@
     <ion-row>
       @for (category of categories; track categories) {
         <ion-col size="6">
-          <ion-card button color="primary">
+          <ion-card button [ngStyle]="{'background-color': getCategoryBackground(category)}">
             <ion-card-header class="ion-text-center">
               <ion-card-title>{{ category }}</ion-card-title>
             </ion-card-header>
             <ion-card-content class="ion-text-center">
-              <ion-icon [name]="getCategoryIcon(category)"></ion-icon>
+              <ion-icon [name]="getCategoryIcon(category)" style="color: #f6f7f9"></ion-icon>
             </ion-card-content>
           </ion-card>
         </ion-col>

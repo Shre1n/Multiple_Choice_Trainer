@@ -6,13 +6,15 @@ import { personOutline, logOutOutline, calculatorOutline, schoolOutline, codeSla
 import {AuthService} from "../services/auth.service";
 import {ModuleService} from "../services/module.service";
 import {ToastController} from "@ionic/angular/standalone";
+import {NgStyle} from "@angular/common";
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
   imports: [
-    IonicModule
+    IonicModule,
+    NgStyle
   ],
   standalone: true
 })
@@ -67,11 +69,21 @@ export class HomeComponent implements OnInit{
     const icons: { [key: string]: string } = {
       'Mathematics': 'calculator-outline',
       'TypeScript': 'code-slash-outline',
-      'Science': 'school-outline',
-      // Fügen Sie hier weitere Kategorien und entsprechende Icons hinzu
+      // Füge hier weitere Kategorien und entsprechende Icons hinzu
     };
     return icons[category] || 'help-outline'; // Standardicon, wenn keine Kategorie übereinstimmt
   }
+
+  getCategoryBackground(category: string): string {
+    const backgrounds: { [key: string]: string } = {
+      'Mathematics': 'var(--ion-color-primary)',
+      'TypeScript': 'var(--ion-color-info)',
+      // Füge hier weitere Kategorien und entsprechende Hintergründe hinzu
+    };
+    return backgrounds[category] || 'var(--ion-color-light)'; // Standardhintergrund, wenn keine Kategorie übereinstimmt
+  }
+
+
 
   extractCategories(modules: any): void {
     this.categories = Object.keys(modules).map(key => modules[key].category);
