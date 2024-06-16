@@ -15,7 +15,7 @@ import {AuthService} from "../services/auth.service";
 export class AchivementsComponent implements OnInit {
 
   achievements: Achievement[] = [];
-  serverAchievements: Achievement[] = [];
+  notAchieved: Achievement[] = [];
   errorMessage: string = 'No Connection to Achievement Server! 😢';
 
   constructor(private achievementsService: AchievementsService, private authService: AuthService, private toastCtrl: ToastController) {}
@@ -24,7 +24,8 @@ export class AchivementsComponent implements OnInit {
     this.authService.getAuth().onAuthStateChanged(async user => {
       if (user) {
         try {
-          this.achievements = await this.achievementsService.getAchievements(user.uid);
+          this.achievements = await this.achievementsService.getUserAchievements(user.uid);
+          this.notAchieved = await this.achievementsService.getAchievements(user.uid);
         } catch (error) {
           console.error('Failed to load user achievements', error);
           await this.presentToast('middle');
@@ -37,6 +38,7 @@ export class AchivementsComponent implements OnInit {
     this.authService.getCurrentUserId().then(async userId => {
       if (userId) {
         try {
+          this.achievements = await this.achievementsService.getUserAchievements(userId);
           this.achievements = await this.achievementsService.getAchievements(userId);
         } catch (error) {
           console.error('Failed to load user achievements', error);
@@ -44,26 +46,13 @@ export class AchivementsComponent implements OnInit {
         }
       }
     });
-
     await this.loadServerAchievements();
   }
 
   async loadServerAchievements() {
     try {
       const achievements = await this.achievementsService.getAllServerAchievements().toPromise();
-      const achievementsArray: Achievement[] = [];
-      // @ts-ignore
-      Object.keys(achievements.achievements).forEach(key => {
-        // @ts-ignore
-        const achievement = achievements.achievements[key];
-        achievementsArray.push({
-          id: achievement.id,
-          name: achievement.name,
-          description: achievement.description,
-          achieved: achievement.achieved
-        });
-      });
-      this.serverAchievements = achievementsArray;
+      this.notAchieved = achievements || [];
     } catch (error) {
       console.error('Error loading server achievements:', error);
       await this.presentToast('middle');

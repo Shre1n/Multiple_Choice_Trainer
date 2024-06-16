@@ -29,6 +29,31 @@ export class AchievementsService {
     return this.http.get<Achievement[]>(url);
   }
 
+  async getUserAchievements(userID: string): Promise<Achievement[]> {
+    try {
+      const docRef = await getDoc(doc(this.firestore, `users/${userID}`));
+      if (docRef.exists()) {
+        const data = docRef.data();
+        this.achievements = data['serverAchievements']['achievements'] || [];
+        return Object.values(this.achievements)
+          .filter((achievement: Achievement) => achievement.achieved)
+          .map((achievement: Achievement) => ({
+            id: achievement.id,
+            name: achievement.name,
+            description: achievement.description,
+            achieved: achievement.achieved,
+          }));
+
+      }else {
+        console.error(`No document found for user ${userID}`);
+        return []; // Return an empty array if document does not exist
+      }
+    } catch (error) {
+      console.log(error);
+      return [];
+    }
+  }
+
 
   async getAchievements(userID: string): Promise<Achievement[]> {
     try {
@@ -37,7 +62,7 @@ export class AchievementsService {
         const data = docRef.data();
         this.achievements = data['serverAchievements']['achievements'] || [];
         return Object.values(this.achievements)
-          .filter((achievement: Achievement) => achievement.achieved)
+          .filter((achievement: Achievement) => !achievement.achieved)
           .map((achievement: Achievement) => ({
             id: achievement.id,
             name: achievement.name,

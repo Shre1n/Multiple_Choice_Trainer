@@ -1,16 +1,32 @@
 <ion-content>
-  <ion-list>
-    @for (achievement of achievements; track achievements) {
-      <ion-item>
-        <ion-label>{{ achievement.name }}</ion-label>
-        <p>{{ achievement.description }}</p>
-      </ion-item>
-    }
-    @for (achievement of serverAchievements; track serverAchievements) {
-      <ion-item>
-        <ion-label>{{ achievement.name }}</ion-label>
-        <p>{{ achievement.description }}</p>
-      </ion-item>
-    }
-  </ion-list>
+  @if (achievements && achievements.length > 0) {
+    <ion-list>
+      @for (achievement of achievements; track achievements) {
+        <ion-item>
+          <ion-label>{{ achievement.name }}</ion-label>
+          <p>{{ achievement.description }}</p>
+        </ion-item>
+      }
+    </ion-list>
+  }
+  @if (!achievements || achievements.length === 0) {
+    <div>
+      No achievements to display.
+    </div>
+  }
+  @if (notAchieved && notAchieved.length > 0) {
+    <ion-list>
+      @for (achievement of notAchieved; track notAchieved) {
+        <ion-item>
+          <ion-label>{{ achievement.name }}</ion-label>
+          <p>{{ achievement.description }}</p>
+        </ion-item>
+      }
+    </ion-list>
+  }
+  @if (!notAchieved || notAchieved.length === 0) {
+    <div>
+      No achievements to display.
+    </div>
+  }
 </ion-content>
