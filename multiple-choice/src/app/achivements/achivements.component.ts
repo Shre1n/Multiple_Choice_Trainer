@@ -51,8 +51,19 @@ export class AchivementsComponent implements OnInit {
   async loadServerAchievements() {
     try {
       const achievements = await this.achievementsService.getAllServerAchievements().toPromise();
-      console.log('Server Achievements Loaded:', achievements);
-      this.serverAchievements = achievements || [];
+      const achievementsArray: Achievement[] = [];
+      // @ts-ignore
+      Object.keys(achievements.achievements).forEach(key => {
+        // @ts-ignore
+        const achievement = achievements.achievements[key];
+        achievementsArray.push({
+          id: achievement.id,
+          name: achievement.name,
+          description: achievement.description,
+          achieved: achievement.achieved
+        });
+      });
+      this.serverAchievements = achievementsArray;
     } catch (error) {
       console.error('Error loading server achievements:', error);
       await this.presentToast('middle');
