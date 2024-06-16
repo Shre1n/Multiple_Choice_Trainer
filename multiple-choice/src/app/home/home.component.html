@@ -10,8 +10,14 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
+  <ion-list>
+    @for(category of categories; track categories){
+      <ion-item>
+        {{category}}
+      </ion-item>
+    }
+  </ion-list>
 
-  <p>home works</p>
 
   <ion-fab horizontal="end" vertical="bottom" slot="fixed">
     @if (!isLoggedIn) {

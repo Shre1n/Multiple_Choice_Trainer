@@ -22,6 +22,8 @@ export class HomeComponent implements OnInit{
   modules: any[] = [];
   errorMessage: string = 'No Connection to External Server! 😢';
 
+  categories: string[] = [];
+
 
   constructor(private router: Router,
               public navCtrl: NavController,
@@ -52,12 +54,17 @@ export class HomeComponent implements OnInit{
       response => {
         console.log('Modules loaded:', response);
         this.modules = response;
+        this.extractCategories(response);
       },
       error => {
         console.error('Error loading modules:', error);
         this.presentToast('middle');
       }
     );
+  }
+
+  extractCategories(modules: any): void {
+    this.categories = Object.keys(modules).map(key => modules[key].category);
   }
 
   checkForUpdates(): void {
