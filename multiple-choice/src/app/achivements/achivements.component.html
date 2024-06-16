@@ -1,11 +1,33 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title slot="start">Achievements</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+
 <ion-content>
   @if (achievements && achievements.length > 0) {
     <ion-list>
+      <ion-card class="ion-center">
+        <h3 >Erfolgreich abgeschlossende Achievements!</h3>
+      </ion-card>
       @for (achievement of achievements; track achievements) {
-        <ion-item class="achieved">
-          <ion-label>{{ achievement.name }}</ion-label>
-          <p>{{ achievement.description }}</p>
-        </ion-item>
+        <ion-card class="achieved">
+          <ion-grid>
+            <ion-row>
+              <ion-col size="2">
+                 <span>
+                   <img src="../../{{achievement.img}}" alt="achievement">
+                 </span>
+              </ion-col>
+              <ion-col size="10" >
+                <p>{{ achievement.name }}</p>
+                <p>{{ achievement.description }}</p>
+              </ion-col>
+
+            </ion-row>
+          </ion-grid>
+        </ion-card>
       }
     </ion-list>
   }
@@ -13,15 +35,32 @@
 
   @if (notAchieved && notAchieved.length > 0) {
     <ion-list>
-      <ion-col size="1" >
-        <img src="../../assets/icon/favicon.png" height="20" width="20"/>
-      </ion-col>
-      @for (achievement of notAchieved; track notAchieved) {
-        <ion-item class="not-achieved">
-          <ion-label>{{ achievement.name }}</ion-label>
-          <p>{{ achievement.description }}</p>
-        </ion-item>
-      }
+      <ion-card class="ion-center">
+        <h3 >Nicht abgeschlossende Achievements! </h3>
+      </ion-card>
+      <ion-card>
+        @for (achievement of notAchieved; track notAchieved) {
+          <ion-card class="not-achieved">
+            <ion-grid>
+              <ion-row>
+                <ion-col size="2">
+                 <span>
+                   <img src="../../{{achievement.img}}" alt="achievement">
+                 </span>
+                </ion-col>
+                <ion-col size="10" >
+                  <p>{{ achievement.name }}</p>
+                  <p>{{ achievement.description }}</p>
+                </ion-col>
+
+              </ion-row>
+            </ion-grid>
+
+
+          </ion-card>
+        }
+      </ion-card>
+
     </ion-list>
   }
   @if (!notAchieved || notAchieved.length === 0) {
