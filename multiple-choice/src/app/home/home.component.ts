@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import { Router } from '@angular/router';
 import {IonicModule, NavController} from "@ionic/angular";
 import {addIcons} from "ionicons";
-import {personOutline,logOutOutline} from "ionicons/icons";
+import { personOutline, logOutOutline, calculatorOutline, schoolOutline, codeSlashOutline } from 'ionicons/icons';
 import {AuthService} from "../services/auth.service";
 import {ModuleService} from "../services/module.service";
 import {ToastController} from "@ionic/angular/standalone";
@@ -30,7 +30,7 @@ export class HomeComponent implements OnInit{
               private authService: AuthService,
               private moduleService: ModuleService,
               private toastController: ToastController) {
-    addIcons({personOutline, logOutOutline});
+    addIcons({ personOutline, logOutOutline, calculatorOutline, schoolOutline, codeSlashOutline });
   }
 
   async presentToast(position: 'middle') {
@@ -61,6 +61,16 @@ export class HomeComponent implements OnInit{
         this.presentToast('middle');
       }
     );
+  }
+
+  getCategoryIcon(category: string): string {
+    const icons: { [key: string]: string } = {
+      'Mathematics': 'calculator-outline',
+      'TypeScript': 'code-slash-outline',
+      'Science': 'school-outline',
+      // Fügen Sie hier weitere Kategorien und entsprechende Icons hinzu
+    };
+    return icons[category] || 'help-outline'; // Standardicon, wenn keine Kategorie übereinstimmt
   }
 
   extractCategories(modules: any): void {

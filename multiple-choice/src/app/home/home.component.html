@@ -10,13 +10,22 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-list>
-    @for(category of categories; track categories){
-      <ion-item>
-        {{category}}
-      </ion-item>
-    }
-  </ion-list>
+  <ion-grid>
+    <ion-row>
+      @for (category of categories; track categories) {
+        <ion-col size="6">
+          <ion-card button color="primary">
+            <ion-card-header class="ion-text-center">
+              <ion-card-title>{{ category }}</ion-card-title>
+            </ion-card-header>
+            <ion-card-content class="ion-text-center">
+              <ion-icon [name]="getCategoryIcon(category)"></ion-icon>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      }
+    </ion-row>
+  </ion-grid>
 
 
   <ion-fab horizontal="end" vertical="bottom" slot="fixed">
@@ -28,8 +37,6 @@
       </ion-fab-button>
     }
   </ion-fab>
-
-
 
 
 </ion-content>
