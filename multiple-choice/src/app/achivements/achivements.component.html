@@ -7,9 +7,11 @@
 <ion-content>
   @if (achievements && achievements.length > 0) {
     <ion-list>
-      <ion-card class="ion-margin-vertical ion-text-center ion-align-self-center">
-        <h3>Erfolgreich abgeschlossende Achievements!</h3>
-      </ion-card>
+      @if(achievements.length > 0){
+        <ion-card class="ion-margin-vertical ion-text-center ion-align-self-center">
+          <h3>Erfolgreich abgeschlossene Achievements!</h3>
+        </ion-card>
+      }
       @for (achievement of achievements; track achievements) {
         <ion-card class="achieved">
           <ion-grid>
@@ -19,7 +21,7 @@
                   <img src="../../{{achievement.img}}" alt="achievement">
                 </span>
               </ion-col>
-              <ion-col size="6" class="ion-margin-vertical ion-text-center ion-align-self-center">
+              <ion-col size="6" class="ion-margin-vertical ion-text-start ion-align-self-center">
                 <b>{{ achievement.name }}</b>
                 <p>{{ achievement.description }}</p>
               </ion-col>
@@ -32,9 +34,11 @@
 
   @if (notAchieved && notAchieved.length > 0) {
     <ion-list>
-      <ion-card class="ion-margin-vertical ion-text-center ion-align-self-center">
-        <h3>Nicht abgeschlossende Achievements!</h3>
-      </ion-card>
+      @if (notAchieved.length > 0){
+        <ion-card class="ion-margin-vertical ion-text-center ion-align-self-center">
+          <h3>Nicht abgeschlossene Achievements!</h3>
+        </ion-card>
+      }
       <ion-card>
         @for (achievement of notAchieved; track notAchieved) {
           <ion-card class="not-achieved">
@@ -45,7 +49,7 @@
                     <img src="../../{{achievement.img}}" alt="achievement">
                   </span>
                 </ion-col>
-                <ion-col size="6" class="ion-text-center ion-align-self-center">
+                <ion-col size="6" class="ion-text-start ion-align-self-center">
                   <b>{{ achievement.name }}</b>
                   <p>{{ achievement.description }}</p>
                 </ion-col>

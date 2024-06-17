@@ -2,13 +2,15 @@ import {Component, OnInit} from '@angular/core';
 import {IonicModule, ToastController} from "@ionic/angular";
 import {Achievement, AchievementsService} from "../services/achievements.service";
 import {AuthService} from "../services/auth.service";
+import {NgOptimizedImage} from "@angular/common";
 
 @Component({
   selector: 'app-achievements',
   templateUrl: './achivements.component.html',
   styleUrls: ['./achivements.component.scss'],
   imports: [
-    IonicModule
+    IonicModule,
+    NgOptimizedImage
   ],
   standalone: true
 })
