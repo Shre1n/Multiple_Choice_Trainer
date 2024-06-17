@@ -107,7 +107,6 @@ export class HomeComponent implements OnInit{
     );
   }
 
-
   checkLoginStatus() {
     const user = this.authService.getCurrentUser();
     this.isLoggedIn = user !== null;

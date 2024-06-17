@@ -16,12 +16,12 @@ export const routes: Routes = [
 
   { path: '', component: HomeComponent },
   { path: 'statistik', component: StatistikComponent },
-  { path: 'cards', component: CardComponent },
+  { path: 'card-list', component: CardComponent },
   { path: 'achivements', component: AchivementsComponent },
   { path: 'login', component: LoginComponent },
   { path: 'forget-password', component: ForgetPasswordComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'card-list', component: CardListComponent },
+  //{ path: 'card-list', component: CardListComponent },
   { path: 'sessionStatistik', component: SessionStatistikComponent },
   { path: 'card-detail', component: CardDetailComponent },
   { path: '**', redirectTo: '' } // Wildcard route for a 404 page
