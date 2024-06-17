@@ -55,7 +55,6 @@ export class HomeComponent implements OnInit{
   }
 
   navSession (category: string) {
-    console.log(category);
     this.router.navigate(['/session',{ category: category }]);
   }
 
