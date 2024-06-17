@@ -54,9 +54,9 @@ export class HomeComponent implements OnInit{
     await toast.present();
   }
 
-  navSession (name:number) {
-    console.log(this.categories[name]);
-    this.router.navigate(['/session']);
+  navSession (category: string) {
+    console.log(category);
+    this.router.navigate(['/session',{ category: category }]);
   }
 
   checkForUpdates(): void {
