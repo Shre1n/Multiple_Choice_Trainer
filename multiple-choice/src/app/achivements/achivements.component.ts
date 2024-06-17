@@ -1,10 +1,11 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {IonicModule, NavController, ToastController} from "@ionic/angular";
+import {GestureController, GestureDetail, IonicModule, NavController, ToastController} from "@ionic/angular";
 import {Achievement, AchievementsService} from "../services/achievements.service";
 import {AuthService} from "../services/auth.service";
 import {NgOptimizedImage} from "@angular/common";
 import {logOutOutline, personOutline} from "ionicons/icons";
 import {addIcons} from "ionicons";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-achievements',
@@ -16,7 +17,7 @@ import {addIcons} from "ionicons";
   ],
   standalone: true
 })
-export class AchivementsComponent{
+export class AchivementsComponent implements OnInit{
 
   achievements: Achievement[] = [];
   notAchieved: Achievement[] = [];
@@ -25,17 +26,45 @@ export class AchivementsComponent{
 
 
   constructor(private achievementsService: AchievementsService,
+              private router: Router,
               private authService: AuthService,
               private toastCtrl: ToastController,
               private navCtrl: NavController,
+              private gestureCtrl: GestureController
               ) {
     addIcons({logOutOutline});
 
   }
 
+  ngOnInit() {
+    this.initializeSwipeGesture();
+  }
+
 
   ionViewDidEnter(){
     this.checkLoginStatus();
+  }
+
+  //Gesture to navigate to neighbor site from footer
+  initializeSwipeGesture() {
+    const content = document.querySelector('ion-content');
+    if (content) {
+      const gesture = this.gestureCtrl.create({
+        el: content as HTMLElement,
+        gestureName: 'swipe',
+        onMove: ev => this.onSwipe(ev)
+      });
+      gesture.enable();
+    } else {
+      console.error('Ion content not found');
+    }
+  }
+
+  onSwipe(ev: GestureDetail) {
+    const deltaX = ev.deltaX;
+    if (deltaX > 50) {
+      this.router.navigate(['/statistik']);
+    }
   }
 
 
