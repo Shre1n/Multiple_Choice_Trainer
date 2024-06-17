@@ -16,6 +16,9 @@ export class StatistikComponent implements OnInit{
 
   public chart: any;
 
+
+
+
   constructor() {
     this.ngOnInit();
   }
