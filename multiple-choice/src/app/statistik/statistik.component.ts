@@ -39,7 +39,12 @@ export class StatistikComponent implements OnInit{
   onSwipe(ev: GestureDetail) {
     const deltaX = ev.deltaX;
     if (deltaX < -50) {
-      this.router.navigate(['/cards']);
+      this.router.navigate(['/card-list']);
+    }else{
+      if (deltaX < 50){
+        this.router.navigate(['']);
+      }
     }
   }
+
 }

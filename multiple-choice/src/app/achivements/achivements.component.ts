@@ -63,7 +63,7 @@ export class AchivementsComponent implements OnInit{
   onSwipe(ev: GestureDetail) {
     const deltaX = ev.deltaX;
     if (deltaX > 50) {
-      this.router.navigate(['/statistik']);
+      this.router.navigate(['/card-list']);
     }
   }
 
