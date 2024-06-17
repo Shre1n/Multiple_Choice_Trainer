@@ -74,7 +74,7 @@ export class LoginComponent implements OnInit{
       const user = await this.authService.login(this.email, this.password);
       await this.achievements.setIndexAchievement(user.uid, 1);
       await this.navController.pop();
-      await this.router.navigate(['/home']);
+      await this.navController.navigateRoot(['/home']);
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.errorMessage = `Login failed: No login found.`;

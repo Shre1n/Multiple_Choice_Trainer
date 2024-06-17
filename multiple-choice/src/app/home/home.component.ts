@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import { Router } from '@angular/router';
 import {IonicModule, NavController} from "@ionic/angular";
 import {addIcons} from "ionicons";
@@ -16,7 +16,7 @@ import {AuthService} from "../services/auth.service";
 })
 export class HomeComponent implements OnInit{
 
-  isLoggedIn: boolean = false;
+  @Input() isLoggedIn!: boolean;
 
 
   constructor(private router: Router,
@@ -30,10 +30,10 @@ export class HomeComponent implements OnInit{
   }
 
 
-  checkLoginStatus() {
-    const user = this.authService.getCurrentUser();
-    this.isLoggedIn = user !== null;
-    console.log(this.isLoggedIn)
+  async checkLoginStatus() {
+    this.authService.getCurrentUser().then(user => {
+      this.isLoggedIn = !!user; // !!user converts user to boolean
+    });
   }
 
   async logout() {

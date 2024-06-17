@@ -74,6 +74,7 @@ export class RegisterComponent implements OnInit {
       const user = await this.authService.register(this.email, this.password, this.additionalData);
       await this.authService.login(this.email, this.password);
       await this.achievements.initAchivements(user.uid);
+      await this.navController.navigateRoot(["/home"]);
     } catch (error: unknown) {
       if (typeof error === 'object' && error !== null && 'code' in error) {
         // Check for specific error codes from Firebase Authentication

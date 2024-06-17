@@ -1,6 +1,11 @@
 <ion-header>
   <ion-toolbar>
     <ion-title slot="start">Achievements</ion-title>
+    @if (isLoggedIn) {
+      <ion-button class="ion-color" slot="end" (click)="logout()">
+        <ion-icon name="log-out-outline" style="color: #f6f7f9"></ion-icon>
+      </ion-button>
+    }
   </ion-toolbar>
 </ion-header>
 
