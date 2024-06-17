@@ -18,7 +18,6 @@ export class AchivementsComponent implements OnInit {
 
   achievements: Achievement[] = [];
   notAchieved: Achievement[] = [];
-  errorMessage: string = 'No Connection to Achievement Server! 😢';
 
   constructor(private achievementsService: AchievementsService, private authService: AuthService, private toastCtrl: ToastController) {}
 
@@ -30,9 +29,11 @@ export class AchivementsComponent implements OnInit {
           this.notAchieved = await this.achievementsService.getAchievements(user.uid);
         } catch (error) {
           console.error('Failed to load user achievements', error);
-          await this.presentToast('middle');
+          await this.presentToast('top', "Failed to load user achievements!");
         }
       } else {
+        this.notAchieved = await this.loadServerAchievements();
+        await this.presentToast("top", "Sign Up to collect Achievements!")
         console.error('User is not authenticated');
       }
     });
@@ -44,16 +45,39 @@ export class AchivementsComponent implements OnInit {
           this.achievements = await this.achievementsService.getAchievements(userId);
         } catch (error) {
           console.error('Failed to load user achievements', error);
-          await this.presentToast('middle');
+          await this.presentToast('top',"No Authenticated User!");
         }
       }
     });
+
   }
 
-  async presentToast(position: 'middle') {
+  async loadServerAchievements():Promise<Achievement[]> {
+    try {
+      const achievements = await this.achievementsService.getAllServerAchievements().toPromise();
+      console.log('Loaded Server Achievements:', achievements);
+      if (!achievements) {
+        return [];
+      }
+      // @ts-ignore
+      return Object.values(achievements.achievements).map((achievement: Achievement) => ({
+        id: achievement.id,
+        name: achievement.name,
+        description: achievement.description,
+        achieved: achievement.achieved,
+        img: achievement.img
+      }));
+    } catch (error) {
+      console.error('Error loading server achievements:', error);
+      await this.presentToast('top',"Error loading server achievements!");
+      return [];
+    }
+  }
+
+  async presentToast(position: 'top' | 'middle' | 'bottom', message: string) {
     const toast = await this.toastCtrl.create({
-      message: this.errorMessage,
-      duration: 10000,
+      message: message,
+      duration: 7000,
       position: position,
     });
 
