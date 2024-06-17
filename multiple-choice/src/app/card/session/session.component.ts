@@ -3,17 +3,20 @@ import {IonicModule} from "@ionic/angular";
 import {ModuleService} from "../../services/module.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {FormsModule} from "@angular/forms";
+import {NgClass} from "@angular/common";
 
 @Component({
   selector: 'app-session',
   templateUrl: './session.component.html',
   styleUrls: ['./session.component.scss'],
-  imports: [IonicModule, FormsModule],standalone:true
+  imports: [IonicModule, FormsModule, NgClass],standalone:true
 })
 export class SessionComponent  implements OnInit {
 
   category: string = '';
   modules: any[] = [];
+  currentIndex: number = 0;
+  showCorrectAnswers: boolean = false;
   selectedAnswer: string = '';
 
   constructor(private moduleService: ModuleService,private router: Router,private route: ActivatedRoute) { }
@@ -43,13 +46,25 @@ export class SessionComponent  implements OnInit {
     });
   }
 
-  checkAnswer(module: any) {
-    if (this.selectedAnswer === module.correctAnswer) {
-      module.answeredCorrectlyCount++;
+  checkAnswer() {
+    this.showCorrectAnswers = true;
+    const currentModule = this.modules[this.currentIndex];
+    if (this.selectedAnswer === currentModule.correctAnswer) {
+      currentModule.answeredCorrectlyCount++;
     } else {
-      module.answeredIncorrectlyCount++;
+      currentModule.answeredIncorrectlyCount++;
     }
+  }
+
+  nextQuestion() {
+    this.showCorrectAnswers = false;
     this.selectedAnswer = '';
+    if (this.currentIndex < this.modules.length - 1) {
+      this.currentIndex++;
+    } else {
+      // Optional: Logik für das Ende der Fragen
+      console.log('End of questions');
+    }
   }
 
 
