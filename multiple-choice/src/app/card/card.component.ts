@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {IonicModule} from "@ionic/angular";
 import {ModuleService} from "../services/module.service";
 import {ToastController} from "@ionic/angular/standalone";
+import {addIcons} from "ionicons";
 
 @Component({
   selector: 'app-card',
@@ -12,14 +13,16 @@ import {ToastController} from "@ionic/angular/standalone";
   ],
   standalone: true
 })
-export class CardComponent implements OnInit{
+export class CardComponent implements OnInit {
 
   modules: any[] = [];
   errorMessage: string = 'No Connection to External Server! 😢';
 
-  constructor(private moduleService: ModuleService, private toastController: ToastController) { }
+  constructor(private moduleService: ModuleService, private toastController: ToastController) {
+}
 
-  ngOnInit(): void {
+
+  ngOnInit() {
 
   }
 
@@ -32,8 +35,6 @@ export class CardComponent implements OnInit{
 
     await toast.present();
   }
-
-
 
 
 }

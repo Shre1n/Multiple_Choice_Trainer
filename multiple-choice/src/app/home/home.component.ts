@@ -7,6 +7,7 @@ import {AuthService} from "../services/auth.service";
 import {ModuleService} from "../services/module.service";
 import {ToastController} from "@ionic/angular/standalone";
 import {NgStyle} from "@angular/common";
+import {ModuleModule} from "../module/module.module";
 
 @Component({
   selector: 'app-home',
@@ -22,6 +23,7 @@ export class HomeComponent implements OnInit{
 
   isLoggedIn: boolean = false;
   modules: any[] = [];
+  module: ModuleModule[]= [];
   errorMessage: string = 'No Connection to External Server! 😢';
 
   categories: string[] = [];
@@ -51,7 +53,8 @@ export class HomeComponent implements OnInit{
     this.checkForUpdates();
   }
 
-  loadModules(): void {
+  async loadModules(){
+    this.module = await this.moduleService.findAll();
     this.moduleService.loadExternalModule().subscribe(
       response => {
         console.log('Modules loaded:', response);
@@ -123,4 +126,6 @@ export class HomeComponent implements OnInit{
   }
 
 
+  protected readonly ModuleService = ModuleService;
+  protected readonly ModuleModule = ModuleModule;
 }
