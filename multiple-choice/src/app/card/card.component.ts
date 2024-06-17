@@ -18,8 +18,7 @@ export class CardComponent implements OnInit{
   modules: any[] = [];
   errorMessage: string = 'No Connection to External Server! 😢';
 
-  constructor(private router: Router,
-              private moduleService: ModuleService,
+  constructor(private router: Router,private moduleService: ModuleService,
               private toastController: ToastController,
               private gestureCtrl: GestureController) { }
 
@@ -57,7 +56,7 @@ export class CardComponent implements OnInit{
   onSwipe(ev: GestureDetail) {
     const deltaX = ev.deltaX;
     if (deltaX < -50) {
-      this.router.navigate(['/achivements']);
+      this.router.navigate(['/statistik']);
     }
   }
 
