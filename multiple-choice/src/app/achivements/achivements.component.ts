@@ -20,8 +20,8 @@ export class AchivementsComponent{
 
   achievements: Achievement[] = [];
   notAchieved: Achievement[] = [];
-  @Input() isLoggedIn!: boolean;
-  @Output() isLoggedInChange = new EventEmitter<boolean>();
+  isLoggedIn!: boolean;
+
 
 
   constructor(private achievementsService: AchievementsService,
@@ -66,7 +66,6 @@ export class AchivementsComponent{
   async logout() {
     await this.authService.logout();
     this.isLoggedIn = false;
-    this.isLoggedInChange.emit(false); // Notify parent component about logout
     await this.navCtrl.navigateRoot(['/achivements']);
   }
 
