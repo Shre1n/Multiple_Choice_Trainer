@@ -14,7 +14,7 @@
     <ion-row>
       @for (category of categories; track categories; ) {
         <ion-col size="6">
-          <ion-card button [ngStyle]="{'background-color': getCategoryBackground(category)}">
+          <ion-card button (click)="navSession(category)" [ngStyle]="{'background-color': getCategoryBackground(category)}">
             <ion-card-header class="ion-text-center">
               <ion-card-title>{{ category }}</ion-card-title>
             </ion-card-header>
@@ -23,20 +23,6 @@
             </ion-card-content>
           </ion-card>
         </ion-col>
-
-
-        @for (module of module; track module.id) {
-          <ion-col size="6">
-            <ion-card button [ngStyle]="{'background-color': getCategoryBackground(category)}">
-              <ion-card-header class="ion-text-center">
-                <ion-card-title>{{ module.name }}</ion-card-title>
-              </ion-card-header>
-              <ion-card-content class="ion-text-center">
-                <ion-icon [name]="getCategoryIcon(category)" style="color: black"></ion-icon>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-        }
       }
     </ion-row>
   </ion-grid>

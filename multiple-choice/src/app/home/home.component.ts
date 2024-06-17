@@ -53,6 +53,13 @@ export class HomeComponent implements OnInit{
     this.checkForUpdates();
   }
 
+  navSession (name:number) {
+    console.log(this.categories [name]);
+    this.router.navigate(['/session', {categories: this.categories}] );
+
+  }
+
+
   async loadModules(){
     this.module = await this.moduleService.findAll();
     this.moduleService.loadExternalModule().subscribe(
