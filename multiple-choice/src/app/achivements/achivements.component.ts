@@ -48,17 +48,6 @@ export class AchivementsComponent implements OnInit {
         }
       }
     });
-    await this.loadServerAchievements();
-  }
-
-  async loadServerAchievements() {
-    try {
-      const achievements = await this.achievementsService.getAllServerAchievements().toPromise();
-      this.notAchieved = achievements || [];
-    } catch (error) {
-      console.error('Error loading server achievements:', error);
-      await this.presentToast('middle');
-    }
   }
 
   async presentToast(position: 'middle') {
