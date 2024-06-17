@@ -22,7 +22,14 @@ import {AuthService} from "./services/auth.service";
 })
 export class AppComponent {
 
-  constructor() {}
+  constructor(private authService: AuthService) {}
+
+  ngOnInit(): void {
+    // Überwache den Anmeldestatus
+    this.authService.getCurrentUser().then(user => {
+      this.authService.isAuth() ? this.authService.isAuth() : null
+    });
+  }
 
 
 }

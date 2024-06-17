@@ -5,6 +5,7 @@ import {addIcons} from "ionicons";
 import {personOutline,logOutOutline} from "ionicons/icons";
 import {AuthService} from "../services/auth.service";
 
+
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -14,9 +15,9 @@ import {AuthService} from "../services/auth.service";
   ],
   standalone: true
 })
-export class HomeComponent implements OnInit{
+export class HomeComponent{
 
-  @Input() isLoggedIn!: boolean;
+  isLoggedIn!: boolean;
 
 
   constructor(private router: Router,
@@ -25,20 +26,13 @@ export class HomeComponent implements OnInit{
     addIcons({personOutline, logOutOutline});
   }
 
-  ngOnInit() {
-    this.checkLoginStatus();
-  }
-
-
-  async checkLoginStatus() {
-    this.authService.getCurrentUser().then(user => {
-      this.isLoggedIn = !!user; // !!user converts user to boolean
-    });
+  ionViewDidEnter(){
+    this.authService.getCurrentUser()
+    this.isLoggedIn = this.authService.isAuth();
   }
 
   async logout() {
     await this.authService.logout();
-    this.isLoggedIn = false;
     await this.navCtrl.navigateRoot(['/home']);
   }
 

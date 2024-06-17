@@ -16,7 +16,7 @@ import {addIcons} from "ionicons";
   ],
   standalone: true
 })
-export class AchivementsComponent implements OnInit {
+export class AchivementsComponent{
 
   achievements: Achievement[] = [];
   notAchieved: Achievement[] = [];
@@ -27,14 +27,17 @@ export class AchivementsComponent implements OnInit {
   constructor(private achievementsService: AchievementsService,
               private authService: AuthService,
               private toastCtrl: ToastController,
-              private navCtrl: NavController,) {
+              private navCtrl: NavController,
+              ) {
     addIcons({logOutOutline});
 
   }
 
-  async ngOnInit(): Promise<void> {
+
+  ionViewDidEnter(){
     this.checkLoginStatus();
   }
+
 
   async checkLoginStatus() {
     const user = await this.authService.getCurrentUser();
@@ -64,7 +67,7 @@ export class AchivementsComponent implements OnInit {
     await this.authService.logout();
     this.isLoggedIn = false;
     this.isLoggedInChange.emit(false); // Notify parent component about logout
-    await this.navCtrl.navigateRoot(['/home']);
+    await this.navCtrl.navigateRoot(['/achivements']);
   }
 
   async loadServerAchievements():Promise<Achievement[]> {

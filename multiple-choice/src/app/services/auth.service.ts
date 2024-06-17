@@ -28,7 +28,7 @@ export class AuthService {
   private currentUser: User | null = null;
   isLoggedIn: boolean = false;
 
-  constructor(private firestore: Firestore, private auth: Auth, private http: HttpClient) {
+  constructor(private firestore: Firestore, private auth: Auth) {
     const firebaseApp = initializeApp(environment.firebaseConfig);
     this.auth = getAuth(firebaseApp);
 
@@ -81,6 +81,7 @@ export class AuthService {
   async login(email: string, password: string): Promise<User> {
     try {
       const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
+      localStorage.setItem('isLoggedIn', 'true');
       const user = userCredential.user;
       this.currentUser = user;
       return user;
@@ -91,6 +92,11 @@ export class AuthService {
         throw new Error('An unknown error occurred during login.');
       }
     }
+  }
+
+  // Methode, um den aktuellen Anmeldestatus abzurufen
+  isAuth(): boolean {
+    return localStorage.getItem('isLoggedIn') === 'true';
   }
 
   async register(email: string, password: string, additionalData: any): Promise<User> {
@@ -107,8 +113,8 @@ export class AuthService {
   async logout(): Promise<void> {
     try {
       await signOut(this.auth);
+      localStorage.setItem('isLoggedIn', 'false');
       this.currentUser = null;
-      console.log(this.currentUser);
     } catch (error: unknown) {
       if (error instanceof Error) {
         throw new Error(`Logout failed: ${error.message}`);
