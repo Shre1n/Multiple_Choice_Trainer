@@ -14,7 +14,7 @@
     <ion-row>
       @for (category of categories; track categories; ) {
         <ion-col size="6">
-          <ion-card button (click)="navSession(category)" [ngStyle]="{'background-color': getCategoryBackground(category)}">
+          <ion-card button [ngStyle]="{'background-color': getCategoryBackground(category)}">
             <ion-card-header class="ion-text-center">
               <ion-card-title>{{ category }}</ion-card-title>
             </ion-card-header>
@@ -26,8 +26,6 @@
       }
     </ion-row>
   </ion-grid>
-
-  <p>home works</p>
 
   <ion-fab horizontal="end" vertical="bottom" slot="fixed">
     @if (!isLoggedIn) {
