@@ -14,7 +14,6 @@ export class SessionComponent  implements OnInit {
 
   category: string = '';
   modules: any[] = [];
-  questions: any[] = [];
   selectedAnswer: string = '';
 
   constructor(private moduleService: ModuleService,private router: Router,private route: ActivatedRoute) { }
