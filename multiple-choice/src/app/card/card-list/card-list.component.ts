@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import {IonicModule} from "@ionic/angular";
+import {GestureDetail, IonicModule} from "@ionic/angular";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-card-list',
@@ -12,8 +13,22 @@ import {IonicModule} from "@ionic/angular";
 })
 export class CardListComponent  implements OnInit {
 
-  constructor() { }
+  constructor(private router:Router) {
+  }
 
-  ngOnInit() {}
+  ngOnInit() {
+  }
 
+
+  onSwipe(ev: GestureDetail) {
+    const deltaX = ev.deltaX;
+    if (deltaX < -50) {
+      this.router.navigate(['/statistik']);
+    }else {
+      if (deltaX < 50) {
+        this.router.navigate(['/achivements'])
+      }
+    }
+  }
 }
+

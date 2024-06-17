@@ -1,20 +1,18 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {
   Auth,
-  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signOut,
-  UserCredential,
-  sendPasswordResetEmail,
   getAuth,
   onAuthStateChanged,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signOut,
   User
 } from '@angular/fire/auth';
-import {Firestore, collection, doc, getDoc, setDoc, updateDoc} from "@angular/fire/firestore";
-import { initializeApp } from "@angular/fire/app";
-import { environment } from "../../environments/environment";
+import {doc, Firestore, setDoc} from "@angular/fire/firestore";
+import {initializeApp} from "@angular/fire/app";
+import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
-import {Observable } from "rxjs";
 import {Achievement} from "./achievements.service";
 
 interface AchievementsResponse {
@@ -28,14 +26,16 @@ interface AchievementsResponse {
 })
 export class AuthService {
   private currentUser: User | null = null;
+  isLoggedIn: boolean = false;
 
-  constructor(private firestore: Firestore, private auth: Auth, private http: HttpClient) {
+  constructor(private firestore: Firestore, private auth: Auth) {
     const firebaseApp = initializeApp(environment.firebaseConfig);
     this.auth = getAuth(firebaseApp);
 
     // Subscribe to auth state changes to update currentUser
     onAuthStateChanged(this.auth, (user) => {
       this.currentUser = user;
+      this.isLoggedIn = !!user;
     });
   }
 
@@ -44,15 +44,18 @@ export class AuthService {
   }
 
   async getCurrentUser(): Promise<User | null> {
-    if (this.currentUser === null) {
+    try {
       this.currentUser = await new Promise<User | null>((resolve) => {
         const unsubscribe = onAuthStateChanged(this.auth, (user) => {
           unsubscribe();
           resolve(user);
         });
       });
+      return this.currentUser;
+    } catch (error) {
+      console.error('Error fetching current user:', error);
+      return null;
     }
-    return this.currentUser;
   }
 
   async getCurrentUserId(): Promise<string | null> {
@@ -78,8 +81,10 @@ export class AuthService {
   async login(email: string, password: string): Promise<User> {
     try {
       const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
-      console.log("User Logged in: ", userCredential);
-      return userCredential.user;
+      localStorage.setItem('isLoggedIn', 'true');
+      const user = userCredential.user;
+      this.currentUser = user;
+      return user;
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(`Login failed: ${error.message}`);
@@ -87,6 +92,11 @@ export class AuthService {
         throw new Error('An unknown error occurred during login.');
       }
     }
+  }
+
+  // Methode, um den aktuellen Anmeldestatus abzurufen
+  isAuth(): boolean {
+    return localStorage.getItem('isLoggedIn') === 'true';
   }
 
   async register(email: string, password: string, additionalData: any): Promise<User> {
@@ -103,6 +113,8 @@ export class AuthService {
   async logout(): Promise<void> {
     try {
       await signOut(this.auth);
+      localStorage.setItem('isLoggedIn', 'false');
+      this.currentUser = null;
     } catch (error: unknown) {
       if (error instanceof Error) {
         throw new Error(`Logout failed: ${error.message}`);

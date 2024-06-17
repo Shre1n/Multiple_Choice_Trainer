@@ -4,12 +4,14 @@ import { Observable } from "rxjs";
 import { map } from 'rxjs/operators';
 import {collection, doc, Firestore, getDoc, setDoc, updateDoc} from "@angular/fire/firestore";
 import {user} from "@angular/fire/auth";
+import {logoFacebook} from "ionicons/icons";
 
 export interface Achievement {
   id: string;
   name: string;
   description: string;
   achieved: boolean;
+  img: string
 }
 
 @Injectable({
@@ -18,7 +20,6 @@ export interface Achievement {
 export class AchievementsService {
   private baseUrl = 'http://localhost:8888/achievements';
   private achievements: Achievement[] = [];
-  private userId: string | null = null;
 
   constructor(private http: HttpClient, private firestore: Firestore) {}
 
@@ -29,16 +30,56 @@ export class AchievementsService {
     return this.http.get<Achievement[]>(url);
   }
 
-
-  async getAchievements(userID: string) {
+  async getUserAchievements(userID: string): Promise<Achievement[]> {
     try {
       const docRef = await getDoc(doc(this.firestore, `users/${userID}`));
       if (docRef.exists()) {
         const data = docRef.data();
-        this.achievements = data['achievements'] || [];
+        this.achievements = data['serverAchievements']['achievements'] || [];
+        return Object.values(this.achievements)
+          .filter((achievement: Achievement) => achievement.achieved)
+          .map((achievement: Achievement) => ({
+            id: achievement.id,
+            name: achievement.name,
+            description: achievement.description,
+            achieved: achievement.achieved,
+            img: achievement.img
+          }));
+
+      }else {
+        console.error(`No document found for user ${userID}`);
+        return []; // Return an empty array if document does not exist
       }
     } catch (error) {
       console.log(error);
+      return [];
+    }
+  }
+
+
+  async getAchievements(userID: string): Promise<Achievement[]> {
+    try {
+      const docRef = await getDoc(doc(this.firestore, `users/${userID}`));
+      if (docRef.exists()) {
+        const data = docRef.data();
+        this.achievements = data['serverAchievements']['achievements'] || [];
+        return Object.values(this.achievements)
+          .filter((achievement: Achievement) => !achievement.achieved)
+          .map((achievement: Achievement) => ({
+            id: achievement.id,
+            name: achievement.name,
+            description: achievement.description,
+            achieved: achievement.achieved,
+            img: achievement.img
+          }));
+
+      }else {
+        console.error(`No document found for user ${userID}`);
+        return []; // Return an empty array if document does not exist
+      }
+    } catch (error) {
+      console.log(error);
+      return [];
     }
   }
 
@@ -54,22 +95,10 @@ export class AchievementsService {
     }
   }
 
-  async updateAchivement(userID: string, achievement: Achievement){
-    const userRef = doc(this.firestore, `users/${userID}`);
-    try{
-      await updateDoc(userRef, {
-        achievements: this.http.get<Achievement[]>(this.baseUrl)
-      });
-    }catch (error) {
-      console.log(error)
-    }
-  }
-
   async setIndexAchievement(userID: string, index: number) {
     const userRef = doc(this.firestore, `users/${userID}`);
-    const serverAchievements = await this.getAllServerAchievements().toPromise();
     try{
-      // Holen Sie die aktuellen Daten des Benutzers
+      // Hole die aktuellen Daten des Benutzers
       const userDoc = await getDoc(userRef);
       const userData = userDoc.data();
 
@@ -95,24 +124,17 @@ export class AchievementsService {
           serverAchievements: updatedAchievements
         });
 
-        console.log(`Achievement ${index} für Benutzer ${userID} aktualisiert.`);
       } else {
         console.error(`Benutzer ${userID} nicht gefunden.`);
+        // No User found maybe throw error to frontend
       }
     } catch (error){
       console.log(error)
     }
   }
 
-
-
   // Get a specific achievement by ID
   getAchievementById(id: string): Achievement | undefined {
     return this.achievements.find(a => a.id === id);
-  }
-
-  // Get all achievements for the current user
-  getAllAchievements(): Achievement[] {
-    return this.achievements;
   }
 }

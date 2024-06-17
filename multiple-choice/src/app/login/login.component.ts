@@ -28,7 +28,7 @@ export class LoginComponent implements OnInit{
   constructor(private authService: AuthService,
               private router: Router,
               private toastController: ToastController,
-              private navController: NavController,
+              private navCtrl: NavController,
               private achievements: AchievementsService) {
   }
 
@@ -73,8 +73,8 @@ export class LoginComponent implements OnInit{
     try {
       const user = await this.authService.login(this.email, this.password);
       await this.achievements.setIndexAchievement(user.uid, 1);
-      await this.navController.pop();
-      await this.router.navigate(['/home']);
+      await this.navCtrl.pop();
+      await this.navCtrl.navigateRoot(['/home']);
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.errorMessage = `Login failed: No login found.`;
@@ -88,13 +88,13 @@ export class LoginComponent implements OnInit{
 
   openRegisterForm(): void {
     this.resetForm();
-    this.navController.pop();
+    this.navCtrl.pop();
     this.router.navigate(['/register']);
   }
 
   openForgotPassword(): void{
     this.resetForm();
-    this.navController.pop();
+    this.navCtrl.pop();
     this.router.navigate(['/forget-password'])
   }
 
