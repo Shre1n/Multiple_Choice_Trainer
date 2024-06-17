@@ -1,14 +1,43 @@
-<ion-content [fullscreen]="true">
+<ion-header>
+  <ion-toolbar>
+    <ion-title slot="start">Multiple-Choice Trainer</ion-title>
+    @if (isLoggedIn) {
+      <ion-button class="ion-color" slot="end" (click)="logout()">
+        <ion-icon name="log-out-outline" style="color: #f6f7f9"></ion-icon>
+      </ion-button>
+    }
+  </ion-toolbar>
+</ion-header>
 
-  <p>home works</p>
+<ion-content [fullscreen]="true">
+  <ion-grid>
+    <ion-row>
+      @for (category of categories; track categories) {
+        <ion-col size="6">
+          <ion-card button [ngStyle]="{'background-color': getCategoryBackground(category)}">
+            <ion-card-header class="ion-text-center">
+              <ion-card-title>{{ category }}</ion-card-title>
+            </ion-card-header>
+            <ion-card-content class="ion-text-center">
+              <ion-icon [name]="getCategoryIcon(category)" style="color: #f6f7f9"></ion-icon>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      }
+    </ion-row>
+  </ion-grid>
+
 
   <ion-fab horizontal="end" vertical="bottom" slot="fixed">
-    <ion-fab-button>
-      <ion-fab-button (click)="openLoginForm()">
-        <ion-icon name="person-outline"></ion-icon>
+    @if (!isLoggedIn) {
+      <ion-fab-button>
+        <ion-fab-button (click)="openLoginForm()">
+          <ion-icon name="person-outline"></ion-icon>
+        </ion-fab-button>
       </ion-fab-button>
-    </ion-fab-button>
+    }
   </ion-fab>
+
 
 </ion-content>
 
