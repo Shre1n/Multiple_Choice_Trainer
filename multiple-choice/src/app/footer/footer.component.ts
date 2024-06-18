@@ -32,7 +32,7 @@ export class FooterComponent  implements OnInit {
   }
 
   navToCards(){
-    this.router.navigate(['/cards'])
+    this.router.navigate(['/card-list'])
   }
 
   navToAchivements(){

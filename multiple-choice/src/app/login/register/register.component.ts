@@ -4,6 +4,7 @@ import {Router} from "@angular/router";
 import {IonicModule, NavController} from "@ionic/angular";
 import {FormsModule} from "@angular/forms";
 import {ToastController} from "@ionic/angular/standalone";
+import {AchievementsService} from "../../services/achievements.service";
 
 @Component({
   selector: 'app-register',
@@ -19,15 +20,21 @@ export class RegisterComponent implements OnInit {
 
   email: string = '';
   password: string = '';
-  additionalData: any = { name: '', otherData: '' };
+  additionalData: any = {name: '', otherData: ''};
   errorMessage: string = '';
   isToastOpen = false;
 
-  constructor(private authService: AuthService, private router: Router, private toastController: ToastController, private navController: NavController) {}
+  constructor(private authService: AuthService,
+              private router: Router,
+              private toastController: ToastController,
+              private navController: NavController,
+              private achievements: AchievementsService) {
+  }
 
   ngOnInit() {
     this.resetForm();
   }
+
   resetForm() {
     this.email = '';
     this.password = '';
@@ -65,14 +72,22 @@ export class RegisterComponent implements OnInit {
     }
     try {
       const user = await this.authService.register(this.email, this.password, this.additionalData);
-      await this.navController.pop();
-      await this.router.navigate(['/home']);
-      this.setOpen(true);
-      await this.presentToast('middle');
+      await this.authService.login(this.email, this.password);
+      await this.achievements.initAchivements(user.uid);
+      await this.navController.navigateRoot(["/home"]);
     } catch (error: unknown) {
-      if (error instanceof Error) {
+      if (typeof error === 'object' && error !== null && 'code' in error) {
+        // Check for specific error codes from Firebase Authentication
+        if ((error as any).code === 'auth/email-already-in-use') {
+          this.errorMessage = 'Diese E-Mail-Adresse wird bereits verwendet.';
+        } else {
+          this.errorMessage = (error as any).message;
+        }
+      } else if (error instanceof Error) {
         this.errorMessage = error.message;
       }
+    } finally {
+      await this.navController.navigateRoot(['/home']);
     }
   }
 }

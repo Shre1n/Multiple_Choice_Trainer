@@ -10,13 +10,13 @@ import {ForgetPasswordComponent} from "./login/forget-password/forget-password.c
 import {CardListComponent} from "./card/card-list/card-list.component";
 import {CardDetailComponent} from "./card/card-detail/card-detail.component";
 import {SessionStatistikComponent} from "./statistik/session-statistik/session-statistik.component";
-
+import {SessionComponent} from "./card/session/session.component";
 
 export const routes: Routes = [
 
   { path: '', component: HomeComponent },
   { path: 'statistik', component: StatistikComponent },
-  { path: 'cards', component: CardComponent },
+  //{ path: 'card-list', component: CardListComponent },
   { path: 'achivements', component: AchivementsComponent },
   { path: 'login', component: LoginComponent },
   { path: 'forget-password', component: ForgetPasswordComponent },
@@ -24,6 +24,7 @@ export const routes: Routes = [
   { path: 'card-list', component: CardListComponent },
   { path: 'sessionStatistik', component: SessionStatistikComponent },
   { path: 'card-detail', component: CardDetailComponent },
+  { path: 'session', component: SessionComponent },
   { path: '**', redirectTo: '' } // Wildcard route for a 404 page
 ];
 

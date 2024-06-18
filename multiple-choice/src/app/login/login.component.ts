@@ -4,6 +4,7 @@ import {Router} from "@angular/router";
 import {IonicModule, NavController} from "@ionic/angular";
 import {FormsModule, NgForm} from "@angular/forms";
 import {ToastController} from "@ionic/angular/standalone";
+import {AchievementsService} from "../services/achievements.service";
 
 @Component({
   selector: 'app-login',
@@ -24,7 +25,11 @@ export class LoginComponent implements OnInit{
   errorMessage: string = '';
   isToastOpen = false;
 
-  constructor(private authService: AuthService, private router: Router, private toastController: ToastController, private navController: NavController) {
+  constructor(private authService: AuthService,
+              private router: Router,
+              private toastController: ToastController,
+              private navCtrl: NavController,
+              private achievements: AchievementsService) {
   }
 
   ngOnInit() {
@@ -67,8 +72,9 @@ export class LoginComponent implements OnInit{
 
     try {
       const user = await this.authService.login(this.email, this.password);
-      await this.navController.pop();
-      await this.router.navigate(['/home']);
+      await this.achievements.setIndexAchievement(user.uid, 1);
+      await this.navCtrl.pop();
+      await this.navCtrl.navigateRoot(['/home']);
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.errorMessage = `Login failed: No login found.`;
@@ -82,13 +88,13 @@ export class LoginComponent implements OnInit{
 
   openRegisterForm(): void {
     this.resetForm();
-    this.navController.pop();
+    this.navCtrl.pop();
     this.router.navigate(['/register']);
   }
 
   openForgotPassword(): void{
     this.resetForm();
-    this.navController.pop();
+    this.navCtrl.pop();
     this.router.navigate(['/forget-password'])
   }
 

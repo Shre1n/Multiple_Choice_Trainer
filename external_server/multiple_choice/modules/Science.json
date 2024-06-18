@@ -1,0 +1,59 @@
+{
+  "category": "Science",
+  "modules": [
+    {
+      "name": "Module 1",
+      "question": "What is the chemical symbol for water?",
+      "description": "This is module 1",
+      "answeredCorrectlyCount": 0,
+      "answeredIncorrectlyCount": 0,
+      "answers": ["H2O", "O2", "CO2", "H2"],
+      "correctAnswer": "H2O"
+    },
+    {
+      "name": "Module 2",
+      "question": "What planet is known as the Red Planet?",
+      "description": "This is module 2",
+      "answeredCorrectlyCount": 0,
+      "answeredIncorrectlyCount": 0,
+      "answers": ["Mars", "Earth", "Jupiter", "Venus"],
+      "correctAnswer": "Mars"
+    },
+    {
+      "name": "Module 3",
+      "question": "What gas do plants absorb from the atmosphere?",
+      "description": "This is module 3",
+      "answeredCorrectlyCount": 0,
+      "answeredIncorrectlyCount": 0,
+      "answers": ["Carbon Dioxide", "Oxygen", "Nitrogen", "Hydrogen"],
+      "correctAnswer": "Carbon Dioxide"
+    },
+    {
+      "name": "Module 4",
+      "question": "What is the center of an atom called?",
+      "description": "This is module 4",
+      "answeredCorrectlyCount": 0,
+      "answeredIncorrectlyCount": 0,
+      "answers": ["Nucleus", "Electron", "Proton", "Neutron"],
+      "correctAnswer": "Nucleus"
+    },
+    {
+      "name": "Module 5",
+      "question": "What force keeps us on the ground?",
+      "description": "This is module 5",
+      "answeredCorrectlyCount": 0,
+      "answeredIncorrectlyCount": 0,
+      "answers": ["Gravity", "Magnetism", "Electromagnetism", "Friction"],
+      "correctAnswer": "Gravity"
+    },
+    {
+      "name": "Module 6",
+      "question": "What is the hardest natural substance on Earth?",
+      "description": "This is module 6",
+      "answeredCorrectlyCount": 0,
+      "answeredIncorrectlyCount": 0,
+      "answers": ["Diamond", "Gold", "Iron", "Platinum"],
+      "correctAnswer": "Diamond"
+    }
+  ]
+}

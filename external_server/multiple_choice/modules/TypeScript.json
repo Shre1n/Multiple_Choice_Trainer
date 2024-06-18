@@ -1,0 +1,23 @@
+{
+  "category": "TypeScript",
+  "modules": [
+    {
+      "name": "Module 1",
+      "question": "TypeScript is a ___ of JavaScript.",
+      "description": "This is TypeScript module 1",
+      "answeredCorrectlyCount": 0,
+      "answeredIncorrectlyCount": 0,
+      "answers": ["A type of script","A superset of JavaScript","A styling language","A database query language"],
+      "correctAnswer": "A superset of JavaScript"
+    },
+    {
+      "name": "Module 2",
+      "question": "When was TypeScript first released?",
+      "description": "This is TypeScript module 2",
+      "answeredCorrectlyCount": 0,
+      "answeredIncorrectlyCount": 0,
+      "answers": ["1995","2005","2012","2010"],
+      "correctAnswer": "2012"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+.correct-answer{
+  box-shadow: 0 0 4px 4px rgb(118, 224, 92);
+  border-radius: 10px;
+}
+
+.wrong-answer {
+  box-shadow: 0 0 4px 4px rgba(220, 68, 68, 0.99);
+  border-radius: 10px;
+
+}
+
+#Question{
+  font-size: medium;
+  display: flex;
+  padding: 20px;
+  background-color: #2D496B;
+  color: white;
+}
+
+#buttonCheck, #buttonNext {
+  color: black;
+  --border-radius: 30px;
+  --background: #CEDBEB;
+  width: 100%;
+  padding: 20px;
+  margin-top: 16px;
+  font-weight: bold;
+}
+
+#answerBg, #answerItem, #checkCardBg, #checkItemBG,{
+  --background: #2D496B;
+  background-color: #2D496B;
+  --border-radius: 30px;
+}
+
+ion-item{
+  border-radius: 12px;
+  width: 90%;
+  margin: auto;
+  margin-bottom: 20px;
+  color: white;
+
+}
+
+.sessionTitle{
+  background-color: #5A7699;
+  color: white;
+}
+
+

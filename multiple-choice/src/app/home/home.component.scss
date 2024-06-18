@@ -4,3 +4,44 @@ ion-fab {
   bottom: 70px; /* Abstand vom unteren Rand des Bildschirms */
   right: 10px; /* Abstand vom rechten Rand des Bildschirms */
 }
+
+:root {
+  --ion-color-primary: #3880ff;
+  --ion-color-secondary: #0cd1e8;
+  --ion-color-tertiary: #7044ff;
+  --ion-color-success: #10dc60;
+  --ion-color-warning: #ffce00;
+  --ion-color-danger: #f04141;
+  --ion-color-dark: #222428;
+  --ion-color-medium: #989aa2;
+  --ion-color-light: #f4f5f8;
+
+  /* Fügen Sie hier weitere benutzerdefinierte Farben hinzu */
+  --ion-color-info: #45aaf2;
+}
+
+ion-icon {
+  scale: 150%;
+}
+
+ion-card{
+  height: 10em;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#categoryTitle{
+  color: white;
+
+}
+
+ion-toolbar{
+  --background: #5A7699;
+  color: white;
+
+}
+
+
+
+
