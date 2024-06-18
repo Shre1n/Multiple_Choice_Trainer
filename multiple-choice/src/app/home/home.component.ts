@@ -125,6 +125,7 @@ export class HomeComponent implements OnInit{
 
   async logout() {
     await this.authService.logout();
+    this.isLoggedIn = false;
     await this.navCtrl.navigateRoot(['/home']);
   }
 
