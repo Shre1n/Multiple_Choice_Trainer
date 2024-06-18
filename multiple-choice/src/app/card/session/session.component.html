@@ -19,12 +19,10 @@
             @if (!showCorrectAnswers) {
               <ion-radio-group [(ngModel)]="selectedAnswer">
                 @for (answer of modules[currentIndex].answers; track modules[currentIndex]) {
-
-                    <ion-item  id="answerItem">
+                    <ion-item (click)="selectedAnswer = answer" id="answerItem">
                       <ion-label>{{ answer }}</ion-label>
                       <ion-radio slot="end" [value]="answer"></ion-radio>
                     </ion-item>
-
                     }
               </ion-radio-group>
             }
