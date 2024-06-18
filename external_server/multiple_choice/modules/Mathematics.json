@@ -27,7 +27,7 @@
       "answeredCorrectlyCount": 0,
       "answeredIncorrectlyCount": 0,
       "answers": ["10","11","12","13"],
-      "correctAnswers": "10"
+      "correctAnswer": "10"
     },
     {
       "name": "Module 4",
