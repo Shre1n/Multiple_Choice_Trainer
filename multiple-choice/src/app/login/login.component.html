@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/"></ion-back-button>
     </ion-buttons>
-    <ion-title slot="start">Login</ion-title>
+    <ion-title  slot="start">Login</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -11,7 +11,7 @@
 <ion-content class="ion-padding">
   <form (ngSubmit)="login()" #loginForm="ngForm">
     <ion-item>
-      <ion-label position="floating">Email</ion-label>
+      <ion-label  position="floating">Email</ion-label>
       <ion-input [(ngModel)]="email" name="email" type="email" required></ion-input>
     </ion-item>
     @if (loginForm.submitted && !email) {
@@ -30,9 +30,9 @@
       </ion-note>
     }
 
-    <ion-button expand="block" type="submit" color="primary" class="ion-margin-top">Login</ion-button>
-    <ion-button expand="block" type="button" color="medium" (click)="openForgotPassword()" class="ion-margin-top">Forgot Password?</ion-button>
-    <ion-button expand="block" color="light" (click)="openRegisterForm()" class="ion-margin-top">Register</ion-button>
+    <ion-button  expand="block" type="submit"  class="ion-margin-top">Login</ion-button>
+    <ion-button  expand="block" type="button" (click)="openForgotPassword()" class="ion-margin-top">Forgot Password?</ion-button>
+    <ion-button  expand="block"  (click)="openRegisterForm()" class="ion-margin-top">Register</ion-button>
 
   </form>
 </ion-content>
