@@ -3,7 +3,7 @@
     <ion-title slot="start">Multiple-Choice Trainer</ion-title>
     @if (isLoggedIn) {
       <ion-button class="ion-color" slot="end" (click)="logout()">
-        <ion-icon name="log-out-outline" style="color: #f6f7f9"></ion-icon>
+        <ion-icon name="log-out-outline" style="color: #CEDBEB"></ion-icon>
       </ion-button>
     }
   </ion-toolbar>
@@ -30,7 +30,7 @@
   <ion-fab horizontal="end" vertical="bottom" slot="fixed">
     @if (!isLoggedIn) {
       <ion-fab-button>
-        <ion-fab-button (click)="openLoginForm()">
+        <ion-fab-button style="--background: #CEDBEB; border: none; box-shadow: none;"  (click)="openLoginForm()">
           <ion-icon name="person-outline"></ion-icon>
         </ion-fab-button>
       </ion-fab-button>
