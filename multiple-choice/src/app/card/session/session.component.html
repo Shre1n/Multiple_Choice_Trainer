@@ -1,59 +1,82 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title id="sessonTitle" slot="start">{{ category }}</ion-title>
+    @if (!sessionCompleted) {
+      <ion-title class="sessionTitle" slot="start">{{ category }}</ion-title>
+    }
+    @if (sessionCompleted) {
+      <ion-title class="sessionTitle" slot="start">Lern Session beendet</ion-title>
+    }
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  @if (modules.length > 0) {
-    <ion-grid>
-      <ion-row>
-        <ion-col size="12">
+  @if (!sessionCompleted) {
+    @if (modules.length > 0) {
+      <ion-grid>
+        <ion-row>
+          <ion-col size="12">
             <ion-card-header>
               <ion-card-title slot="center">{{ modules[currentIndex].name }}</ion-card-title>
             </ion-card-header>
-          <ion-card>
             <ion-card>
-              <ion-card-title id="Question">{{ modules[currentIndex].question }}</ion-card-title>
-            </ion-card>
-            @if (!showCorrectAnswers) {
-              <ion-radio-group [(ngModel)]="selectedAnswer">
-                @for (answer of modules[currentIndex].answers; track modules[currentIndex]) {
+              <ion-card>
+                <ion-card-title id="Question">{{ modules[currentIndex].question }}</ion-card-title>
+              </ion-card>
+              @if (!showCorrectAnswers) {
+                <ion-radio-group [(ngModel)]="selectedAnswer">
+                  @for (answer of modules[currentIndex].answers; track modules[currentIndex]) {
                     <ion-item (click)="selectedAnswer = answer" id="answerItem">
                       <ion-label>{{ answer }}</ion-label>
                       <ion-radio slot="end" [value]="answer"></ion-radio>
                     </ion-item>
-                    }
-              </ion-radio-group>
-            }
-            @if (showCorrectAnswers) {
+                  }
+                </ion-radio-group>
+              }
+              @if (showCorrectAnswers) {
 
                 @for (answer of modules[currentIndex].answers; track showCorrectAnswers) {
                   <ion-item id=checkItemBG
-                    [ngClass]="{'correct-answer': answer === modules[currentIndex].correctAnswer, 'wrong-answer': answer !== modules[currentIndex].correctAnswer && answer === selectedAnswer}">
+                            [ngClass]="{'correct-answer': answer === modules[currentIndex].correctAnswer, 'wrong-answer': answer !== modules[currentIndex].correctAnswer && answer === selectedAnswer}">
                     <ion-label>{{ answer }}</ion-label>
                   </ion-item>
 
                 }
 
-            }
-            @if (!showCorrectAnswers) {
-              <ion-button id="buttonCheck" shape="round" (click)="checkAnswer()">Check Answer</ion-button>
+              }
+              @if (!showCorrectAnswers) {
+                <ion-button id="buttonCheck" shape="round" (click)="checkAnswer()">Check Answer</ion-button>
 
-            }
-            @if (showCorrectAnswers) {
-              <ion-button shape="round" id="buttonNext" (click)="nextQuestion()">Next</ion-button>
-            }
-          </ion-card>
+              }
+              @if (showCorrectAnswers) {
+                <ion-button shape="round" id="buttonNext" (click)="nextQuestion()">Next</ion-button>
+              }
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+    }
+    @if (modules.length === 0) {
+      <ion-row>
+        <ion-col size="12">
+          <p>No modules found for this category.</p>
         </ion-col>
       </ion-row>
-    </ion-grid>
-
+    }
   }
-  @if (modules.length === 0) {
+
+  @if (sessionCompleted) {
     <ion-row>
-      <ion-col size="12">
-        <p>No modules found for this category.</p>
+      <ion-col size="12" class="ion-text-center">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Lern Session beendet!</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <p>Gratulation! Du hast alle Fragen dieser Lerneinheit beantwortet.</p>
+            <ion-button shape="round" (click)="goToHome()">Zurück zur Startseite</ion-button>
+          </ion-card-content>
+        </ion-card>
       </ion-col>
     </ion-row>
   }

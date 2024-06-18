@@ -18,6 +18,7 @@ export class SessionComponent  implements OnInit {
   currentIndex: number = 0;
   showCorrectAnswers: boolean = false;
   selectedAnswer: string = '';
+  sessionCompleted: boolean = false;
 
   constructor(private moduleService: ModuleService,private router: Router,private route: ActivatedRoute) { }
 
@@ -28,12 +29,16 @@ export class SessionComponent  implements OnInit {
     });
   }
 
+  goToHome() {
+    this.router.navigate(['/']);
+  }
+
   loadAllCategoryModules() {
     this.moduleService.loadExternalModule().subscribe(data => {
       if (data && data[this.category] && data[this.category].modules) {
         this.modules = data[this.category].modules.map((module: any) => ({
           question: module.question,
-          answers: module.answers,
+          answers: this.shuffleArray(module.answers),
           correctAnswer: module.correctAnswer,
           answeredCorrectlyCount: module.answeredCorrectlyCount,
           answeredIncorrectlyCount: module.answeredIncorrectlyCount
@@ -44,6 +49,14 @@ export class SessionComponent  implements OnInit {
     }, error => {
       console.error('Error loading modules:', error);
     });
+  }
+
+  shuffleArray(array: any[]): any[] {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
   }
 
   checkAnswer() {
@@ -62,8 +75,7 @@ export class SessionComponent  implements OnInit {
     if (this.currentIndex < this.modules.length - 1) {
       this.currentIndex++;
     } else {
-      // Optional: Logik für das Ende der Fragen
-      console.log('End of questions');
+      this.sessionCompleted = true;
     }
   }
 
