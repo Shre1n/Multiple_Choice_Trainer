@@ -58,6 +58,8 @@ export class HomeComponent implements OnInit{
     this.router.navigate(['/session',{ category: category }]);
   }
 
+
+
   checkForUpdates(): void {
     this.moduleService.checkForUpdates().subscribe(
       (response) => {
@@ -102,8 +104,8 @@ export class HomeComponent implements OnInit{
 
   getCategoryBackground(category: string): string {
     const backgrounds: { [key: string]: string } = {
-      'Mathematics': 'var(--ion-color-primary)',
-      'TypeScript': 'var(--ion-color-info)',
+      'Mathematics': '#2D496B',
+      'TypeScript': '#5A7699',
       // Füge hier weitere Kategorien und entsprechende Hintergründe hinzu
     };
     return backgrounds[category] || 'var(--ion-color-light)'; // Standardhintergrund, wenn keine Kategorie übereinstimmt
