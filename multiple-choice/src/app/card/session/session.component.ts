@@ -4,6 +4,7 @@ import {ModuleService} from "../../services/module.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {FormsModule} from "@angular/forms";
 import {NgClass} from "@angular/common";
+import {AuthService} from "../../services/auth.service";
 
 @Component({
   selector: 'app-session',
@@ -20,7 +21,10 @@ export class SessionComponent  implements OnInit {
   selectedAnswer: string = '';
   sessionCompleted: boolean = false;
 
-  constructor(private moduleService: ModuleService,private router: Router,private route: ActivatedRoute) { }
+  constructor(private moduleService: ModuleService,
+              private router: Router,
+              private route: ActivatedRoute,
+              private authService: AuthService) { }
 
   ngOnInit() {
     this.route.params.subscribe(params => {
@@ -31,6 +35,23 @@ export class SessionComponent  implements OnInit {
 
   goToHome() {
     this.router.navigate(['/']);
+  }
+
+  async saveSessionProgress() {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      const sessionData = {
+        category: this.category,
+        modules: this.modules
+      };
+      await this.moduleService.saveSession(user.uid, sessionData).then(() => {
+        console.log('Session saved successfully');
+      }).catch(error => {
+        console.error('Error saving session:', error);
+      });
+    } else {
+      console.error('No user is logged in');
+    }
   }
 
   loadAllCategoryModules() {
@@ -59,7 +80,7 @@ export class SessionComponent  implements OnInit {
     return array;
   }
 
-  checkAnswer() {
+  async checkAnswer() {
     this.showCorrectAnswers = true;
     const currentModule = this.modules[this.currentIndex];
     if (this.selectedAnswer === currentModule.correctAnswer) {
@@ -69,13 +90,14 @@ export class SessionComponent  implements OnInit {
     }
   }
 
-  nextQuestion() {
+  async nextQuestion() {
     this.showCorrectAnswers = false;
     this.selectedAnswer = '';
     if (this.currentIndex < this.modules.length - 1) {
       this.currentIndex++;
     } else {
       this.sessionCompleted = true;
+      await this.saveSessionProgress();
     }
   }
 

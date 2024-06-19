@@ -5,7 +5,7 @@ import {addIcons} from "ionicons";
 import { personOutline, logOutOutline, calculatorOutline, schoolOutline, codeSlashOutline } from 'ionicons/icons';
 import {AuthService} from "../services/auth.service";
 import {ModuleService} from "../services/module.service";
-import {ToastController} from "@ionic/angular/standalone";
+import {AlertController, ToastController} from "@ionic/angular/standalone";
 import {NgStyle} from "@angular/common";
 import {ModuleModule} from "../module/module.module";
 
@@ -32,7 +32,8 @@ export class HomeComponent implements OnInit{
               private authService: AuthService,
               private gestureCtrl: GestureController,
               private moduleService: ModuleService,
-              private toastController: ToastController) {
+              private toastController: ToastController,
+              private alertController: AlertController) {
     addIcons({ personOutline, logOutOutline, calculatorOutline, schoolOutline, codeSlashOutline });
     this.isLoggedIn = this.isAuth();
   }
@@ -55,8 +56,30 @@ export class HomeComponent implements OnInit{
   }
 
   async navSession(category: string) {
-    if (this.isAuth()) this.router.navigate(['/session', {category: category}]);
-    else {
+    if (this.isLoggedIn) {
+      const alert = await this.alertController.create({
+        header: 'Start Session',
+        message: 'Möchten Sie die Lernsession jetzt starten?',
+        buttons: [
+          {
+            text: 'Cancel',
+            role: 'cancel',
+            cssClass: 'secondary',
+            handler: () => {
+              console.log('Confirm Cancel');
+            }
+          },
+          {
+            text: 'Start',
+            handler: () => {
+              this.router.navigate(['/session', {category: category}]);
+            }
+          }
+        ]
+      });
+
+      await alert.present();
+    } else {
       const toast = await this.toastController.create({
         message: 'Bitte melde dich an, um eine Lernsession zu starten!',
         duration: 2000,
