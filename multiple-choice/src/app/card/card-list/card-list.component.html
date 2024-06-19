@@ -7,17 +7,23 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-grid>
-    <ion-row>
-      @for (module of savedModules; let i = $index; track savedModules) {
-        <ion-col size="6">
-        <ion-card button>
-          <ion-card-content class="ion-text-center">
-            {{ module.category }}
-          </ion-card-content>
-        </ion-card>
-        </ion-col>
-      }
-    </ion-row>
-  </ion-grid>
+  @if (savedModules.length > 0) {
+    <ion-grid>
+      <ion-row>
+        @for (module of savedModules; track savedModules) {
+          <ion-col size="6">
+            <ion-card button (click)="navSession(module.category)">
+              <ion-card-content class="ion-text-center">
+                {{ module.category }}
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        }
+      </ion-row>
+    </ion-grid>
+  }
+  @if(savedModules.length === 0) {
+    <p>Du hast noch keine LernSessions Gestartet!</p>
+    <ion-button>Starte eine Zufällige Lernsession!</ion-button>
+  }
 </ion-content>

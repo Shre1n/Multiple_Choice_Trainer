@@ -25,6 +25,10 @@ export class CardListComponent  implements OnInit {
   }
 
   async ngOnInit() {
+    this.fetchSavedModules();
+  }
+
+  async fetchSavedModules() {
     const user = await this.authService.getCurrentUser();
     if (user) {
       this.moduleService.getSavedModulesForUser(user.uid).then(savedModules => {
@@ -35,7 +39,14 @@ export class CardListComponent  implements OnInit {
     }
   }
 
-
+  async navSession(category: string) {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      this.router.navigate(['/session', { category: category }]);
+    } else {
+      console.error('No user is logged in');
+    }
+  }
 
   onSwipe(ev: GestureDetail) {
     const deltaX = ev.deltaX;
