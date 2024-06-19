@@ -121,6 +121,27 @@ export class ModuleService {
     }
   }
 
+  async getSavedModulesForUser(userID: string): Promise<any[]> {
+    const userRef = doc(this.firestore, `users/${userID}`);
+    const userDoc = await getDoc(userRef);
+    let existingData: any = {};
+    if (userDoc.exists()) {
+      existingData = userDoc.data();
+    }
+
+    if (!existingData.sessions) {
+      existingData.sessions = [];
+    }
+
+    // Collect all modules from all sessions
+    let savedModules: any[] = [];
+    existingData.sessions.forEach((session: any) => {
+      savedModules.push(session);
+    });
+
+    return savedModules;
+  }
+
   async findAll(): Promise<ModuleModule[]> {
     const filterQuery = query(this.modulesCollectionRef)
     const moduleDocs = await getDocs(filterQuery);

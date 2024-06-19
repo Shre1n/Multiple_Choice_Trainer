@@ -1,3 +1,17 @@
-<p>
-  card-list works!! Card-list
-</p>
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Angefangene Module
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @for (module of savedModules; track savedModules) {
+    <ion-card>
+      <ion-card-header>
+        {{ module.category }}
+      </ion-card-header>
+    </ion-card>
+  }
+</ion-content>
