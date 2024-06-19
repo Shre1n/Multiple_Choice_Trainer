@@ -7,11 +7,17 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  @for (module of savedModules; track savedModules) {
-    <ion-card>
-      <ion-card-header>
-        {{ module.category }}
-      </ion-card-header>
-    </ion-card>
-  }
+  <ion-grid>
+    <ion-row>
+      @for (module of savedModules; let i = $index; track savedModules) {
+        <ion-col size="6">
+        <ion-card button>
+          <ion-card-content class="ion-text-center">
+            {{ module.category }}
+          </ion-card-content>
+        </ion-card>
+        </ion-col>
+      }
+    </ion-row>
+  </ion-grid>
 </ion-content>

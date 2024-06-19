@@ -3,6 +3,7 @@ import {GestureDetail, IonicModule} from "@ionic/angular";
 import {Router} from "@angular/router";
 import {ModuleService} from "../../services/module.service";
 import {AuthService} from "../../services/auth.service";
+import {AlertController} from "@ionic/angular/standalone";
 
 @Component({
   selector: 'app-card-list',
@@ -19,7 +20,8 @@ export class CardListComponent  implements OnInit {
 
   constructor(private router:Router,
               private moduleService: ModuleService,
-              private authService: AuthService) {
+              private authService: AuthService,
+              private alertController: AlertController) {
   }
 
   async ngOnInit() {
@@ -32,6 +34,7 @@ export class CardListComponent  implements OnInit {
       });
     }
   }
+
 
 
   onSwipe(ev: GestureDetail) {
