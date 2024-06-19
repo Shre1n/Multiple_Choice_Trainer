@@ -34,7 +34,7 @@ export class HomeComponent implements OnInit{
               private moduleService: ModuleService,
               private toastController: ToastController) {
     addIcons({ personOutline, logOutOutline, calculatorOutline, schoolOutline, codeSlashOutline });
-
+    this.isLoggedIn = this.isAuth();
   }
 
   ngOnInit() {
@@ -54,8 +54,16 @@ export class HomeComponent implements OnInit{
     await toast.present();
   }
 
-  navSession (category: string) {
-    this.router.navigate(['/session',{ category: category }]);
+  async navSession(category: string) {
+    if (this.isAuth()) this.router.navigate(['/session', {category: category}]);
+    else {
+      const toast = await this.toastController.create({
+        message: 'Bitte melde dich an, um eine Lernsession zu starten!',
+        duration: 2000,
+        position: 'top'
+      });
+      toast.present();
+    }
   }
 
 
@@ -117,10 +125,14 @@ export class HomeComponent implements OnInit{
     this.isLoggedIn = this.authService.isAuth();
   }
 
+
+  isAuth(): boolean{
+    return this.authService.isAuth();
+  }
+
   checkLoginStatus() {
     const user = this.authService.getCurrentUser();
     this.isLoggedIn = user !== null;
-    console.log(this.isLoggedIn)
   }
 
   async logout() {
