@@ -6,6 +6,7 @@ import {NgOptimizedImage} from "@angular/common";
 import {logOutOutline, personOutline} from "ionicons/icons";
 import {addIcons} from "ionicons";
 import {Router} from "@angular/router";
+import {FooterComponent} from "../footer/footer.component";
 
 @Component({
   selector: 'app-achievements',
@@ -13,7 +14,8 @@ import {Router} from "@angular/router";
   styleUrls: ['./achivements.component.scss'],
   imports: [
     IonicModule,
-    NgOptimizedImage
+    NgOptimizedImage,
+    FooterComponent
   ],
   standalone: true
 })

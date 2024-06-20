@@ -8,6 +8,7 @@ import {ModuleService} from "../services/module.service";
 import {AlertController, ToastController} from "@ionic/angular/standalone";
 import {NgStyle} from "@angular/common";
 import {ModuleModule} from "../module/module.module";
+import {FooterComponent} from "../footer/footer.component";
 
 @Component({
   selector: 'app-home',
@@ -15,7 +16,8 @@ import {ModuleModule} from "../module/module.module";
   styleUrls: ['./home.component.scss'],
   imports: [
     IonicModule,
-    NgStyle
+    NgStyle,
+    FooterComponent
   ],
   standalone: true
 })
@@ -161,7 +163,7 @@ export class HomeComponent implements OnInit{
   async logout() {
     await this.authService.logout();
     this.isLoggedIn = false;
-    await this.navCtrl.navigateRoot(['/home']);
+    await this.navCtrl.navigateRoot(['/landingpage']);
   }
 
   openLoginForm(): void {

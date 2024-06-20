@@ -22,10 +22,10 @@ export class LandingpageComponent  implements OnInit {
 
   }
 
-  openLoginComponente():void{
+  openLoginComponent():void{
     this.router.navigate(['/login']);
   }
-  openRegisterComponente():void{
+  openRegisterComponent():void{
     this.router.navigate(['/register']);
   }
 }

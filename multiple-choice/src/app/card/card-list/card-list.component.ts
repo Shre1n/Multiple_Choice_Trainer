@@ -4,13 +4,15 @@ import {Router} from "@angular/router";
 import {ModuleService} from "../../services/module.service";
 import {AuthService} from "../../services/auth.service";
 import {AlertController} from "@ionic/angular/standalone";
+import {FooterComponent} from "../../footer/footer.component";
 
 @Component({
   selector: 'app-card-list',
   templateUrl: './card-list.component.html',
   styleUrls: ['./card-list.component.scss'],
   imports: [
-    IonicModule
+    IonicModule,
+    FooterComponent
   ],
   standalone: true
 })
