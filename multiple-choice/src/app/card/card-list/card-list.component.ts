@@ -3,7 +3,7 @@ import {GestureDetail, IonicModule} from "@ionic/angular";
 import {Router} from "@angular/router";
 import {ModuleService} from "../../services/module.service";
 import {AuthService} from "../../services/auth.service";
-import {AlertController} from "@ionic/angular/standalone";
+import {AlertController, ToastController} from "@ionic/angular/standalone";
 import {FooterComponent} from "../../footer/footer.component";
 
 @Component({
@@ -23,7 +23,8 @@ export class CardListComponent  implements OnInit {
   constructor(private router:Router,
               private moduleService: ModuleService,
               private authService: AuthService,
-              private alertController: AlertController) {
+              private alertController: AlertController,
+              private toastController: ToastController,) {
   }
 
   async ngOnInit() {
@@ -44,9 +45,35 @@ export class CardListComponent  implements OnInit {
   async navSession(category: string) {
     const user = await this.authService.getCurrentUser();
     if (user) {
-      this.router.navigate(['/session', { category: category }]);
+      const alert = await this.alertController.create({
+        header: 'Start Session',
+        message: 'Möchten Sie die Lernsession jetzt starten?',
+        buttons: [
+          {
+            text: 'Cancel',
+            role: 'cancel',
+            cssClass: 'secondary',
+            handler: () => {
+              console.log('Confirm Cancel');
+            }
+          },
+          {
+            text: 'Start',
+            handler: () => {
+              this.router.navigate(['/session', {category: category}]);
+            }
+          }
+        ]
+      });
+
+      await alert.present();
     } else {
-      console.error('No user is logged in');
+      const toast = await this.toastController.create({
+        message: 'Bitte melde dich an, um eine Lernsession zu starten!',
+        duration: 2000,
+        position: 'top'
+      });
+      toast.present();
     }
   }
 
@@ -60,5 +87,8 @@ export class CardListComponent  implements OnInit {
       }
     }
   }
+
+
+
 }
 

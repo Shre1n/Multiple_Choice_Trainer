@@ -34,7 +34,7 @@ export class SessionComponent  implements OnInit {
   }
 
   goToHome() {
-    this.router.navigate(['/']);
+    this.router.navigate(['/card-list']);
   }
 
   async saveSessionProgress() {

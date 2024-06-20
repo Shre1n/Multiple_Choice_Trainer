@@ -86,12 +86,6 @@ export class LoginComponent implements OnInit{
     }
   }
 
-  openRegisterForm(): void {
-    this.resetForm();
-    this.navCtrl.pop();
-    this.router.navigate(['/register']);
-  }
-
   openForgotPassword(): void{
     this.resetForm();
     this.navCtrl.pop();

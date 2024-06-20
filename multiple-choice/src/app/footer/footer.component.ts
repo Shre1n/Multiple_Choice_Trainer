@@ -24,7 +24,7 @@ export class FooterComponent  implements OnInit {
 
 
   navToHome(){
-    this.router.navigate([''])
+    this.router.navigate(['/home'])
   }
 
   navToStatistik(){
