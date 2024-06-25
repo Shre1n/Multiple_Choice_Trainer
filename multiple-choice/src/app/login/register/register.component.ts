@@ -1,10 +1,10 @@
-import {Component, NgModule, OnInit} from '@angular/core';
-import {AuthService} from "../../services/auth.service";
-import {Router} from "@angular/router";
-import {IonicModule, NavController} from "@ionic/angular";
-import {FormsModule} from "@angular/forms";
-import {ToastController} from "@ionic/angular/standalone";
-import {AchievementsService} from "../../services/achievements.service";
+import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
+import { IonicModule, NavController } from '@ionic/angular';
+import { FormsModule } from '@angular/forms';
+import { ToastController } from '@ionic/angular/standalone';
+import { AchievementsService } from '../../services/achievements.service';
 
 @Component({
   selector: 'app-register',
@@ -20,7 +20,7 @@ export class RegisterComponent implements OnInit {
 
   email: string = '';
   password: string = '';
-  additionalData: any = {name: '', otherData: ''};
+  additionalData: any = { name: '', otherData: '' };
   errorMessage: string = '';
   isToastOpen = false;
 
@@ -47,11 +47,12 @@ export class RegisterComponent implements OnInit {
     this.isToastOpen = isOpen;
   }
 
-  async presentToast(position: 'middle') {
+  // MARKIERT: Geänderte Methode, um benutzerdefinierte Nachrichten zu akzeptieren
+  async presentToast(message: string, duration: number) {
     const toast = await this.toastController.create({
-      message: this.errorMessage,
-      duration: 5000,
-      position: position,
+      message: message,
+      duration: duration,
+      position: 'top',
     });
 
     await toast.present();
@@ -59,25 +60,18 @@ export class RegisterComponent implements OnInit {
 
   async register() {
     if (!this.email || !this.password || !this.additionalData.name) {
-      if (!this.email) {
-        this.setOpen(false);
-      }
-      if (!this.password) {
-        this.setOpen(false);
-      }
-      if (!this.additionalData.name) {
-        this.setOpen(false);
-      }
+      this.setOpen(false);
       return;
     }
     try {
       const user = await this.authService.register(this.email, this.password, this.additionalData);
       await this.authService.login(this.email, this.password);
       await this.achievements.initAchivements(user.uid);
-      await this.navController.navigateRoot(["/home"]);
+      // MARKIERT: Zeige Erfolgsnachricht bei erfolgreicher Registrierung
+      await this.presentToast('Registrieren hat funktioniert!', 2000);
+      await this.navController.navigateRoot(['/home']);
     } catch (error: unknown) {
       if (typeof error === 'object' && error !== null && 'code' in error) {
-        // Check for specific error codes from Firebase Authentication
         if ((error as any).code === 'auth/email-already-in-use') {
           this.errorMessage = 'Diese E-Mail-Adresse wird bereits verwendet.';
         } else {
@@ -86,8 +80,9 @@ export class RegisterComponent implements OnInit {
       } else if (error instanceof Error) {
         this.errorMessage = error.message;
       }
-    } finally {
-      await this.navController.navigateRoot(['/home']);
+      this.setOpen(true);
+      // MARKIERT: Zeige Fehlermeldung bei fehlgeschlagener Registrierung
+      await this.presentToast(this.errorMessage, 5000);
     }
   }
 }
