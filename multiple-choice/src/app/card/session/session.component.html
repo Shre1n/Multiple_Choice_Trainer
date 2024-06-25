@@ -1,10 +1,10 @@
 <ion-header>
   <ion-toolbar>
+    <ion-button slot="start" (click)="goBack()">
+      <ion-icon slot="icon-only" name="close"></ion-icon>
+    </ion-button>
     @if (!sessionCompleted) {
       <ion-title class="sessionTitle" slot="start">{{ category }}</ion-title>
-      <ion-button slot="start" (click)="goBack()">
-      <ion-icon slot="icon-only" name="close"></ion-icon>
-      </ion-button>
     }
     @if (sessionCompleted) {
       <ion-title class="sessionTitle" slot="start">Lern Session beendet</ion-title>
