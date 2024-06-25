@@ -5,6 +5,8 @@ import { IonicModule, NavController } from '@ionic/angular';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ToastController } from '@ionic/angular/standalone';
 import { AchievementsService } from '../services/achievements.service';
+import {addIcons} from "ionicons";
+import {close} from "ionicons/icons";
 
 @Component({
   selector: 'app-login',
@@ -30,10 +32,19 @@ export class LoginComponent implements OnInit {
               private toastController: ToastController,
               private navCtrl: NavController,
               private achievements: AchievementsService) {
+    addIcons({close})
   }
 
   ngOnInit() {
     this.resetForm();
+  }
+
+  clearEmail(){
+    this.email="";
+  }
+
+  clearPassword(){
+    this.password="";
   }
 
   resetForm() {

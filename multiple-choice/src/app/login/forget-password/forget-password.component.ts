@@ -4,6 +4,8 @@ import {FormsModule} from "@angular/forms";
 import {AuthService} from "../../services/auth.service";
 import {Router} from "@angular/router";
 import {ToastController} from "@ionic/angular/standalone";
+import {addIcons} from "ionicons";
+import {close} from "ionicons/icons";
 
 @Component({
   selector: 'app-forget-password',
@@ -21,7 +23,13 @@ export class ForgetPasswordComponent implements OnInit {
   successMessage: string = '';
   isToastOpen = false;
 
-  constructor(private authService: AuthService, private router: Router, private toastController: ToastController, private navController: NavController) {}
+  constructor(private authService: AuthService, private router: Router, private toastController: ToastController, private navController: NavController) {
+    addIcons({close})
+  }
+
+  cleanEmail(){
+    this.email="";
+  }
 
   ngOnInit() {
     this.resetForm();
