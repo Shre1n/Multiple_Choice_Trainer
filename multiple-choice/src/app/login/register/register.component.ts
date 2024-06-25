@@ -68,7 +68,7 @@ export class RegisterComponent implements OnInit {
       await this.authService.login(this.email, this.password);
       await this.achievements.initAchivements(user.uid);
       // MARKIERT: Zeige Erfolgsnachricht bei erfolgreicher Registrierung
-      await this.presentToast('Registrieren hat funktioniert!', 2000);
+      await this.presentToast('Sie haben sich erfolgreich registriert!', 2000);
       await this.navController.navigateRoot(['/home']);
     } catch (error: unknown) {
       if (typeof error === 'object' && error !== null && 'code' in error) {
