@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import {IonicModule} from "@ionic/angular";
-import {ModuleService} from "../../services/module.service";
-import {ActivatedRoute, Router} from "@angular/router";
-import {FormsModule} from "@angular/forms";
-import {NgClass} from "@angular/common";
-import {AuthService} from "../../services/auth.service";
+import { IonicModule, AlertController, ToastController } from "@ionic/angular";
+import { ModuleService } from "../../services/module.service";
+import { ActivatedRoute, Router } from "@angular/router";
+import { FormsModule } from "@angular/forms";
+import { NgClass, Location } from "@angular/common";
+import { AuthService } from "../../services/auth.service";
+import {addIcons} from "ionicons";
+import {close} from "ionicons/icons";
 
 @Component({
   selector: 'app-session',
@@ -21,16 +23,48 @@ export class SessionComponent  implements OnInit {
   selectedAnswer: string = '';
   sessionCompleted: boolean = false;
 
-  constructor(private moduleService: ModuleService,
-              private router: Router,
-              private route: ActivatedRoute,
-              private authService: AuthService) { }
+  constructor(
+    private moduleService: ModuleService,
+    private router: Router,
+    private route: ActivatedRoute,
+    private authService: AuthService,
+    private location: Location,
+    private alertController: AlertController,
+    private toastController: ToastController
+  ) {addIcons({close})}
 
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.category = params['category']; // assuming category is passed as a parameter
       this.loadAllCategoryModules();
     });
+  }
+
+  async goBack(): Promise<void> {
+
+      const alert = await this.alertController.create({
+        header: 'Beenden',
+        message: 'Möchten Sie die Lernsession wirklich beenden?',
+        buttons: [
+          {
+            text: 'Nein',
+            role: 'cancel',
+            cssClass: 'secondary',
+            handler: () => {
+              console.log('Confirm Cancel');
+            }
+          },
+          {
+            text: 'Ja',
+            handler: () => {
+              this.router.navigate(['/home'])
+            }
+          }
+        ]
+      });
+
+      await alert.present();
+
   }
 
   goToHome() {
