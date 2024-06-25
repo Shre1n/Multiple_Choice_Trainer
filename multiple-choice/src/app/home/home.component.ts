@@ -5,9 +5,10 @@ import {addIcons} from "ionicons";
 import { personOutline, logOutOutline, calculatorOutline, schoolOutline, codeSlashOutline } from 'ionicons/icons';
 import {AuthService} from "../services/auth.service";
 import {ModuleService} from "../services/module.service";
-import {ToastController} from "@ionic/angular/standalone";
+import {AlertController, ToastController} from "@ionic/angular/standalone";
 import {NgStyle} from "@angular/common";
 import {ModuleModule} from "../module/module.module";
+import {FooterComponent} from "../footer/footer.component";
 
 @Component({
   selector: 'app-home',
@@ -15,7 +16,8 @@ import {ModuleModule} from "../module/module.module";
   styleUrls: ['./home.component.scss'],
   imports: [
     IonicModule,
-    NgStyle
+    NgStyle,
+    FooterComponent
   ],
   standalone: true
 })
@@ -32,9 +34,10 @@ export class HomeComponent implements OnInit{
               private authService: AuthService,
               private gestureCtrl: GestureController,
               private moduleService: ModuleService,
-              private toastController: ToastController) {
+              private toastController: ToastController,
+              private alertController: AlertController) {
     addIcons({ personOutline, logOutOutline, calculatorOutline, schoolOutline, codeSlashOutline });
-
+    this.isLoggedIn = this.isAuth();
   }
 
   ngOnInit() {
@@ -54,8 +57,38 @@ export class HomeComponent implements OnInit{
     await toast.present();
   }
 
-  navSession (category: string) {
-    this.router.navigate(['/session',{ category: category }]);
+  async navSession(category: string) {
+    if (this.isLoggedIn) {
+      const alert = await this.alertController.create({
+        header: 'Start Session',
+        message: 'Möchten Sie die Lernsession jetzt starten?',
+        buttons: [
+          {
+            text: 'Cancel',
+            role: 'cancel',
+            cssClass: 'secondary',
+            handler: () => {
+              console.log('Confirm Cancel');
+            }
+          },
+          {
+            text: 'Start',
+            handler: () => {
+              this.router.navigate(['/session', {category: category}]);
+            }
+          }
+        ]
+      });
+
+      await alert.present();
+    } else {
+      const toast = await this.toastController.create({
+        message: 'Bitte melde dich an, um eine Lernsession zu starten!',
+        duration: 2000,
+        position: 'top'
+      });
+      toast.present();
+    }
   }
 
 
@@ -117,16 +150,20 @@ export class HomeComponent implements OnInit{
     this.isLoggedIn = this.authService.isAuth();
   }
 
+
+  isAuth(): boolean{
+    return this.authService.isAuth();
+  }
+
   checkLoginStatus() {
     const user = this.authService.getCurrentUser();
     this.isLoggedIn = user !== null;
-    console.log(this.isLoggedIn)
   }
 
   async logout() {
     await this.authService.logout();
     this.isLoggedIn = false;
-    await this.navCtrl.navigateRoot(['/home']);
+    await this.navCtrl.navigateRoot(['/landingpage']);
   }
 
   openLoginForm(): void {

@@ -113,7 +113,7 @@ export class AuthService {
   async logout(): Promise<void> {
     try {
       await signOut(this.auth);
-      localStorage.setItem('isLoggedIn', 'false');
+      localStorage.removeItem('isLoggedIn');
       this.currentUser = null;
     } catch (error: unknown) {
       if (error instanceof Error) {

@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import {GestureController, GestureDetail, IonicModule} from "@ionic/angular";
 import {Router} from "@angular/router";
+import {FooterComponent} from "../footer/footer.component";
 
 @Component({
   selector: 'app-statistik',
   templateUrl: './statistik.component.html',
   styleUrls: ['./statistik.component.scss'],
   imports: [
-    IonicModule
+    IonicModule,
+    FooterComponent
   ],
   standalone: true
 })

@@ -1,10 +1,10 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {AuthService} from '../services/auth.service'
-import {Router} from "@angular/router";
-import {IonicModule, NavController} from "@ionic/angular";
-import {FormsModule, NgForm} from "@angular/forms";
-import {ToastController} from "@ionic/angular/standalone";
-import {AchievementsService} from "../services/achievements.service";
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { AuthService } from '../services/auth.service';
+import { Router } from '@angular/router';
+import { IonicModule, NavController } from '@ionic/angular';
+import { FormsModule, NgForm } from '@angular/forms';
+import { ToastController } from '@ionic/angular/standalone';
+import { AchievementsService } from '../services/achievements.service';
 
 @Component({
   selector: 'app-login',
@@ -16,7 +16,7 @@ import {AchievementsService} from "../services/achievements.service";
   ],
   standalone: true
 })
-export class LoginComponent implements OnInit{
+export class LoginComponent implements OnInit {
 
   @ViewChild('loginForm') loginForm!: NgForm;
 
@@ -35,6 +35,7 @@ export class LoginComponent implements OnInit{
   ngOnInit() {
     this.resetForm();
   }
+
   resetForm() {
     if (this.loginForm) {
       this.loginForm.reset();
@@ -49,11 +50,12 @@ export class LoginComponent implements OnInit{
     this.isToastOpen = isOpen;
   }
 
-  async presentToast(position: 'middle') {
+  // MARKIERT: Geänderte Methode, um benutzerdefinierte Nachrichten zu akzeptieren
+  async presentToast(message: string, duration: number) {
     const toast = await this.toastController.create({
-      message: this.errorMessage,
-      duration: 5000,
-      position: position,
+      message: message,
+      duration: duration,
+      position: 'top',
     });
 
     await toast.present();
@@ -61,41 +63,32 @@ export class LoginComponent implements OnInit{
 
   async login() {
     if (!this.email || !this.password) {
-      if (!this.email) {
-        this.setOpen(false);
-      }
-      if (!this.password) {
-        this.setOpen(false);
-      }
+      this.setOpen(false);
       return;
     }
 
     try {
       const user = await this.authService.login(this.email, this.password);
       await this.achievements.setIndexAchievement(user.uid, 1);
-      await this.navCtrl.pop();
+      // MARKIERT: Zeige Erfolgsnachricht bei erfolgreichem Login
+      await this.presentToast('Sie haben sich erfolgreich eingeloggt!', 2000);
       await this.navCtrl.navigateRoot(['/home']);
     } catch (error: unknown) {
       if (error instanceof Error) {
-        this.errorMessage = `Login failed: No login found.`;
+        this.errorMessage = 'Login failed: No login found.';
       } else {
         this.errorMessage = 'An unknown error occurred during login.';
       }
       this.setOpen(true);
-      await this.presentToast('middle');
+      // MARKIERT: Zeige Fehlermeldung bei fehlgeschlagenem Login
+      await this.presentToast(this.errorMessage, 5000);
     }
   }
 
-  openRegisterForm(): void {
+  openForgotPassword(): void {
     this.resetForm();
     this.navCtrl.pop();
-    this.router.navigate(['/register']);
-  }
-
-  openForgotPassword(): void{
-    this.resetForm();
-    this.navCtrl.pop();
-    this.router.navigate(['/forget-password'])
+    this.router.navigate(['/forget-password']);
   }
 
 }
