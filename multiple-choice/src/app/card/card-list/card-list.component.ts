@@ -5,6 +5,8 @@ import {ModuleService} from "../../services/module.service";
 import {AuthService} from "../../services/auth.service";
 import {AlertController, ToastController} from "@ionic/angular/standalone";
 import {FooterComponent} from "../../footer/footer.component";
+import {addIcons} from "ionicons";
+import {addCircleSharp} from "ionicons/icons";
 
 @Component({
   selector: 'app-card-list',
@@ -25,6 +27,7 @@ export class CardListComponent  implements OnInit {
               private authService: AuthService,
               private alertController: AlertController,
               private toastController: ToastController,) {
+    addIcons({addCircleSharp});
   }
 
   async ngOnInit() {
@@ -86,6 +89,10 @@ export class CardListComponent  implements OnInit {
         this.router.navigate(['/achivements'])
       }
     }
+  }
+
+  navigateToCardDetail() {
+    this.router.navigate(['/card-detail']);
   }
 
 

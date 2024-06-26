@@ -10,19 +10,28 @@
   @if (savedModules.length > 0) {
     <ion-grid>
       <ion-row>
+        <ion-col size="6">
+          <ion-card button (click)="navigateToCardDetail()" class="global_blue">
+            <ion-card-content class="ion-text-center">
+              <ion-icon class="global_shine_blue" name="add-circle-sharp"></ion-icon>
+              <ion-card-subtitle>Modul Hinzufügen</ion-card-subtitle>
+            </ion-card-content>
+
+          </ion-card>
+        </ion-col>
         @for (module of savedModules; track savedModules) {
           <ion-col size="6">
-            <ion-card button (click)="navSession(module.category)">
-              <ion-card-content class="ion-text-center">
-                {{ module.category }}
-              </ion-card-content>
+            <ion-card button (click)="navSession(module.category)" class="global_blue">
+              <ion-card-header class="ion-text-center">
+                <ion-card-title class="title">{{ module.category }}</ion-card-title>
+              </ion-card-header>
             </ion-card>
           </ion-col>
         }
       </ion-row>
     </ion-grid>
   }
-  @if(savedModules.length === 0) {
+  @if (savedModules.length === 0) {
     <p>Du hast noch keine LernSessions Gestartet!</p>
     <ion-button>Starte eine Zufällige Lernsession!</ion-button>
   }
