@@ -49,8 +49,9 @@
       }
 
       <!-- Control Buttons -->
-      <ion-button expand="block" type="submit">Weiter</ion-button>
-      <ion-button expand="block" color="danger" (click)="cancel()">Abbrechen</ion-button>
+      <ion-button expand="block" type="submit" (click)="save()">Weiter</ion-button>
+      <ion-button expand="block" color="danger" (click)="alertCancel()">Abbrechen</ion-button>
+
     </form>
   }
 </ion-content>

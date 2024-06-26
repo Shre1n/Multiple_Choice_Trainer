@@ -99,8 +99,6 @@ export class ModuleService {
       }catch (error) {
         console.error('Error saving session:', error);
       }
-
-
     }
   }
 
@@ -186,11 +184,13 @@ export class ModuleService {
   }
 
 
-
+  //Loads External Modules
   loadExternalModule(): Observable<any> {
     const url: string = `${this.baseUrl}/load-all-modules`;
     return this.http.get<any>(url);
   }
+
+  //TODO: Load User Modules
 
   checkForUpdates(): Observable<{ updatesAvailable: boolean }> {
     const url = `${this.baseUrl}/check-updates`;

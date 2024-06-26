@@ -88,6 +88,8 @@ export class SessionComponent  implements OnInit {
     }
   }
 
+  //This Category loader Only loads from Server Modules
+  //Must include the loading of user saved categories for card-list
   loadAllCategoryModules() {
     this.moduleService.loadExternalModule().subscribe(data => {
       if (data && data[this.category] && data[this.category].modules) {

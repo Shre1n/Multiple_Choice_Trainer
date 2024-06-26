@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {IonicModule} from "@ionic/angular";
+import {AlertController, IonicModule, ToastController} from "@ionic/angular";
 import {FormsModule} from "@angular/forms";
 import {Router} from "@angular/router";
 import {AuthService} from "../../services/auth.service";
@@ -27,6 +27,7 @@ export class CardDetailComponent {
 
   category: string = '';
   categoryAdded: boolean = false;
+  cancel = false;
   currentQuestion: Question = {
     question: '',
     answers: ['', '', '', ''],
@@ -37,7 +38,9 @@ export class CardDetailComponent {
   moduleData: { category: string, modules: Question[] } = { category: '', modules: [] };
   constructor(private router: Router,
               private authService: AuthService,
-              private moduleService: ModuleService) {
+              private moduleService: ModuleService,
+              private alertController: AlertController,
+              private toastController: ToastController,) {
   }
 
   addCategory() {
@@ -70,13 +73,42 @@ export class CardDetailComponent {
     return index;
   }
 
-  async cancel() {
-    const user = await this.authService.getCurrentUser();
+  async save() {
     await this.moduleService.saveModule(this.moduleData);
-    this.router.navigate(['/card-list']);
+  }
 
+  async alertCancel() {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      const alert = await this.alertController.create({
+        header: 'Abbrechen',
+        message: 'Möchten Sie den Vorgang wirklich Abbrechen? Die jetzige Seite wird NICHT gespeichert!',
+        buttons: [
+          {
+            text: 'Yes',
+            role: 'yes',
+            cssClass: 'secondary',
+            handler: async () => {
+              await this.router.navigate(['/home']);
+            }
+          },
+          {
+            text: 'Cancel',
+            handler: async () => {
+              console.log("Cancel")
+            }
+          }
+        ]
+      });
 
-    // Navigate back to the card list
-    this.router.navigate(['/card-list']);
+      await alert.present();
+    } else {
+      const toast = await this.toastController.create({
+        message: 'An Unexpected Error Occurred during Cancel!',
+        duration: 2000,
+        position: 'top'
+      });
+      toast.present();
+    }
   }
 }

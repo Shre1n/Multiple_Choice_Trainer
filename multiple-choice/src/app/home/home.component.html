@@ -18,9 +18,9 @@
             <ion-icon class="global_shine_blue" name="add-circle-sharp"></ion-icon>
             <ion-card-subtitle>Modul Hinzufügen</ion-card-subtitle>
           </ion-card-content>
-
         </ion-card>
       </ion-col>
+
       @for (category of categories; track categories;) {
         <ion-col size="6">
           <ion-card button (click)="navSession(category)" [ngStyle]="{'background-color': getCategoryBackground(category)}">
