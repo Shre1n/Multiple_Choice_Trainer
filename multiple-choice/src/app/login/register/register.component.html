@@ -11,7 +11,12 @@
   <form (ngSubmit)="register()" #registerForm="ngForm">
     <ion-item>
       <ion-label position="floating">Email</ion-label>
-      <ion-input [(ngModel)]="email" name="email" type="email" required></ion-input>
+      <ion-input [(ngModel)]="email" name="email" type="email" required>
+        <ion-button (click)="clearEmail()" slot="end" type="button">
+          <ion-icon slot="icon-only" name="close"></ion-icon>
+        </ion-button>
+      </ion-input>
+
     </ion-item>
     @if (registerForm.submitted && !email) {
       <ion-note color="danger">
@@ -20,7 +25,11 @@
     }
     <ion-item>
       <ion-label position="floating">Password</ion-label>
-      <ion-input [(ngModel)]="password" name="password" type="password" required></ion-input>
+      <ion-input [(ngModel)]="password" name="password" type="password" required>
+        <ion-button (click)="clearPasswort()" slot="end" type="button">
+          <ion-icon slot="icon-only" name="close"></ion-icon>
+        </ion-button>
+      </ion-input>
     </ion-item>
 
     @if (registerForm.submitted && !password) {
@@ -31,7 +40,11 @@
 
     <ion-item>
       <ion-label position="floating">Name</ion-label>
-      <ion-input [(ngModel)]="additionalData.name" name="name" required></ion-input>
+      <ion-input [(ngModel)]="additionalData.name" name="name" required>
+        <ion-button (click)="clearName()" slot="end" type="button">
+          <ion-icon slot="icon-only" name="close"></ion-icon>
+        </ion-button>
+      </ion-input>
     </ion-item>
 
     @if (registerForm.submitted && !additionalData.name) {

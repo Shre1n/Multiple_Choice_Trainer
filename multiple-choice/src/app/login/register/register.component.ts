@@ -31,6 +31,17 @@ export class RegisterComponent implements OnInit {
               private achievements: AchievementsService) {
   }
 
+  clearPasswort(){
+    this.password="";
+  }
+
+  clearName(){
+    this.additionalData="";
+  }
+
+  clearEmail() {
+    this.email="";
+  }
   ngOnInit() {
     this.resetForm();
   }
