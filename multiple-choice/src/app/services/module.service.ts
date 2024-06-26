@@ -16,6 +16,7 @@ import {environment} from "../../environments/environment.prod";
 import {recording} from "ionicons/icons";
 import {AuthService} from "./auth.service";
 import index from "eslint-plugin-jsdoc";
+import {get} from "@angular/fire/database";
 
 @Injectable({
   providedIn: 'root'
@@ -74,6 +75,31 @@ export class ModuleService {
       console.log('saved to Firestore:', module);
     } catch (error) {
       console.log('Error saving to Firestore', error);
+    }
+  }
+
+  async saveModule(userId: string, moduleData: { category: string, questions: any[] }) {
+    const user = await this.authService.getCurrentUser();
+    if (user){
+      const userRef = doc(this.firestore, `users/${userId}`);
+      try {
+
+        const userDoc = await getDoc(userRef);
+        let existingData: any = {};
+        if (userDoc.exists()) {
+          existingData = userDoc.data();
+        }
+        if (!existingData.sessions) {
+          existingData.sessions = [];
+        }
+
+        existingData.sessions.push(moduleData);
+
+      }catch (error) {
+        console.error('Error saving session:', error);
+      }
+
+
     }
   }
 
