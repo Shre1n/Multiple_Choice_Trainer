@@ -78,10 +78,10 @@ export class ModuleService {
     }
   }
 
-  async saveModule(userId: string, moduleData: { category: string, questions: any[] }) {
+  async saveModule(moduleData: any) {
     const user = await this.authService.getCurrentUser();
     if (user){
-      const userRef = doc(this.firestore, `users/${userId}`);
+      const userRef = doc(this.firestore, `users/${user.uid}`);
       try {
 
         const userDoc = await getDoc(userRef);
@@ -94,6 +94,9 @@ export class ModuleService {
         }
 
         existingData.sessions.push(moduleData);
+        await setDoc(userRef,{
+          existingData,
+        },  { merge: true });
 
       }catch (error) {
         console.error('Error saving session:', error);

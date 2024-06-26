@@ -8,6 +8,9 @@ import {ModuleService} from "../../services/module.service";
 interface Question {
   question: string;
   answers: string[];
+  correctAnswer: string;
+  answeredCorrectlyCount: number;
+  answeredIncorrectlyCount: number;
 }
 
 @Component({
@@ -24,9 +27,14 @@ export class CardDetailComponent {
 
   category: string = '';
   categoryAdded: boolean = false;
-  currentQuestion: Question = {question: '', answers: ['', '', '', '']};
-  moduleData: { category: string, questions: Question[] } = {category: '', questions: []};
-
+  currentQuestion: Question = {
+    question: '',
+    answers: ['', '', '', ''],
+    correctAnswer: '',
+    answeredCorrectlyCount: 0,
+    answeredIncorrectlyCount: 0
+  };
+  moduleData: { category: string, modules: Question[] } = { category: '', modules: [] };
   constructor(private router: Router,
               private authService: AuthService,
               private moduleService: ModuleService) {
@@ -44,18 +52,29 @@ export class CardDetailComponent {
   }
 
   async saveModule() {
-    this.moduleData.questions.push({ ...this.currentQuestion });
-    this.currentQuestion = { question: '', answers: ['', '', '', ''] };
+    this.moduleData.modules.push({ ...this.currentQuestion });
+    this.currentQuestion = {
+      question: '',
+      answers: ['', '', '', ''],
+      correctAnswer: '',
+      answeredCorrectlyCount: 0,
+      answeredIncorrectlyCount: 0
+    };
+    if (!this.categoryAdded) {
+      this.categoryAdded = true;  // Make category readonly after first question is saved
+    }
+
+  }
+
+  trackByIndex(index: number, obj: any): any {
+    return index;
   }
 
   async cancel() {
     const user = await this.authService.getCurrentUser();
-    this.moduleData.category = this.category;
-    this.moduleData.questions.push({...this.currentQuestion});
+    await this.moduleService.saveModule(this.moduleData);
+    this.router.navigate(['/card-list']);
 
-    if (user) {
-      await this.moduleService.saveModule(user.uid, this.moduleData);
-    }
 
     // Navigate back to the card list
     this.router.navigate(['/card-list']);
