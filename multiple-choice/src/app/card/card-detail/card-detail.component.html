@@ -11,7 +11,12 @@
       <form (ngSubmit)="addCategory()">
         <ion-item>
           <ion-label position="floating">Kategorie</ion-label>
-          <ion-input [(ngModel)]="category" name="category" required></ion-input>
+          <ion-input [(ngModel)]="category" name="category" required maxlength="30">
+          <ion-button (click)="clearCategory()" slot="end" type="button">
+            <ion-icon slot="icon-only" name="close">
+            </ion-icon>
+          </ion-button>
+          </ion-input>
         </ion-item>
         <ion-button expand="block" type="submit">Kategorie hinzufügen</ion-button>
       </form>
@@ -22,13 +27,19 @@
       <!-- Category Input -->
       <ion-item>
         <ion-label position="floating">Kategorie</ion-label>
-        <ion-input [(ngModel)]="category" name="category" readonly required></ion-input>
+        <ion-input [(ngModel)]="category" name="category" readonly required>
+        </ion-input>
       </ion-item>
 
       <!-- Question Input -->
       <ion-item>
         <ion-label position="floating">Frage</ion-label>
-        <ion-input [(ngModel)]="currentQuestion.question" name="question" required></ion-input>
+        <ion-input [(ngModel)]="currentQuestion.question" name="question" required maxlength="150">
+          <ion-button (click)="clearQuestion()" slot="end" type="button">
+            <ion-icon slot="icon-only" name="close">
+            </ion-icon>
+          </ion-button>
+        </ion-input>
       </ion-item>
 
 
@@ -36,7 +47,11 @@
       @for (answer of currentQuestion.answers; track trackByIndex; let i = $index) {
         <ion-item>
           <ion-label position="floating">Antwort {{ i + 1 }}</ion-label>
-          <ion-input [(ngModel)]="currentQuestion.answers[i]" name="answer{{ i }}" required></ion-input>
+          <ion-input [(ngModel)]="currentQuestion.answers[i]" name="answer{{ i }}" required maxlength="130">
+            <ion-button (click)="clearAnswer(i)" slot="end" type="button">
+              <ion-icon slot="icon-only" name="close"></ion-icon>
+            </ion-button>
+          </ion-input>
         </ion-item>
       }
 

@@ -4,6 +4,9 @@ import {FormsModule} from "@angular/forms";
 import {Router} from "@angular/router";
 import {AuthService} from "../../services/auth.service";
 import {ModuleService} from "../../services/module.service";
+import {addIcons} from "ionicons";
+import {close} from "ionicons/icons";
+
 
 interface Question {
   question: string;
@@ -41,11 +44,26 @@ export class CardDetailComponent {
               private moduleService: ModuleService,
               private alertController: AlertController,
               private toastController: ToastController,) {
+    addIcons({close})
   }
 
   addCategory() {
     this.moduleData.category = this.category;
     this.categoryAdded = true;
+  }
+
+  clearAnswer(index: number){
+    this.currentQuestion.answers.splice(index,1);
+  }
+
+  clearCategory(){
+    this.category= "";
+    this.categoryAdded= false;
+    this.moduleData.category ="";
+  }
+
+  clearQuestion(){
+    this.currentQuestion.question="";
   }
 
   addAnswerField() {
