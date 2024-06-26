@@ -94,9 +94,7 @@ export class ModuleService {
         }
 
         existingData.sessions.push(moduleData);
-        await setDoc(userRef,{
-          existingData,
-        },  { merge: true });
+        await setDoc(userRef, existingData,  { merge: true });
 
       }catch (error) {
         console.error('Error saving session:', error);

@@ -47,6 +47,10 @@ export class HomeComponent implements OnInit{
     this.checkForUpdates();
   }
 
+  navigateToCardDetail() {
+    this.router.navigate(['/card-detail']);
+  }
+
   async presentToast(position: 'middle') {
     const toast = await this.toastController.create({
       message: this.errorMessage,

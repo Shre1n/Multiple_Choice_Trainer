@@ -91,10 +91,6 @@ export class CardListComponent  implements OnInit {
     }
   }
 
-  navigateToCardDetail() {
-    this.router.navigate(['/card-detail']);
-  }
-
 
 
 }
