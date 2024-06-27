@@ -56,7 +56,14 @@ export class HomeComponent implements OnInit{
   async loadUserModules() {
     const user = await this.authService.getCurrentUser();
     if (user) {
-      this.userModules = await this.moduleService.getSavedModulesForUser(user.uid);
+      const savedModules = await this.moduleService.getSavedModulesForUser();
+      if (savedModules) {
+        this.userModules = savedModules;
+      } else {
+        this.userModules = []; // Fallback to empty array if savedModules is undefined
+      }
+    } else {
+      this.userModules = []; // Fallback to empty array if user is not logged in
     }
   }
 
