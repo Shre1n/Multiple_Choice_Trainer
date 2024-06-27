@@ -16,6 +16,7 @@ import {environment} from "../../environments/environment.prod";
 import {recording} from "ionicons/icons";
 import {AuthService} from "./auth.service";
 import index from "eslint-plugin-jsdoc";
+import {get} from "@angular/fire/database";
 
 @Injectable({
   providedIn: 'root'
@@ -77,6 +78,80 @@ export class ModuleService {
     }
   }
 
+  async saveModule(moduleData: any) {
+    const user = await this.authService.getCurrentUser();
+    if (user){
+      const userRef = doc(this.firestore, `users/${user.uid}`);
+      try {
+
+        const userDoc = await getDoc(userRef);
+        let existingData: any = {};
+        if (userDoc.exists()) {
+          existingData = userDoc.data();
+        }
+        if (!existingData.selfmademodules) {
+          existingData.selfmademodules = [];
+        }
+
+        existingData.selfmademodules.push(moduleData);
+        await setDoc(userRef, existingData,  { merge: true });
+
+      }catch (error) {
+        console.error('Error saving session:', error);
+      }
+    }
+  }
+
+  async saveUserModulesToFirestore(module: any): Promise<void> {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      const userRef = doc(this.firestore, `users/${user.uid}`);
+      try {
+        const userDoc = await getDoc(userRef);
+        let existingData: any = {};
+        if (userDoc.exists()) {
+          existingData = userDoc.data();
+        }
+        if (!existingData.selfmademodules) {
+          existingData.selfmademodules = [];
+        }
+
+        existingData.selfmademodules.push(module);
+        await setDoc(userRef, existingData, { merge: true });
+      } catch (error) {
+        console.error('Error saving module:', error);
+      }
+    }
+  }
+
+  async getSavedModulesForUser(): Promise<any[]> {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      const userRef = doc(this.firestore, `users/${user.uid}`);
+      const userDoc = await getDoc(userRef);
+      let existingData: any = {};
+      if (userDoc.exists()) {
+        existingData = userDoc.data();
+      }
+
+      if (!existingData.selfmademodules) {
+        existingData.selfmademodules = [];
+      }
+
+      // Collect all modules from all sessions
+      let savedModules: any[] = [];
+      existingData.selfmademodules.forEach((module: any) => {
+        savedModules.push(module);
+      });
+      return savedModules;
+    } else {
+      // Return an empty array if user is not logged in
+      return [];
+    }
+  }
+
+
+
   async saveSession(userID: string, sessionData: any) {
     const user = await this.authService.getCurrentUser();
     if (user) {
@@ -121,7 +196,7 @@ export class ModuleService {
     }
   }
 
-  async getSavedModulesForUser(userID: string): Promise<any[]> {
+  async getSavedSessionModulesForUser(userID: string): Promise<any[]> {
     const userRef = doc(this.firestore, `users/${userID}`);
     const userDoc = await getDoc(userRef);
     let existingData: any = {};
@@ -142,6 +217,8 @@ export class ModuleService {
     return savedModules;
   }
 
+
+
   async findAll(): Promise<ModuleModule[]> {
     const filterQuery = query(this.modulesCollectionRef)
     const moduleDocs = await getDocs(filterQuery);
@@ -159,11 +236,13 @@ export class ModuleService {
   }
 
 
-
+  //Loads External Modules
   loadExternalModule(): Observable<any> {
     const url: string = `${this.baseUrl}/load-all-modules`;
     return this.http.get<any>(url);
   }
+
+  //TODO: Load User Modules
 
   checkForUpdates(): Observable<{ updatesAvailable: boolean }> {
     const url = `${this.baseUrl}/check-updates`;

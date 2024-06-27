@@ -5,6 +5,8 @@ import {ModuleService} from "../../services/module.service";
 import {AuthService} from "../../services/auth.service";
 import {AlertController, ToastController} from "@ionic/angular/standalone";
 import {FooterComponent} from "../../footer/footer.component";
+import {addIcons} from "ionicons";
+import {addCircleSharp} from "ionicons/icons";
 
 @Component({
   selector: 'app-card-list',
@@ -25,16 +27,17 @@ export class CardListComponent  implements OnInit {
               private authService: AuthService,
               private alertController: AlertController,
               private toastController: ToastController,) {
+    addIcons({addCircleSharp});
   }
 
   async ngOnInit() {
-    this.fetchSavedModules();
+    this.fetchSessionSavedModules();
   }
 
-  async fetchSavedModules() {
+  async fetchSessionSavedModules() {
     const user = await this.authService.getCurrentUser();
     if (user) {
-      this.moduleService.getSavedModulesForUser(user.uid).then(savedModules => {
+      this.moduleService.getSavedSessionModulesForUser(user.uid).then(savedModules => {
         this.savedModules = savedModules;
       }).catch(error => {
         console.error('Error fetching saved modules:', error);
