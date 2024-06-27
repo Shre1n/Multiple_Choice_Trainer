@@ -99,11 +99,11 @@ export class ModuleService {
         if (userDoc.exists()) {
           existingData = userDoc.data();
         }
-        if (!existingData.sessions) {
-          existingData.sessions = [];
+        if (!existingData.selfmademodules) {
+          existingData.selfmademodules = [];
         }
 
-        existingData.sessions.push(moduleData);
+        existingData.selfmademodules.push(moduleData);
         await setDoc(userRef, existingData,  { merge: true });
 
       }catch (error) {
