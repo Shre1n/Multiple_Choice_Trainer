@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {GestureDetail, IonicModule} from "@ionic/angular";
 import {Router} from "@angular/router";
 import {ModuleService} from "../../services/module.service";
 import {AuthService} from "../../services/auth.service";
 import {AlertController, ToastController} from "@ionic/angular/standalone";
 import {FooterComponent} from "../../footer/footer.component";
+import {addIcons} from "ionicons";
+import {addCircleSharp} from "ionicons/icons";
 
 @Component({
   selector: 'app-card-list',
@@ -19,26 +21,46 @@ import {FooterComponent} from "../../footer/footer.component";
 export class CardListComponent  implements OnInit {
 
   savedModules: any[] = [];
+  userSessions: any[] = [];
 
   constructor(private router:Router,
               private moduleService: ModuleService,
               private authService: AuthService,
               private alertController: AlertController,
-              private toastController: ToastController,) {
+              private toastController: ToastController,
+              private cdr: ChangeDetectorRef) {
+    addIcons({addCircleSharp});
   }
 
   async ngOnInit() {
-    this.fetchSavedModules();
+    this.fetchSessionSavedModules();
   }
 
-  async fetchSavedModules() {
+  async loadAndSortUserSessions() {
     const user = await this.authService.getCurrentUser();
     if (user) {
-      this.moduleService.getSavedModulesForUser(user.uid).then(savedModules => {
-        this.savedModules = savedModules;
-      }).catch(error => {
+      try {
+        this.userSessions = await this.moduleService.getUserSessions(user.uid);
+        await this.moduleService.sortModulesByLastStudied(this.userSessions);
+      } catch (error) {
+        console.error('Error loading and sorting user sessions:', error);
+      }
+    } else {
+      console.error('No user is logged in');
+    }
+  }
+
+  async fetchSessionSavedModules() {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      try {
+        this.savedModules = await this.moduleService.getSavedSessionModulesForUser(user.uid);
+        this.cdr.detectChanges();
+      } catch (error) {
         console.error('Error fetching saved modules:', error);
-      });
+      }
+    } else {
+      console.error('No user is logged in');
     }
   }
 

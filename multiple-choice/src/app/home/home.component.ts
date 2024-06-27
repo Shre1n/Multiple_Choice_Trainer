@@ -2,7 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import { Router } from '@angular/router';
 import {GestureController, GestureDetail, IonicModule, NavController} from "@ionic/angular";
 import {addIcons} from "ionicons";
-import { personOutline, logOutOutline, calculatorOutline, schoolOutline, codeSlashOutline } from 'ionicons/icons';
+import { personOutline, logOutOutline, calculatorOutline, schoolOutline,addCircleSharp, codeSlashOutline } from 'ionicons/icons';
 import {AuthService} from "../services/auth.service";
 import {ModuleService} from "../services/module.service";
 import {AlertController, ToastController} from "@ionic/angular/standalone";
@@ -25,6 +25,7 @@ export class HomeComponent implements OnInit{
 
   isLoggedIn!:boolean;
   modules: any[] = [];
+  userModules: any[] = [];
   errorMessage: string = 'No Connection to External Server! :cry:';
   categories: string[] = [];
 
@@ -36,7 +37,7 @@ export class HomeComponent implements OnInit{
               private moduleService: ModuleService,
               private toastController: ToastController,
               private alertController: AlertController) {
-    addIcons({ personOutline, logOutOutline, calculatorOutline, schoolOutline, codeSlashOutline });
+    addIcons({ personOutline, logOutOutline, calculatorOutline, addCircleSharp, schoolOutline, codeSlashOutline });
     this.isLoggedIn = this.isAuth();
   }
 
@@ -44,8 +45,34 @@ export class HomeComponent implements OnInit{
     this.initializeSwipeGesture();
     this.checkLoginStatus();
     this.loadModules();
+    this.loadUserModules();
     this.checkForUpdates();
   }
+
+  navigateToCardDetail() {
+    this.router.navigate(['/card-detail']);
+  }
+
+  async loadUserModules() {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      const savedModules = await this.moduleService.getSavedModulesForUser();
+      if (savedModules) {
+        this.userModules = savedModules;
+      } else {
+        this.userModules = []; // Fallback to empty array if savedModules is undefined
+      }
+    } else {
+      this.userModules = []; // Fallback to empty array if user is not logged in
+    }
+  }
+
+  async addModule(module: any) {
+    await this.moduleService.saveUserModulesToFirestore(module);
+    this.loadUserModules();
+  }
+
+
 
   async presentToast(position: 'middle') {
     const toast = await this.toastController.create({
