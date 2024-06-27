@@ -102,6 +102,51 @@ export class ModuleService {
     }
   }
 
+  async saveUserModulesToFirestore(module: any): Promise<void> {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      const userRef = doc(this.firestore, `users/${user.uid}`);
+      try {
+        const userDoc = await getDoc(userRef);
+        let existingData: any = {};
+        if (userDoc.exists()) {
+          existingData = userDoc.data();
+        }
+        if (!existingData.selfmademodules) {
+          existingData.selfmademodules = [];
+        }
+
+        existingData.selfmademodules.push(module);
+        await setDoc(userRef, existingData, { merge: true });
+      } catch (error) {
+        console.error('Error saving module:', error);
+      }
+    }
+  }
+
+  async getSavedModulesForUser(userID: string): Promise<any[]> {
+    const userRef = doc(this.firestore, `users/${userID}`);
+    const userDoc = await getDoc(userRef);
+    let existingData: any = {};
+    if (userDoc.exists()) {
+      existingData = userDoc.data();
+    }
+
+    if (!existingData.selfmademodules) {
+      existingData.selfmademodules = [];
+    }
+
+    // Collect all modules from all sessions
+    let savedModules: any[] = [];
+    existingData.selfmademodules.forEach((module: any) => {
+      savedModules.push(module);
+    });
+
+    return savedModules;
+  }
+
+
+
   async saveSession(userID: string, sessionData: any) {
     const user = await this.authService.getCurrentUser();
     if (user) {
@@ -146,7 +191,7 @@ export class ModuleService {
     }
   }
 
-  async getSavedModulesForUser(userID: string): Promise<any[]> {
+  async getSavedSessionModulesForUser(userID: string): Promise<any[]> {
     const userRef = doc(this.firestore, `users/${userID}`);
     const userDoc = await getDoc(userRef);
     let existingData: any = {};
@@ -166,6 +211,8 @@ export class ModuleService {
 
     return savedModules;
   }
+
+
 
   async findAll(): Promise<ModuleModule[]> {
     const filterQuery = query(this.modulesCollectionRef)

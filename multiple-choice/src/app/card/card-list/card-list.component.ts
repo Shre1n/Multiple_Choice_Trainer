@@ -31,13 +31,13 @@ export class CardListComponent  implements OnInit {
   }
 
   async ngOnInit() {
-    this.fetchSavedModules();
+    this.fetchSessionSavedModules();
   }
 
-  async fetchSavedModules() {
+  async fetchSessionSavedModules() {
     const user = await this.authService.getCurrentUser();
     if (user) {
-      this.moduleService.getSavedModulesForUser(user.uid).then(savedModules => {
+      this.moduleService.getSavedSessionModulesForUser(user.uid).then(savedModules => {
         this.savedModules = savedModules;
       }).catch(error => {
         console.error('Error fetching saved modules:', error);
