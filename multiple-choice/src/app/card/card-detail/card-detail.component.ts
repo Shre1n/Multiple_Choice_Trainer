@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {AlertController, IonicModule, ToastController} from "@ionic/angular";
+import {AlertController, GestureDetail, IonicModule, ToastController} from "@ionic/angular";
 import {FormsModule} from "@angular/forms";
 import {Router} from "@angular/router";
 import {AuthService} from "../../services/auth.service";
@@ -53,7 +53,7 @@ export class CardDetailComponent {
   }
 
   clearAnswer(index: number){
-    this.currentQuestion.answers.splice(index,1);
+    this.currentQuestion.answers[index]="";
   }
 
   clearCategory(){
@@ -127,6 +127,14 @@ export class CardDetailComponent {
         position: 'top'
       });
       toast.present();
+    }
+  }
+
+
+ onSwipe(ev: GestureDetail) {
+    const deltaX = ev.deltaX;
+    if (deltaX < -50) {
+     this.saveModule();
     }
   }
 }
