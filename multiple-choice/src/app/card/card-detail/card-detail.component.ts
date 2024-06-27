@@ -4,6 +4,9 @@ import {FormsModule} from "@angular/forms";
 import {Router} from "@angular/router";
 import {AuthService} from "../../services/auth.service";
 import {ModuleService} from "../../services/module.service";
+import {addIcons} from "ionicons";
+import {close} from "ionicons/icons";
+
 
 interface Question {
   question: string;
@@ -23,7 +26,7 @@ interface Question {
   ],
   standalone: true
 })
-export class CardDetailComponent{
+export class CardDetailComponent {
 
   category: string = '';
   categoryAdded: boolean = false;
@@ -42,8 +45,8 @@ export class CardDetailComponent{
               private alertController: AlertController,
               private toastController: ToastController,
               private navCtrl:NavController) {
+    addIcons({close})
   }
-
 
   addCategory() {
     this.moduleData.category = this.category;
@@ -54,6 +57,20 @@ export class CardDetailComponent{
     this.currentQuestion.question = '';
     this.currentQuestion.answers = ['', '', '', ''];
     this.currentQuestion.correctAnswer = null;
+  }
+
+  clearAnswer(index: number){
+    this.currentQuestion.answers[index]="";
+  }
+
+  clearCategory(){
+    this.category= "";
+    this.categoryAdded= false;
+    this.moduleData.category ="";
+  }
+
+  clearQuestion(){
+    this.currentQuestion.question="";
   }
 
   addAnswerField() {
@@ -81,6 +98,7 @@ export class CardDetailComponent{
     if (!this.categoryAdded) {
       this.categoryAdded = true;  // Make category readonly after first question is saved
     }
+
   }
 
   trackByIndex(index: number, obj: any): any {
