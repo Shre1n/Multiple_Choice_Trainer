@@ -92,7 +92,7 @@ export class CardDetailComponent {
   }
 
   async save() {
-    await this.moduleService.saveModule(this.moduleData);
+      await this.moduleService.saveModule(this.moduleData);
   }
 
   async alertCancel() {
