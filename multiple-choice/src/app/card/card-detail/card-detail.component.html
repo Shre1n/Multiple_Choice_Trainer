@@ -1,5 +1,8 @@
 <ion-header>
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
     <ion-title slot="start">Neues Modul erstellen</ion-title>
   </ion-toolbar>
 </ion-header>
@@ -46,19 +49,21 @@
 
       <!-- Answer Inputs -->
       @for (answer of currentQuestion.answers; track trackByIndex; let i = $index) {
-        <ion-item>
-          <ion-label position="floating">Antwort {{ i + 1 }}</ion-label>
-          <ion-input [(ngModel)]="currentQuestion.answers[i]" name="answer{{ i }}" required maxlength="50" [counter]="true">
-            <ion-button (click)="clearAnswer(i)" slot="end" type="button">
-              <ion-icon slot="icon-only" name="close"></ion-icon>
-            </ion-button>
-          </ion-input>
-        </ion-item>
+          <ion-item lines="none" class="answer-item">
+            <ion-radio-group slot="start" value="default" (ionChange)="setCorrectAnswer(i)">
+              <ion-radio [(ngModel)]="currentQuestion.correctAnswer" [value]="answer"></ion-radio>
+            </ion-radio-group>
+            <ion-label position="floating">Antwort {{ i + 1 }}</ion-label>
+            <ion-input [(ngModel)]="currentQuestion.answers[i]" name="answer{{ i }}" required maxlength="50" [counter]="true">
+              <ion-button (click)="clearAnswer(i)" slot="end" type="button">
+                <ion-icon slot="icon-only" name="close"></ion-icon>
+              </ion-button></ion-input>
+          </ion-item>
       }
 
       <!-- Add Answer Button -->
       @if (currentQuestion.answers.length < 6) {
-        <ion-button (click)="addAnswerField()" type="button">
+        <ion-button expand="block" (click)="addAnswerField()" type="button">
           <ion-icon name="add-circle-sharp"></ion-icon>
           Antwort hinzufügen
         </ion-button>

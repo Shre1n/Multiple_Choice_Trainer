@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {AlertController, GestureDetail, IonicModule, ToastController} from "@ionic/angular";
+import {AlertController, IonicModule, NavController, ToastController} from "@ionic/angular";
 import {FormsModule} from "@angular/forms";
 import {Router} from "@angular/router";
 import {AuthService} from "../../services/auth.service";
@@ -11,7 +11,7 @@ import {close} from "ionicons/icons";
 interface Question {
   question: string;
   answers: string[];
-  correctAnswer: string;
+  correctAnswer: string | null;
   answeredCorrectlyCount: number;
   answeredIncorrectlyCount: number;
 }
@@ -34,7 +34,7 @@ export class CardDetailComponent {
   currentQuestion: Question = {
     question: '',
     answers: ['', '', '', ''],
-    correctAnswer: '',
+    correctAnswer: null,
     answeredCorrectlyCount: 0,
     answeredIncorrectlyCount: 0
   };
@@ -43,13 +43,20 @@ export class CardDetailComponent {
               private authService: AuthService,
               private moduleService: ModuleService,
               private alertController: AlertController,
-              private toastController: ToastController,) {
+              private toastController: ToastController,
+              private navCtrl:NavController) {
     addIcons({close})
   }
 
   addCategory() {
     this.moduleData.category = this.category;
     this.categoryAdded = true;
+  }
+
+  resetAnswers() {
+    this.currentQuestion.question = '';
+    this.currentQuestion.answers = ['', '', '', ''];
+    this.currentQuestion.correctAnswer = null;
   }
 
   clearAnswer(index: number){
@@ -72,15 +79,22 @@ export class CardDetailComponent {
     }
   }
 
-  async saveModule() {
-    this.moduleData.modules.push({ ...this.currentQuestion });
+  setCorrectAnswer(index: number) {
+    this.currentQuestion.correctAnswer = this.currentQuestion.answers[index];
+  }
+
+  clearCurrentQuestion() {
     this.currentQuestion = {
       question: '',
       answers: ['', '', '', ''],
-      correctAnswer: '',
+      correctAnswer: null,
       answeredCorrectlyCount: 0,
       answeredIncorrectlyCount: 0
     };
+  }
+
+  async saveModule() {
+    this.moduleData.modules.push({ ...this.currentQuestion });
     if (!this.categoryAdded) {
       this.categoryAdded = true;  // Make category readonly after first question is saved
     }
@@ -92,7 +106,8 @@ export class CardDetailComponent {
   }
 
   async save() {
-      await this.moduleService.saveModule(this.moduleData);
+    await this.moduleService.saveModule(this.moduleData);
+    this.resetAnswers();
   }
 
   async alertCancel() {
@@ -107,6 +122,7 @@ export class CardDetailComponent {
             role: 'yes',
             cssClass: 'secondary',
             handler: async () => {
+              await this.navCtrl.pop();
               await this.router.navigate(['/home']);
             }
           },
@@ -127,14 +143,6 @@ export class CardDetailComponent {
         position: 'top'
       });
       toast.present();
-    }
-  }
-
-
- onSwipe(ev: GestureDetail) {
-    const deltaX = ev.deltaX;
-    if (deltaX < -50) {
-     this.saveModule();
     }
   }
 }
