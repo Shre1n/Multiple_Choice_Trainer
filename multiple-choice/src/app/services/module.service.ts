@@ -93,7 +93,6 @@ export class ModuleService {
     if (user){
       const userRef = doc(this.firestore, `users/${user.uid}`);
       try {
-
         const userDoc = await getDoc(userRef);
         let existingData: any = {};
         if (userDoc.exists()) {
@@ -103,14 +102,36 @@ export class ModuleService {
           existingData.selfmademodules = [];
         }
 
-        existingData.selfmademodules.push(moduleData);
-        await setDoc(userRef, existingData,  { merge: true });
+        // Prüfe, ob die Kategorie bereits existiert
+        const existingCategoryIndex = existingData.selfmademodules.findIndex((selfmademodule: any) => selfmademodule.category === moduleData.category);
 
-      }catch (error) {
-        console.error('Error saving session:', error);
+        if (existingCategoryIndex !== -1) {
+          // Kategorie existiert bereits, füge die neuen Module hinzu oder aktualisiere bestehende Module
+          moduleData.modules.forEach((newModule: any) => {
+            const existingModuleIndex = existingData.selfmademodules[existingCategoryIndex].modules.findIndex((module: any) => module.question === newModule.question);
+            if (existingModuleIndex !== -1) {
+              // Modul existiert bereits, aktualisiere answeredCorrectlyCount und answeredIncorrectlyCount
+              existingData.selfmademodules[existingCategoryIndex].modules[existingModuleIndex].answeredCorrectlyCount += newModule.answeredCorrectlyCount;
+              existingData.selfmademodules[existingCategoryIndex].modules[existingModuleIndex].answeredIncorrectlyCount += newModule.answeredIncorrectlyCount;
+            } else {
+              // Modul existiert noch nicht, füge es hinzu
+              existingData.selfmademodules[existingCategoryIndex].modules.push(newModule);
+            }
+          });
+        } else {
+          // Füge die neue Kategorie hinzu, da sie noch nicht existiert
+          existingData.selfmademodules.push(moduleData);
+        }
+
+        await setDoc(userRef, existingData, { merge: true });
+        console.log('Module saved successfully');
+
+      } catch (error) {
+        console.error('Error saving module:', error);
       }
     }
   }
+
 
   async saveUserModulesToFirestore(module: any): Promise<void> {
     const user = await this.authService.getCurrentUser();
