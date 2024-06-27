@@ -7,7 +7,7 @@ import {
   doc,
   DocumentData,
   Firestore, getDoc,
-  getDocs,
+  getDocs, orderBy,
   query,
   setDoc, updateDoc
 } from "@angular/fire/firestore";
@@ -58,6 +58,16 @@ export class ModuleService {
   private saveLocal() {
     localStorage.setItem('records', JSON.stringify(this.modules));
     localStorage.setItem('nextId', this.nextId.toString());
+  }
+
+  async sortModulesByLastStudied(userSessions: any[]): Promise<void> {
+    userSessions.forEach(session => {
+      session.modules.sort((a: { lastStudied: string | number | Date; }, b: { lastStudied: string | number | Date; }) => {
+        const dateA = new Date(a.lastStudied);
+        const dateB = new Date(b.lastStudied);
+        return dateB.getTime() - dateA.getTime();
+      });
+    });
   }
 
   private async saveModulesToFirestore(module: ModuleModule): Promise<void> {
@@ -180,8 +190,10 @@ export class ModuleService {
               existingData.sessions[existingSessionIndex].modules[existingModuleIndex].answeredIncorrectlyCount += newModule.answeredIncorrectlyCount;
             }
           });
+          existingData.sessions[existingSessionIndex].lastStudied = new Date().toISOString();
         } else {
           // Füge die neue Sitzung hinzu, da die Kategorie noch nicht existiert
+          sessionData.lastStudied = new Date().toISOString();
           existingData.sessions.push(sessionData);
         }
 
@@ -196,7 +208,7 @@ export class ModuleService {
     }
   }
 
-  async getSavedSessionModulesForUser(userID: string): Promise<any[]> {
+  async getUserSessions(userID: string): Promise<any[]> {
     const userRef = doc(this.firestore, `users/${userID}`);
     const userDoc = await getDoc(userRef);
     let existingData: any = {};
@@ -208,13 +220,31 @@ export class ModuleService {
       existingData.sessions = [];
     }
 
-    // Collect all modules from all sessions
-    let savedModules: any[] = [];
-    existingData.sessions.forEach((session: any) => {
-      savedModules.push(session);
+    // Collect all sessions
+    return existingData.sessions;
+  }
+
+  async getSavedSessionModulesForUser(userID: string): Promise<any[]> {
+    const userRef = doc(this.firestore, `users/${userID}`);
+    const userDoc = await getDoc(userRef);
+    let existingData: any = {};
+
+    if (userDoc.exists()) {
+      existingData = userDoc.data();
+    }
+
+    if (!existingData.sessions) {
+      existingData.sessions = [];
+    }
+
+    // Sortiere die Sitzungen nach dem letzten Studiumsdatum absteigend
+    existingData.sessions.sort((a: any, b: any) => {
+      const dateA = new Date(a.lastStudied);
+      const dateB = new Date(b.lastStudied);
+      return dateB.getTime() - dateA.getTime();
     });
 
-    return savedModules;
+    return existingData.sessions;
   }
 
 
@@ -242,7 +272,6 @@ export class ModuleService {
     return this.http.get<any>(url);
   }
 
-  //TODO: Load User Modules
 
   checkForUpdates(): Observable<{ updatesAvailable: boolean }> {
     const url = `${this.baseUrl}/check-updates`;
