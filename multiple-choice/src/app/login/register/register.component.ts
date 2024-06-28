@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
-import { IonicModule, NavController } from '@ionic/angular';
+import {IonicModule, IonInput, NavController} from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { ToastController } from '@ionic/angular/standalone';
 import { AchievementsService } from '../../services/achievements.service';
@@ -25,6 +25,17 @@ export class RegisterComponent implements OnInit {
   additionalData: any = { name: '', otherData: '' };
   errorMessage: string = '';
   isToastOpen = false;
+
+  #IonInput: IonInput | undefined;
+  @ViewChild( IonInput)
+  set searchbar(II: IonInput) {
+    if (II) {
+      II.setFocus();
+      this.#IonInput = II;
+    }
+    setTimeout(() => II.setFocus(), 1);
+  }
+
 
   constructor(private authService: AuthService,
               private router: Router,

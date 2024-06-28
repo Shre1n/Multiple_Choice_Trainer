@@ -29,9 +29,8 @@
     <form (ngSubmit)="saveModule()">
       <!-- Category Input -->
       <ion-item>
-        <ion-label position="floating">Kategorie</ion-label>
-        <ion-input [(ngModel)]="category" name="category" readonly required maxlength="50" [counter]="true">
-        </ion-input>
+        <ion-label>Kategorie</ion-label>
+        <ion-label>{{ category }}</ion-label>
       </ion-item>
 
 
