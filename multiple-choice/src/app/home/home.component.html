@@ -29,36 +29,37 @@
 
       @for (module of userModules; track userModules; let i = $index; ) {
         <ion-col size="6">
-          <ion-card button (click)="navSession(module.category)"
-                    [ngStyle]="{'background-color': getCategoryBackground(module.category)}">
-            <ion-card-header class="ion-text-center">
-              <ion-card-title>{{ module.category }}</ion-card-title>
-            </ion-card-header>
-            <ion-row>
-              <ion-col>
-                <ion-card-content class="icon-container">
-                  <ion-button expand="block" fill="outline" (click)="updateModule(module)">
-                    <ion-icon name="pencil-sharp">
-                      <ion-label>Update</ion-label>
-                    </ion-icon>
-                  </ion-button>
-                  <ion-button expand="block" fill="outline" (click)="presentDeleteConfirm(module)">
-                    <ion-icon name="trash-sharp">
-                      <ion-label>Delete</ion-label>
-                    </ion-icon>
-                  </ion-button>
-                </ion-card-content>
-              </ion-col>
-            </ion-row>
-          </ion-card>
+          <ion-item-sliding>
+            <ion-item>
+              <ion-card button (click)="navSession(module.category)"
+                        [ngStyle]="{'background-color': getCategoryBackground(module.category)}">
+                <ion-card-header class="ion-text-center">
+                  <ion-card-title class="categoryTitle">{{ module.category }}</ion-card-title>
+                </ion-card-header>
+              </ion-card>
+            </ion-item>
+
+            <ion-item-options side="start">
+              <ion-item-option color="primary" expandable (click)="updateModule(module)">
+                <ion-icon slot="icon-only" name="pencil-sharp"></ion-icon>
+              </ion-item-option>
+            </ion-item-options>
+
+            <ion-item-options side="end">
+              <ion-item-option color="danger" expandable (click)="presentDeleteConfirm(module)">
+                <ion-icon slot="icon-only" name="trash-sharp"></ion-icon>
+              </ion-item-option>
+            </ion-item-options>
+          </ion-item-sliding>
         </ion-col>
       }
 
       @for (category of categories; track categories; ) {
         <ion-col size="6">
-          <ion-card button (click)="navSession(category)" [ngStyle]="{'background-color': getCategoryBackground(category)}">
+          <ion-card button (click)="navSession(category)"
+                    [ngStyle]="{'background-color': getCategoryBackground(category)}">
             <ion-card-header class="ion-text-center">
-              <ion-card-title id="categoryTitle">{{ category }}</ion-card-title>
+              <ion-card-title class="categoryTitle">{{ category }}</ion-card-title>
             </ion-card-header>
             <ion-card-content class="ion-text-center">
               <ion-icon [name]="getCategoryIcon(category)" style="color: #f6f7f9"></ion-icon>

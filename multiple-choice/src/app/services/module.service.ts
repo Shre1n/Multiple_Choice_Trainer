@@ -60,6 +60,26 @@ export class ModuleService {
     localStorage.setItem('nextId', this.nextId.toString());
   }
 
+  async getDataForUpdate(category: string): Promise<any> {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      const userRef = doc(this.firestore, `users/${user.uid}`);
+      const userDoc = await getDoc(userRef);
+      if (!userDoc.exists()) throw new Error('User document not found');
+      const userData = userDoc.data();
+
+      // Überprüfen, ob das Feld selfmademodules im Benutzerdokument existiert und ein Array ist
+      const modulesData = userData && Array.isArray(userData['selfmademodules']) ? userData['selfmademodules'] : [];
+
+      // Filtern der Module nach der angegebenen Kategorie
+      const filteredModules = modulesData.filter((module: any) => module.category === category);
+      console.log(filteredModules);
+      return filteredModules;
+
+
+    }
+  }
+
   async sortModulesByLastStudied(userSessions: any[]): Promise<void> {
     userSessions.forEach(session => {
       session.modules.sort((a: { lastStudied: string | number | Date; }, b: { lastStudied: string | number | Date; }) => {
@@ -85,6 +105,32 @@ export class ModuleService {
       console.log('saved to Firestore:', module);
     } catch (error) {
       console.log('Error saving to Firestore', error);
+    }
+  }
+
+  async getSavedModulesForUser(): Promise<any[]> {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      const userRef = doc(this.firestore, `users/${user.uid}`);
+      const userDoc = await getDoc(userRef);
+      let existingData: any = {};
+      if (userDoc.exists()) {
+        existingData = userDoc.data();
+      }
+
+      if (!existingData.selfmademodules) {
+        existingData.selfmademodules = [];
+      }
+
+      // Collect all modules from all sessions
+      let savedModules: any[] = [];
+      existingData.selfmademodules.forEach((module: any) => {
+        savedModules.push(module);
+      });
+      return savedModules;
+    } else {
+      // Return an empty array if user is not logged in
+      return [];
     }
   }
 

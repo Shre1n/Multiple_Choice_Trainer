@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import { Router } from '@angular/router';
 import {GestureController, GestureDetail, IonicModule, NavController} from "@ionic/angular";
 import {addIcons} from "ionicons";
@@ -37,8 +37,10 @@ export class HomeComponent implements OnInit{
   isLoggedIn!:boolean;
   modules: any[] = [];
   userModules: any[] = [];
-  errorMessage: string = 'No Connection to External Server! :cry:';
   categories: string[] = [];
+  isDragging = false;
+
+  @ViewChild('cardContent', { read: ElementRef }) cardContent!: ElementRef;
 
 
   constructor(private router: Router,
@@ -70,9 +72,8 @@ export class HomeComponent implements OnInit{
   }
 
   updateModule(module: { category: any; }){
-
+    this.router.navigate(['/card-detail'], { queryParams: { category: module.category } });
   }
-
 
 
   async presentDeleteConfirm(module: { category: any; }) {

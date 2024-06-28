@@ -30,9 +30,19 @@ ion-card{
   align-items: center;
 }
 
-#categoryTitle{
-  color: white;
+.button-container {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
 
+.button-container.show-buttons {
+  opacity: 1;
+}
+
+
+.categoryTitle{
+  color: white;
+  font-size: medium;
 }
 
 ion-card.active {

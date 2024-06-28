@@ -1,11 +1,13 @@
 import {Component, OnInit} from '@angular/core';
 import {AlertController, IonicModule, NavController, ToastController} from "@ionic/angular";
 import {FormsModule} from "@angular/forms";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {AuthService} from "../../services/auth.service";
 import {ModuleService} from "../../services/module.service";
 import {addIcons} from "ionicons";
-import {close} from "ionicons/icons";
+import {alert, close} from "ionicons/icons";
+import index from "eslint-plugin-jsdoc";
+import {user} from "@angular/fire/auth";
 
 
 interface Question {
@@ -26,11 +28,12 @@ interface Question {
   ],
   standalone: true
 })
-export class CardDetailComponent {
+export class CardDetailComponent implements OnInit{
 
   category: string = '';
   categoryAdded: boolean = false;
   cancel = false;
+  modules: any[] = [];
   currentQuestion: Question = {
     question: '',
     answers: ['', '', '', ''],
@@ -44,9 +47,41 @@ export class CardDetailComponent {
               private moduleService: ModuleService,
               private alertController: AlertController,
               private toastController: ToastController,
-              private navCtrl:NavController) {
+              private navCtrl:NavController,
+              private route: ActivatedRoute,) {
     addIcons({close})
   }
+
+  ngOnInit(): void {
+    // Empfangen der Parameter aus der URL
+    this.route.queryParams.subscribe(params => {
+      this.category = params['category'];
+      // Laden der Daten für die angegebene Kategorie
+      this.loadDataForCategory(this.category);
+    });
+  }
+
+  // Funktion zum Laden der Daten für die angegebene Kategorie
+  async loadDataForCategory(category: string): Promise<void> {
+    try {
+      const filteredModules = await this.moduleService.getDataForUpdate(category);
+      if (filteredModules.length > 0) {
+        this.modules = filteredModules[0].modules;
+        if (this.modules.length > 0) {
+          this.currentQuestion = this.modules[0]; // Laden der ersten Frage als Beispiel
+        }
+      }
+    } catch (error) {
+      console.error('Error loading data for category:', error);
+      const toast = await this.toastController.create({
+        message: 'Fehler beim Laden der Daten für die Kategorie!',
+        duration: 2000,
+        position: 'top'
+      });
+      toast.present();
+    }
+  }
+
 
   addCategory() {
     this.moduleData.category = this.category;
@@ -145,4 +180,6 @@ export class CardDetailComponent {
       toast.present();
     }
   }
+
+
 }
