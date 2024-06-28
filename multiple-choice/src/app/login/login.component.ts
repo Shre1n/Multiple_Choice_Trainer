@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
-import {IonicModule, IonInput, NavController} from '@ionic/angular';
-import { FormsModule, NgForm } from '@angular/forms';
+import { IonicModule, IonInput, NavController } from '@ionic/angular';
+import {FormsModule, NgForm, Validators} from '@angular/forms';
 import { ToastController } from '@ionic/angular/standalone';
 import { AchievementsService } from '../services/achievements.service';
 import {addIcons} from "ionicons";

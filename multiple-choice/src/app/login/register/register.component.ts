@@ -18,6 +18,8 @@ import { AchievementsService } from '../../services/achievements.service';
 })
 export class RegisterComponent implements OnInit {
 
+  passwordMinLength:number=6;
+  nameMinLength:number=2;
   email: string = '';
   password: string = '';
   additionalData: any = { name: '', otherData: '' };
@@ -107,4 +109,6 @@ export class RegisterComponent implements OnInit {
       await this.presentToast(this.errorMessage, 5000);
     }
   }
+
+  protected readonly name = name;
 }
