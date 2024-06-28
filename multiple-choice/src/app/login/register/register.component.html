@@ -18,6 +18,7 @@
       </ion-input>
 
     </ion-item>
+
     @if (registerForm.submitted && !email) {
       <ion-note color="danger">
         Email is required.
@@ -25,12 +26,18 @@
     }
     <ion-item>
       <ion-label position="floating">Password</ion-label>
-      <ion-input [(ngModel)]="password" name="password" type="password" required>
+      <ion-input [(ngModel)]="password" name="password" type="password" required maxlength="15" minlength="6" [counter]="true">
         <ion-button (click)="clearPasswort()" slot="end" type="button">
           <ion-icon slot="icon-only" name="close"></ion-icon>
         </ion-button>
       </ion-input>
     </ion-item>
+
+    @if (registerForm.submitted && password.length < passwordMinLength){
+      <ion-note color="danger">
+        Password must be 6 characters long!
+      </ion-note>
+    }
 
     @if (registerForm.submitted && !password) {
       <ion-note color="danger">
@@ -40,12 +47,18 @@
 
     <ion-item>
       <ion-label position="floating">Name</ion-label>
-      <ion-input [(ngModel)]="additionalData.name" name="name" required>
+      <ion-input [(ngModel)]="additionalData.name" name="name" required maxlength="30" minlength="2" [counter]="true">
         <ion-button (click)="clearName()" slot="end" type="button">
           <ion-icon slot="icon-only" name="close"></ion-icon>
         </ion-button>
       </ion-input>
     </ion-item>
+
+    @if (registerForm.submitted && additionalData.name.length < nameMinLength){
+      <ion-note color="danger">
+        Name must be 2 characters long!
+      </ion-note>
+    }
 
     @if (registerForm.submitted && !additionalData.name) {
       <ion-note color="danger">
