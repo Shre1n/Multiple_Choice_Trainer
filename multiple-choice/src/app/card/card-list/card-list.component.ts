@@ -1,10 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {GestureDetail, IonicModule} from "@ionic/angular";
 import {Router} from "@angular/router";
 import {ModuleService} from "../../services/module.service";
 import {AuthService} from "../../services/auth.service";
 import {AlertController, ToastController} from "@ionic/angular/standalone";
 import {FooterComponent} from "../../footer/footer.component";
+import {addIcons} from "ionicons";
+import {addCircleSharp,shareSocialOutline} from "ionicons/icons";
+import {Share} from '@capacitor/share';
 
 @Component({
   selector: 'app-card-list',
@@ -19,26 +22,70 @@ import {FooterComponent} from "../../footer/footer.component";
 export class CardListComponent  implements OnInit {
 
   savedModules: any[] = [];
+  userSessions: any[] = [];
 
   constructor(private router:Router,
               private moduleService: ModuleService,
               private authService: AuthService,
               private alertController: AlertController,
-              private toastController: ToastController,) {
+              private toastController: ToastController,
+              private cdr: ChangeDetectorRef) {
+    addIcons({addCircleSharp,shareSocialOutline});
   }
 
   async ngOnInit() {
-    this.fetchSavedModules();
+    this.fetchSessionSavedModules();
   }
 
-  async fetchSavedModules() {
+  async loadAndSortUserSessions() {
     const user = await this.authService.getCurrentUser();
     if (user) {
-      this.moduleService.getSavedModulesForUser().then(savedModules => {
-        this.savedModules = savedModules;
-      }).catch(error => {
+      try {
+        this.userSessions = await this.moduleService.getUserSessions(user.uid);
+        await this.moduleService.sortModulesByLastStudied(this.userSessions);
+      } catch (error) {
+        console.error('Error loading and sorting user sessions:', error);
+      }
+    } else {
+      console.error('No user is logged in');
+    }
+  }
+
+  shareLearnedModules() {
+    let msgText = "Hallo, \ndas sind meine Angefangenen Module:\n";
+
+    msgText += "Kategorien:\n"
+    this.savedModules.forEach(mod => {
+      msgText += `${mod.category}\n`;
+    });
+
+    Share.canShare().then(canShare => {
+      if (canShare.value) {
+        Share.share({
+          title: 'Meine Angefangenen Module',
+          text: msgText,
+          dialogTitle: 'Module teilen'
+        }).then((v) =>
+          console.log('ok: ', v))
+          .catch(err => console.log(err));
+      } else {
+        console.log('Error: Sharing not available!');
+      }
+    });
+
+  }
+
+  async fetchSessionSavedModules() {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      try {
+        this.savedModules = await this.moduleService.getSavedSessionModulesForUser(user.uid);
+        this.cdr.detectChanges();
+      } catch (error) {
         console.error('Error fetching saved modules:', error);
-      });
+      }
+    } else {
+      console.error('No user is logged in');
     }
   }
 

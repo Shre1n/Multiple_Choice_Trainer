@@ -36,7 +36,17 @@ export class SessionComponent  implements OnInit {
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.category = params['category']; // assuming category is passed as a parameter
-      this.loadAllCategoryModules();
+      this.loadModules();
+    });
+  }
+
+  loadModules() {
+    Promise.all([this.loadUserSavedModules(), this.loadAllCategoryModules()]).then(() => {
+      if (this.modules.length === 0) {
+        console.error('No modules found for this category:', this.category);
+      }
+    }).catch(error => {
+      console.error('Error loading modules:', error);
     });
   }
 
@@ -88,6 +98,28 @@ export class SessionComponent  implements OnInit {
     }
   }
 
+  loadUserSavedModules() {
+    this.moduleService.getSavedModulesForUser().then((data: any[]) => {
+      const foundModule = data.find(module => module.category === this.category);
+      if (foundModule && foundModule.modules) {
+        this.modules = foundModule.modules.map((module: any) => ({
+          question: module.question,
+          answers: this.shuffleArray([...module.answers]), // Use spread operator to clone array
+          correctAnswer: module.correctAnswer,
+          answeredCorrectlyCount: module.answeredCorrectlyCount,
+          answeredIncorrectlyCount: module.answeredIncorrectlyCount
+        }));
+      } else {
+        console.error('No modules found for this category:', this.category);
+      }
+    }).catch(error => {
+      console.error('Error loading modules:', error);
+    });
+  }
+
+
+  //This Category loader Only loads from Server Modules
+  //Must include the loading of user saved categories for card-list
   loadAllCategoryModules() {
     this.moduleService.loadExternalModule().subscribe(data => {
       if (data && data[this.category] && data[this.category].modules) {

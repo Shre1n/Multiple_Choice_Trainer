@@ -178,32 +178,6 @@ export class ModuleService {
     }
   }
 
-  async getSavedModulesForUser(): Promise<any[]> {
-    const user = await this.authService.getCurrentUser();
-    if (user) {
-      const userRef = doc(this.firestore, `users/${user.uid}`);
-      const userDoc = await getDoc(userRef);
-      let existingData: any = {};
-      if (userDoc.exists()) {
-        existingData = userDoc.data();
-      }
-
-      if (!existingData.selfmademodules) {
-        existingData.selfmademodules = [];
-      }
-
-      // Collect all modules from all sessions
-      let savedModules: any[] = [];
-      existingData.selfmademodules.forEach((module: any) => {
-        savedModules.push(module);
-      });
-      return savedModules;
-    } else {
-      // Return an empty array if user is not logged in
-      return [];
-    }
-  }
-
 
 
   async saveSession(userID: string, sessionData: any) {
@@ -291,8 +265,6 @@ export class ModuleService {
     return existingData.sessions;
   }
 
-
-
   async findAll(): Promise<ModuleModule[]> {
     const filterQuery = query(this.modulesCollectionRef)
     const moduleDocs = await getDocs(filterQuery);
@@ -305,8 +277,8 @@ export class ModuleService {
       }as ModuleModule;
     });
     this.saveLocal();
-    return  this.modules;
-    console.log(this.findAll())
+  return  this.modules;
+  console.log(this.findAll())
   }
 
 
@@ -315,7 +287,6 @@ export class ModuleService {
     const url: string = `${this.baseUrl}/load-all-modules`;
     return this.http.get<any>(url);
   }
-
 
   checkForUpdates(): Observable<{ updatesAvailable: boolean }> {
     const url = `${this.baseUrl}/check-updates`;

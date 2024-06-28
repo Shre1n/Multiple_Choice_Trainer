@@ -1,6 +1,6 @@
-import {AfterViewInit, Component, Input, OnInit, ChangeDetectorRef, ElementRef, ViewChild} from '@angular/core';
-import {Router} from '@angular/router';
-import {GestureController, GestureDetail, IonicModule, NavController, IonCard} from "@ionic/angular";
+import {Component, Input, OnInit} from '@angular/core';
+import { Router } from '@angular/router';
+import {GestureController, GestureDetail, IonicModule, NavController} from "@ionic/angular";
 import {addIcons} from "ionicons";
 import {
   personOutline,
@@ -32,11 +32,12 @@ import {Share} from '@capacitor/share';
   ],
   standalone: true
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit{
 
-  isLoggedIn!: boolean;
+  isLoggedIn!:boolean;
   modules: any[] = [];
   userModules: any[] = [];
+  errorMessage: string = 'No Connection to External Server! :cry:';
   categories: string[] = [];
 
 
@@ -46,10 +47,7 @@ export class HomeComponent implements OnInit {
               private gestureCtrl: GestureController,
               private moduleService: ModuleService,
               private toastController: ToastController,
-              private alertController: AlertController,
-              private el: ElementRef,
-              private cdRef: ChangeDetectorRef
-  ) {
+              private alertController: AlertController) {
     addIcons({
       personOutline,
       shareSocialOutline,
@@ -70,8 +68,6 @@ export class HomeComponent implements OnInit {
     this.loadUserModules();
     this.checkForUpdates();
   }
-
-
 
   updateModule(module: { category: any; }){
 
@@ -222,7 +218,7 @@ export class HomeComponent implements OnInit {
     );
   }
 
-  async loadModules() {
+  async loadModules(){
     this.moduleService.loadExternalModule().subscribe(
       response => {
         console.log('Modules loaded:', response);
@@ -259,13 +255,13 @@ export class HomeComponent implements OnInit {
   }
 
 
-  ionViewDidEnter() {
+  ionViewDidEnter(){
     this.authService.getCurrentUser()
     this.isLoggedIn = this.authService.isAuth();
   }
 
 
-  isAuth(): boolean {
+  isAuth(): boolean{
     return this.authService.isAuth();
   }
 
