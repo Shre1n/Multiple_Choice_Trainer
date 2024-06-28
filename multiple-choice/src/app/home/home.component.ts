@@ -2,13 +2,14 @@ import {Component, Input, OnInit} from '@angular/core';
 import { Router } from '@angular/router';
 import {GestureController, GestureDetail, IonicModule, NavController} from "@ionic/angular";
 import {addIcons} from "ionicons";
-import { personOutline, logOutOutline, calculatorOutline, schoolOutline,addCircleSharp, codeSlashOutline } from 'ionicons/icons';
+import { personOutline, logOutOutline,shareSocialOutline, calculatorOutline, schoolOutline,addCircleSharp, codeSlashOutline } from 'ionicons/icons';
 import {AuthService} from "../services/auth.service";
 import {ModuleService} from "../services/module.service";
 import {AlertController, ToastController} from "@ionic/angular/standalone";
 import {NgStyle} from "@angular/common";
 import {ModuleModule} from "../module/module.module";
 import {FooterComponent} from "../footer/footer.component";
+import {Share} from '@capacitor/share';
 
 @Component({
   selector: 'app-home',
@@ -37,7 +38,7 @@ export class HomeComponent implements OnInit{
               private moduleService: ModuleService,
               private toastController: ToastController,
               private alertController: AlertController) {
-    addIcons({ personOutline, logOutOutline, calculatorOutline, addCircleSharp, schoolOutline, codeSlashOutline });
+    addIcons({ personOutline,shareSocialOutline, logOutOutline, calculatorOutline, addCircleSharp, schoolOutline, codeSlashOutline });
     this.isLoggedIn = this.isAuth();
   }
 
@@ -47,6 +48,30 @@ export class HomeComponent implements OnInit{
     this.loadModules();
     this.loadUserModules();
     this.checkForUpdates();
+  }
+
+  async shareMyModules() {
+    let msgText = "Hallo, \ndas sind meine Module:\nKategorien:\n";
+
+    this.userModules = await this.moduleService.getSavedModulesForUser();
+
+    this.userModules.forEach(mod => {
+      msgText += `${mod.category}\n`;
+    });
+
+    Share.canShare().then(canShare => {
+      if (canShare.value) {
+        Share.share({
+          title: 'Meine Angefangenen Module',
+          text: msgText,
+          dialogTitle: 'Module teilen'
+        }).then((v) =>
+          console.log('ok: ', v))
+          .catch(err => console.log(err));
+      } else {
+        console.log('Error: Sharing not available!');
+      }
+    });
   }
 
   navigateToCardDetail() {

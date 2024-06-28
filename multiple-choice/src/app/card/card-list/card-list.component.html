@@ -1,8 +1,13 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>
+    <ion-title slot="start">
       Angefangene Module
     </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="shareLearnedModules()">
+      <ion-icon name="share-social-outline"></ion-icon>
+    </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 

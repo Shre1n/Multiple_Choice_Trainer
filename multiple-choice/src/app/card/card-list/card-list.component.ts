@@ -6,7 +6,8 @@ import {AuthService} from "../../services/auth.service";
 import {AlertController, ToastController} from "@ionic/angular/standalone";
 import {FooterComponent} from "../../footer/footer.component";
 import {addIcons} from "ionicons";
-import {addCircleSharp} from "ionicons/icons";
+import {addCircleSharp,shareSocialOutline} from "ionicons/icons";
+import {Share} from '@capacitor/share';
 
 @Component({
   selector: 'app-card-list',
@@ -29,7 +30,7 @@ export class CardListComponent  implements OnInit {
               private alertController: AlertController,
               private toastController: ToastController,
               private cdr: ChangeDetectorRef) {
-    addIcons({addCircleSharp});
+    addIcons({addCircleSharp,shareSocialOutline});
   }
 
   async ngOnInit() {
@@ -48,6 +49,30 @@ export class CardListComponent  implements OnInit {
     } else {
       console.error('No user is logged in');
     }
+  }
+
+  shareLearnedModules() {
+    let msgText = "Hallo, \ndas sind meine Angefangenen Module:\n";
+
+    msgText += "Kategorien:\n"
+    this.savedModules.forEach(mod => {
+      msgText += `${mod.category}\n`;
+    });
+
+    Share.canShare().then(canShare => {
+      if (canShare.value) {
+        Share.share({
+          title: 'Meine Angefangenen Module',
+          text: msgText,
+          dialogTitle: 'Module teilen'
+        }).then((v) =>
+          console.log('ok: ', v))
+          .catch(err => console.log(err));
+      } else {
+        console.log('Error: Sharing not available!');
+      }
+    });
+
   }
 
   async fetchSessionSavedModules() {
