@@ -34,7 +34,7 @@ export class CardListComponent  implements OnInit {
   async fetchSavedModules() {
     const user = await this.authService.getCurrentUser();
     if (user) {
-      this.moduleService.getSavedModulesForUser(user.uid).then(savedModules => {
+      this.moduleService.getSavedModulesForUser().then(savedModules => {
         this.savedModules = savedModules;
       }).catch(error => {
         console.error('Error fetching saved modules:', error);
