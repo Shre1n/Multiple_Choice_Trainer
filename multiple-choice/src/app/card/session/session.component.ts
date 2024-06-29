@@ -71,6 +71,7 @@ export class SessionComponent  implements OnInit {
     this.router.navigate(['/card-list']);
   }
 
+
   async saveSessionProgress() {
     const user = await this.authService.getCurrentUser();
     if (user) {
@@ -80,6 +81,7 @@ export class SessionComponent  implements OnInit {
       };
       await this.moduleService.saveSession(user.uid, sessionData).then(() => {
         console.log('Session saved successfully');
+
       }).catch(error => {
         console.error('Error saving session:', error);
       });
@@ -124,6 +126,8 @@ export class SessionComponent  implements OnInit {
     }
   }
 
+
+
   async nextQuestion() {
     this.showCorrectAnswers = false;
     this.selectedAnswer = '';
@@ -136,8 +140,10 @@ export class SessionComponent  implements OnInit {
   }
 
 
+  showStatistic() {
+    this.router.navigate(['statistik/session-statistik']);
 
-
+  }
 }
 
 
