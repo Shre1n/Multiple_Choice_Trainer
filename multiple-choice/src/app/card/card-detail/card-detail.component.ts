@@ -6,9 +6,7 @@ import {AuthService} from "../../services/auth.service";
 import {ModuleService} from "../../services/module.service";
 import {addIcons} from "ionicons";
 import {alert, close} from "ionicons/icons";
-import index from "eslint-plugin-jsdoc";
-import {user} from "@angular/fire/auth";
-
+import {catchError} from "rxjs";
 
 interface Question {
   question: string;
@@ -40,9 +38,12 @@ export class CardDetailComponent implements OnInit{
     correctAnswer: null,
     answeredCorrectlyCount: 0,
     answeredIncorrectlyCount: 0
-
-
   };
+
+  isEditMode: boolean = false;
+  addMode = false;
+  showQuestionList: boolean = true;
+
 
   #IonInput: IonInput | undefined;
   @ViewChild( IonInput)
@@ -71,9 +72,15 @@ export class CardDetailComponent implements OnInit{
     // Empfangen der Parameter aus der URL
     this.route.queryParams.subscribe(params => {
       this.category = params['category'];
-      // Laden der Daten für die angegebene Kategorie
-      this.loadDataForCategory(this.category);
+      this.isEditMode = params['edit'] === 'true';
+      // Laden der Daten für die angegebene Kategorie, falls nicht im Edit-Modus
+      if (!params['edit']) {
+        this.resetAnswers();
+      } else {
+        this.loadDataForCategory(this.category);
+      }
     });
+
   }
 
   // Funktion zum Laden der Daten für die angegebene Kategorie
@@ -101,6 +108,48 @@ export class CardDetailComponent implements OnInit{
   addCategory() {
     this.moduleData.category = this.category;
     this.categoryAdded = true;
+  }
+
+  async presentToast(message: string, position: 'middle' | 'top' | 'bottom') {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 2000,
+      position: position,
+    });
+
+    await toast.present();
+  }
+
+  async addNewQuestion(category: string) {
+    // Prüfe, ob die Kategorie gesetzt ist
+    if (category && category.trim() !== '') {
+      // Erstelle eine neue Frage mit der aktuellen Kategorie
+      const newQuestion: Question = {
+        question: '',
+        answers: ['', '', '', ''],
+        correctAnswer: null,
+        answeredCorrectlyCount: 0,
+        answeredIncorrectlyCount: 0
+      };
+
+      // Füge die neue Frage zur Liste der bestehenden Module hinzu
+      this.modules.push(newQuestion);
+
+      await this.moduleService.addQuestionToCategory(category,newQuestion);
+
+      // Setze die Anzeige für die Frage-Liste auf false, um das Formular anzuzeigen
+      this.showQuestionList = false;
+
+      // Optional: Setze die Antworten zurück
+      this.resetAnswers();
+    } else {
+      const toast = await this.toastController.create({
+        message: 'Bitte geben Sie eine gültige Kategorie ein!',
+        duration: 2000,
+        position: 'top'
+      });
+      toast.present();
+    }
   }
 
   resetAnswers() {
@@ -144,11 +193,8 @@ export class CardDetailComponent implements OnInit{
   }
 
   async saveModule() {
+    this.moduleData.category = this.category;
     this.moduleData.modules.push({ ...this.currentQuestion });
-    if (!this.categoryAdded) {
-      this.categoryAdded = true;  // Make category readonly after first question is saved
-    }
-
   }
 
   trackByIndex(index: number, obj: any): any {
@@ -156,8 +202,23 @@ export class CardDetailComponent implements OnInit{
   }
 
   async save() {
-    await this.moduleService.saveModule(this.moduleData);
-    this.resetAnswers();
+    if (this.isEditMode) {
+      await this.updateModuleInFirebase();
+      await this.presentToast("Modul erfolgreich Aktualisiert!", "bottom")
+      await this.navCtrl.pop();
+    } else {
+      await this.saveModuleToFirebase();
+      this.resetAnswers();
+    }
+
+  }
+
+  async saveModuleToFirebase() {
+    await this.moduleService.saveUserModulesToFirestore(this.moduleData);
+  }
+
+  async updateModuleInFirebase() {
+    await this.moduleService.updateUserModuleInFirestore(this.moduleData, this.category);
   }
 
   async alertCancel() {
@@ -196,5 +257,17 @@ export class CardDetailComponent implements OnInit{
     }
   }
 
+  async selectQuestion(question: Question) {
+    this.currentQuestion = question;
+    this.showQuestionList = false;
+  }
 
+  backToQuestionList() {
+    this.showQuestionList = true;
+  }
+
+  navigateSelf(category:string){
+    this.addMode = true;
+    this.router.navigate(['/card-detail'], {queryParams: {category: category}});
+  }
 }

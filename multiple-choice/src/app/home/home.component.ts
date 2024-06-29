@@ -72,7 +72,7 @@ export class HomeComponent implements OnInit{
   }
 
   updateModule(module: { category: any; }){
-    this.router.navigate(['/card-detail'], { queryParams: { category: module.category } });
+    this.router.navigate(['/card-detail'], { queryParams: { category: module.category, edit: 'true' } });
   }
 
 

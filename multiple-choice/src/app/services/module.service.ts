@@ -224,6 +224,62 @@ export class ModuleService {
     }
   }
 
+  async addQuestionToCategory(category: string, newQuestion: any): Promise<void> {
+    try {
+      const user = await this.authService.getCurrentUser();
+      if (user) {
+        const userRef = doc(this.firestore, `users/${user.uid}`);
+        const userDoc = await getDoc(userRef);
+        if (!userDoc.exists()) {
+          throw new Error('User document not found');
+        }
+        const userData = userDoc.data();
+
+        // Überprüfe, ob das Feld selfmademodules im Benutzerdokument existiert und ein Array ist
+        const modulesData = Array.isArray(userData['selfmademodules']) ? userData['selfmademodules'] : [];
+
+        // Suche nach der Kategorie und füge die neue Frage hinzu
+        const categoryIndex = modulesData.findIndex((modules: any) => modules.category === category);
+        console.log(categoryIndex)
+        if (categoryIndex !== -1) {
+          modulesData[categoryIndex].modules.push(newQuestion);
+        }
+
+        // Aktualisiere die Daten in Firestore
+        await setDoc(userRef, { selfmademodules: modulesData }, { merge: true });
+        console.log('New question added successfully');
+      }
+    } catch (error) {
+      console.error('Error adding question:', error);
+    }
+  }
+
+  async updateUserModuleInFirestore(updatedModule: any, category: string): Promise<void> {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      const userRef = doc(this.firestore, `users/${user.uid}`);
+      try {
+        const userDoc = await getDoc(userRef);
+        if (!userDoc.exists()) throw new Error('User document not found');
+        const data = userDoc.data();
+
+        // Find the index of the module with the matching category
+        const modules = data['selfmademodules'] || [];
+        const moduleIndex = modules.findIndex((mod: any) => mod.category === category);
+
+        if (moduleIndex !== -1) {
+          // Update the module at the found index
+          modules[moduleIndex] = updatedModule;
+          await updateDoc(userRef, { selfmademodules: modules });
+        } else {
+          console.error('Module not found for the specified category');
+        }
+      } catch (error) {
+        console.error('Error updating module:', error);
+      }
+    }
+  }
+
 
 
   async saveSession(userID: string, sessionData: any) {
