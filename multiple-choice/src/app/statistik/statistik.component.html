@@ -1,5 +1,47 @@
-<p>
-  statistik works!?
-</p>
+<ion-header>
+  <ion-toolbar>
+    <ion-title slot="start">Meine Statistik</ion-title>
+  </ion-toolbar>
+</ion-header>
 
-<app-footer></app-footer>
+<ion-content>
+
+  <ion-list>
+    <ion-text class="ion-margin-vertical ion-text-center ion-align-self-center">
+      <h2 >Statistik deiner {{ anzModule }} Module</h2>
+    </ion-text>
+    <ion-text class="ion-margin-vertical ion-text-center ion-align-self-center">
+      <h2 >Abgeschlossene Karten: {{ counter6 }} </h2>
+    </ion-text>
+    <ion-text class="ion-margin-vertical ion-text-center ion-align-self-center">
+      <h2> Müssen noch geübt werden {{ anzNotDoneCards }} </h2>
+    </ion-text>
+
+    <ion-text class="ion-margin-vertical ion-text-center ion-align-self-center">
+      <h2 >erungene Achievements: {{ anzAchievements }} von {{anzMaxAchievements}}</h2>
+    </ion-text>
+    <div class="chart-container">
+      <canvas  id="MyChart" >{{ chart }}</canvas>
+    </div>
+    <ion-text class="ion-margin-vertical ion-text-center ion-align-self-center">
+      <h2>0 mal richtig: {{counter0}}</h2>
+    </ion-text>
+    <ion-button expand="block" (click)="share()">
+      teilen
+    <!--  <ion-icon slot="icon-only" name="share-outline"></ion-icon>
+    -->
+    </ion-button>
+    <ion-button expand="block" (click)="shareTest()">
+      Test Test
+      <!--  <ion-icon slot="icon-only" name="share-outline"></ion-icon>
+      -->
+    </ion-button>
+
+  </ion-list>
+</ion-content>
+
+
+
+
+<app-footer>
+</app-footer>

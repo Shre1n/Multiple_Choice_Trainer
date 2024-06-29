@@ -80,6 +80,7 @@ export class SessionComponent  implements OnInit {
       };
       await this.moduleService.saveSession(user.uid, sessionData).then(() => {
         console.log('Session saved successfully');
+
       }).catch(error => {
         console.error('Error saving session:', error);
       });
