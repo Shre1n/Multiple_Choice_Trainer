@@ -1,5 +1,5 @@
-import {Component, OnInit} from '@angular/core';
-import {AlertController, IonicModule, NavController, ToastController} from "@ionic/angular";
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {AlertController, IonicModule, IonInput, NavController, ToastController} from "@ionic/angular";
 import {FormsModule} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthService} from "../../services/auth.service";
@@ -40,7 +40,22 @@ export class CardDetailComponent implements OnInit{
     correctAnswer: null,
     answeredCorrectlyCount: 0,
     answeredIncorrectlyCount: 0
+
+
   };
+
+  #IonInput: IonInput | undefined;
+  @ViewChild( IonInput)
+  set IonInput(II: IonInput) {
+    if (II) {
+      II.setFocus();
+      this.#IonInput =II;
+    }
+    setTimeout(() => II.setFocus(), 1);
+  }
+
+
+
   moduleData: { category: string, modules: Question[] } = { category: '', modules: [] };
   constructor(private router: Router,
               private authService: AuthService,
