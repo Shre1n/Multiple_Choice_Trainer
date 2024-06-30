@@ -42,6 +42,7 @@ export class CardDetailComponent implements OnInit{
 
   isEditMode: boolean = false;
   addMode = false;
+  currentQuestionIndex: number | null = null;
   showQuestionList: boolean = true;
 
 
@@ -123,19 +124,8 @@ export class CardDetailComponent implements OnInit{
   async addNewQuestion(category: string) {
     // Prüfe, ob die Kategorie gesetzt ist
     if (category && category.trim() !== '') {
-      // Erstelle eine neue Frage mit der aktuellen Kategorie
-      const newQuestion: Question = {
-        question: '',
-        answers: ['', '', '', ''],
-        correctAnswer: null,
-        answeredCorrectlyCount: 0,
-        answeredIncorrectlyCount: 0
-      };
 
-      // Füge die neue Frage zur Liste der bestehenden Module hinzu
-      this.modules.push(newQuestion);
-
-      await this.moduleService.addQuestionToCategory(category,newQuestion);
+      this.moduleData.modules.push({ ...this.currentQuestion });
 
       // Setze die Anzeige für die Frage-Liste auf false, um das Formular anzuzeigen
       this.showQuestionList = false;
@@ -218,8 +208,9 @@ export class CardDetailComponent implements OnInit{
   }
 
   async updateModuleInFirebase() {
-    await this.moduleService.updateUserModuleInFirestore(this.moduleData, this.category);
-  }
+    if (this.currentQuestionIndex !== null) {
+      await this.moduleService.updateUserModuleInFirestore(this.currentQuestion, this.category, this.currentQuestionIndex);
+    }  }
 
   async alertCancel() {
     const user = await this.authService.getCurrentUser();
@@ -257,8 +248,9 @@ export class CardDetailComponent implements OnInit{
     }
   }
 
-  async selectQuestion(question: Question) {
+  selectQuestion(question: Question, index: number) {
     this.currentQuestion = question;
+    this.currentQuestionIndex = index;
     this.showQuestionList = false;
   }
 

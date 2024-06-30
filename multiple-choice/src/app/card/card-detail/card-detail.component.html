@@ -11,8 +11,8 @@
   @if (isEditMode && showQuestionList){
     <ion-button expand="full" type="button" (click)="navigateSelf(category)">Neue Frage Hinzufügen</ion-button>
     <ion-list>
-      @for (question of modules; track trackByIndex){
-      <ion-item (click)="selectQuestion(question)">
+      @for (question of modules; track trackByIndex; let i = $index){
+      <ion-item (click)="selectQuestion(question,i)">
         <ion-label>{{ question.question }}</ion-label>
       </ion-item>
       }
@@ -64,12 +64,10 @@
       }
 
       <!-- Control Buttons -->
-      @if(!addMode){
-        <ion-button expand="block" type="submit" (click)="save()">Weiter</ion-button>
-        <ion-button expand="block" color="danger" (click)="alertCancel()">Speichern und beenden</ion-button>
-      }
-      <ion-button expand="block" type="submit" (click)="addNewQuestion(category)">Weiter</ion-button>
+
+      <ion-button expand="block" type="submit" (click)="save()">Weiter</ion-button>
       <ion-button expand="block" color="danger" (click)="alertCancel()">Speichern und beenden</ion-button>
+
 
 
     </form>

@@ -13,10 +13,8 @@ import {
 } from "@angular/fire/firestore";
 import {ModuleModule} from "../module/module.module";
 import {environment} from "../../environments/environment.prod";
-import {recording} from "ionicons/icons";
 import {AuthService} from "./auth.service";
-import index from "eslint-plugin-jsdoc";
-import {get} from "@angular/fire/database";
+
 
 @Injectable({
   providedIn: 'root'
@@ -202,7 +200,7 @@ export class ModuleService {
   }
 
 
-  async saveUserModulesToFirestore(module: any): Promise<void> {
+  async saveUserModulesToFirestore(moduleData: any): Promise<void> {
     const user = await this.authService.getCurrentUser();
     if (user) {
       const userRef = doc(this.firestore, `users/${user.uid}`);
@@ -216,7 +214,19 @@ export class ModuleService {
           existingData.selfmademodules = [];
         }
 
-        existingData.selfmademodules.push(module);
+        let categoryFound = false;
+        for (let i = 0; i < existingData.selfmademodules.length; i++) {
+          if (existingData.selfmademodules[i].category === moduleData.category) {
+            existingData.selfmademodules[i].modules.push(...moduleData.modules);
+            categoryFound = true;
+            break;
+          }
+        }
+
+        if (!categoryFound) {
+          existingData.selfmademodules.push(moduleData);
+        }
+
         await setDoc(userRef, existingData, { merge: true });
       } catch (error) {
         console.error('Error saving module:', error);
@@ -224,37 +234,7 @@ export class ModuleService {
     }
   }
 
-  async addQuestionToCategory(category: string, newQuestion: any): Promise<void> {
-    try {
-      const user = await this.authService.getCurrentUser();
-      if (user) {
-        const userRef = doc(this.firestore, `users/${user.uid}`);
-        const userDoc = await getDoc(userRef);
-        if (!userDoc.exists()) {
-          throw new Error('User document not found');
-        }
-        const userData = userDoc.data();
-
-        // Überprüfe, ob das Feld selfmademodules im Benutzerdokument existiert und ein Array ist
-        const modulesData = Array.isArray(userData['selfmademodules']) ? userData['selfmademodules'] : [];
-
-        // Suche nach der Kategorie und füge die neue Frage hinzu
-        const categoryIndex = modulesData.findIndex((modules: any) => modules.category === category);
-        console.log(categoryIndex)
-        if (categoryIndex !== -1) {
-          modulesData[categoryIndex].modules.push(newQuestion);
-        }
-
-        // Aktualisiere die Daten in Firestore
-        await setDoc(userRef, { selfmademodules: modulesData }, { merge: true });
-        console.log('New question added successfully');
-      }
-    } catch (error) {
-      console.error('Error adding question:', error);
-    }
-  }
-
-  async updateUserModuleInFirestore(updatedModule: any, category: string): Promise<void> {
+  async updateUserModuleInFirestore(updatedQuestion: any, category: string, questionIndex: number): Promise<void> {
     const user = await this.authService.getCurrentUser();
     if (user) {
       const userRef = doc(this.firestore, `users/${user.uid}`);
@@ -268,9 +248,14 @@ export class ModuleService {
         const moduleIndex = modules.findIndex((mod: any) => mod.category === category);
 
         if (moduleIndex !== -1) {
-          // Update the module at the found index
-          modules[moduleIndex] = updatedModule;
-          await updateDoc(userRef, { selfmademodules: modules });
+          // Update the specific question within the module
+          const module = modules[moduleIndex];
+          if (module && module.modules && module.modules[questionIndex]) {
+            module.modules[questionIndex] = updatedQuestion;
+            await updateDoc(userRef, { selfmademodules: modules });
+          } else {
+            console.error('Question not found for the specified index');
+          }
         } else {
           console.error('Module not found for the specified category');
         }
