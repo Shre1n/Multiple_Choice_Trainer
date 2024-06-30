@@ -41,10 +41,11 @@ export class HomeComponent implements OnInit {
   modules: any[] = [];
   userModules: any[] = [];
   categories: string[] = [];
-  isDragging = false;
-  showSearchbar: boolean = false;
+  showSearchBar: boolean = false;
   searchText: string = "";
-  filtermodule: any[] = [];
+  filterServermodule: any[] = [];
+  filterUsermodule: any[] = [];
+
 
   @ViewChild('cardContent', {read: ElementRef}) cardContent!: ElementRef;
   @ViewChild('searchbar') searchbar!: IonSearchbar;
@@ -76,6 +77,12 @@ export class HomeComponent implements OnInit {
     this.loadModules();
     this.loadUserModules();
     this.checkForUpdates();
+    console.log(this.filterServermodule)
+    console.log(this.filterUsermodule)
+  }
+
+  toggleSearchBar() {
+    this.showSearchBar = !this.showSearchBar;
   }
 
   updateModule(module: { category: any; }) {
@@ -109,8 +116,8 @@ export class HomeComponent implements OnInit {
   }
 
   search() {
-    this.showSearchbar = !this.showSearchbar;
-    if (this.showSearchbar) {
+    this.showSearchBar = !this.showSearchBar;
+    if (this.showSearchBar) {
       setTimeout(() => {
         this.searchbar.setFocus();
       }, 100);
@@ -118,26 +125,29 @@ export class HomeComponent implements OnInit {
   }
 
   closeSearch() {
-    this.searchText = "";
+    this.searchText = '';
+    this.filterModule();
   }
 
   clear() {
     this.searchText = "";
-    this.filterModule();
+    this.filterServermodule = [...this.categories];
+    this.filterUsermodule = [...this.filterUsermodule]
   }
 
   filterModule() {
     if (this.searchText.trim() === '') {
-      this.filtermodule = this.categories
+      this.filterServermodule = [...this.categories];
+      this.filterUsermodule = [...this.filterUsermodule]
     } else {
-      console.log(this.categories);
-      console.log(this.userModules);
-      // @ts-ignore
-
-      this.filtermodule = this.categories.filter(category =>
+      this.filterServermodule = this.categories.filter(category =>
         category.toLowerCase().includes(this.searchText.toLowerCase())
       );
-      console.log(this.filtermodule);
+      this.filterUsermodule = this.userModules.filter(module =>
+        module.toLowerCase().includes(this.searchText.toLowerCase())
+      );
+      this.filterServermodule = [...this.filterServermodule];
+      this.filterUsermodule = [...this.filterUsermodule]
     }
   }
 
@@ -155,7 +165,7 @@ export class HomeComponent implements OnInit {
   async shareMyModules() {
     let msgText = "Hallo, \ndas sind meine Module:\nKategorien:\n";
 
-    this.userModules = await this.moduleService.getSavedModulesForUser();
+    this.userModules = await this.moduleService.renderUserCategories();
 
     this.userModules.forEach(mod => {
       msgText += `${mod.category}\n`;
@@ -183,7 +193,8 @@ export class HomeComponent implements OnInit {
   async loadUserModules() {
     const user = await this.authService.getCurrentUser();
     if (user) {
-      const savedModules = await this.moduleService.getSavedModulesForUser();
+      const savedModules = await this.moduleService.renderUserCategories();
+      console.log(savedModules)
       if (savedModules) {
         this.userModules = savedModules;
       } else {
@@ -266,7 +277,6 @@ export class HomeComponent implements OnInit {
         console.log('Modules loaded:', response);
         this.modules = response;
         this.extractCategories(response);
-        this.filtermodule = this.categories;
       },
       error => {
         console.error('Error loading modules:', error);
