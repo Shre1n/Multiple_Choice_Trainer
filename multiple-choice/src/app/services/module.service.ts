@@ -13,10 +13,8 @@ import {
 } from "@angular/fire/firestore";
 import {ModuleModule} from "../module/module.module";
 import {environment} from "../../environments/environment.prod";
-import {recording} from "ionicons/icons";
 import {AuthService} from "./auth.service";
-import index from "eslint-plugin-jsdoc";
-import {get} from "@angular/fire/database";
+
 
 @Injectable({
   providedIn: 'root'
@@ -60,6 +58,26 @@ export class ModuleService {
     localStorage.setItem('nextId', this.nextId.toString());
   }
 
+  async getDataForUpdate(category: string): Promise<any> {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      const userRef = doc(this.firestore, `users/${user.uid}`);
+      const userDoc = await getDoc(userRef);
+      if (!userDoc.exists()) throw new Error('User document not found');
+      const userData = userDoc.data();
+
+      // Überprüfen, ob das Feld selfmademodules im Benutzerdokument existiert und ein Array ist
+      const modulesData = userData && Array.isArray(userData['selfmademodules']) ? userData['selfmademodules'] : [];
+
+      // Filtern der Module nach der angegebenen Kategorie
+      const filteredModules = modulesData.filter((module: any) => module.category === category);
+      console.log(filteredModules);
+      return filteredModules;
+
+
+    }
+  }
+
   async sortModulesByLastStudied(userSessions: any[]): Promise<void> {
     userSessions.forEach(session => {
       session.modules.sort((a: { lastStudied: string | number | Date; }, b: { lastStudied: string | number | Date; }) => {
@@ -85,6 +103,55 @@ export class ModuleService {
       console.log('saved to Firestore:', module);
     } catch (error) {
       console.log('Error saving to Firestore', error);
+    }
+  }
+
+  async getSavedModulesForUser(): Promise<any[]> {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      const userRef = doc(this.firestore, `users/${user.uid}`);
+      const userDoc = await getDoc(userRef);
+      let existingData: any = {};
+      if (userDoc.exists()) {
+        existingData = userDoc.data();
+      }
+
+      if (!existingData.selfmademodules) {
+        existingData.selfmademodules = [];
+      }
+
+      // Collect all modules from all sessions
+      let savedModules: any[] = [];
+      existingData.selfmademodules.forEach((module: any) => {
+        savedModules.push(module);
+      });
+      return savedModules;
+    } else {
+      // Return an empty array if user is not logged in
+      return [];
+    }
+  }
+
+  async deleteUserModule(category: string): Promise<void> {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      const userRef = doc(this.firestore, `users/${user.uid}`);
+      try {
+        const userDoc = await getDoc(userRef);
+        let existingData: any = {};
+        if (userDoc.exists()) {
+          existingData = userDoc.data();
+        }
+        if (!existingData.selfmademodules) {
+          existingData.selfmademodules = [];
+        }
+
+        existingData.selfmademodules = existingData.selfmademodules.filter((selfmademodule: any) => selfmademodule.category !== category);
+        await setDoc(userRef, existingData, { merge: true });
+        console.log('Module deleted successfully');
+      } catch (error) {
+        console.error('Error saving module:', error);
+      }
     }
   }
 
@@ -133,7 +200,7 @@ export class ModuleService {
   }
 
 
-  async saveUserModulesToFirestore(module: any): Promise<void> {
+  async saveUserModulesToFirestore(moduleData: any): Promise<void> {
     const user = await this.authService.getCurrentUser();
     if (user) {
       const userRef = doc(this.firestore, `users/${user.uid}`);
@@ -147,7 +214,19 @@ export class ModuleService {
           existingData.selfmademodules = [];
         }
 
-        existingData.selfmademodules.push(module);
+        let categoryFound = false;
+        for (let i = 0; i < existingData.selfmademodules.length; i++) {
+          if (existingData.selfmademodules[i].category === moduleData.category) {
+            existingData.selfmademodules[i].modules.push(...moduleData.modules);
+            categoryFound = true;
+            break;
+          }
+        }
+
+        if (!categoryFound) {
+          existingData.selfmademodules.push(moduleData);
+        }
+
         await setDoc(userRef, existingData, { merge: true });
       } catch (error) {
         console.error('Error saving module:', error);
@@ -155,29 +234,67 @@ export class ModuleService {
     }
   }
 
-  async getSavedModulesForUser(): Promise<any[]> {
+  async updateUserModuleInFirestore(updatedQuestion: any, category: string, questionIndex: number): Promise<void> {
     const user = await this.authService.getCurrentUser();
     if (user) {
       const userRef = doc(this.firestore, `users/${user.uid}`);
-      const userDoc = await getDoc(userRef);
-      let existingData: any = {};
-      if (userDoc.exists()) {
-        existingData = userDoc.data();
-      }
+      try {
+        const userDoc = await getDoc(userRef);
+        if (!userDoc.exists()) throw new Error('User document not found');
+        const data = userDoc.data();
 
-      if (!existingData.selfmademodules) {
-        existingData.selfmademodules = [];
-      }
+        // Find the index of the module with the matching category
+        const modules = data['selfmademodules'] || [];
+        const moduleIndex = modules.findIndex((mod: any) => mod.category === category);
 
-      // Collect all modules from all sessions
-      let savedModules: any[] = [];
-      existingData.selfmademodules.forEach((module: any) => {
-        savedModules.push(module);
-      });
-      return savedModules;
-    } else {
-      // Return an empty array if user is not logged in
-      return [];
+        if (moduleIndex !== -1) {
+          // Update the specific question within the module
+          const module = modules[moduleIndex];
+          if (module && module.modules && module.modules[questionIndex]) {
+            module.modules[questionIndex] = updatedQuestion;
+            await updateDoc(userRef, { selfmademodules: modules });
+          } else {
+            console.error('Question not found for the specified index');
+          }
+        } else {
+          console.error('Module not found for the specified category');
+        }
+      } catch (error) {
+        console.error('Error updating module:', error);
+      }
+    }
+  }
+
+  async deleteQuestion(category: string, questionIndex: number): Promise<void> {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      const userRef = doc(this.firestore, `users/${user.uid}`);
+      try {
+        const userDoc = await getDoc(userRef);
+        if (!userDoc.exists()) throw new Error('User document not found');
+        const data = userDoc.data();
+
+        // Find the index of the module with the matching category
+        const modules = data['selfmademodules'] || [];
+        const moduleIndex = modules.findIndex((mod: any) => mod.category === category);
+
+        if (moduleIndex !== -1) {
+          // Remove the specific question from the module
+          const module = modules[moduleIndex];
+          if (module && module.modules && module.modules[questionIndex]) {
+            module.modules.splice(questionIndex, 1);
+            // Update the Firestore document
+            await updateDoc(userRef, { selfmademodules: modules });
+            console.log('Question deleted successfully');
+          } else {
+            console.error('Question not found for the specified index');
+          }
+        } else {
+          console.error('Module not found for the specified category');
+        }
+      } catch (error) {
+        console.error('Error deleting question:', error);
+      }
     }
   }
 
@@ -268,8 +385,6 @@ export class ModuleService {
     return existingData.sessions;
   }
 
-
-
   async findAll(): Promise<ModuleModule[]> {
     const filterQuery = query(this.modulesCollectionRef)
     const moduleDocs = await getDocs(filterQuery);
@@ -292,7 +407,6 @@ export class ModuleService {
     const url: string = `${this.baseUrl}/load-all-modules`;
     return this.http.get<any>(url);
   }
-
 
   checkForUpdates(): Observable<{ updatesAvailable: boolean }> {
     const url = `${this.baseUrl}/check-updates`;

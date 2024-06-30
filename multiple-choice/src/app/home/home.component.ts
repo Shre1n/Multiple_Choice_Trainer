@@ -1,8 +1,18 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import { Router } from '@angular/router';
 import {GestureController, GestureDetail, IonicModule, NavController} from "@ionic/angular";
 import {addIcons} from "ionicons";
-import { personOutline, logOutOutline,shareSocialOutline, calculatorOutline, schoolOutline,addCircleSharp, codeSlashOutline } from 'ionicons/icons';
+import {
+  personOutline,
+  logOutOutline,
+  shareSocialOutline,
+  calculatorOutline,
+  schoolOutline,
+  addCircleSharp,
+  codeSlashOutline,
+  pencilSharp,
+  trashSharp
+} from 'ionicons/icons';
 import {AuthService} from "../services/auth.service";
 import {ModuleService} from "../services/module.service";
 import {AlertController, ToastController} from "@ionic/angular/standalone";
@@ -27,8 +37,10 @@ export class HomeComponent implements OnInit{
   isLoggedIn!:boolean;
   modules: any[] = [];
   userModules: any[] = [];
-  errorMessage: string = 'No Connection to External Server! :cry:';
   categories: string[] = [];
+  isDragging = false;
+
+  @ViewChild('cardContent', { read: ElementRef }) cardContent!: ElementRef;
 
 
   constructor(private router: Router,
@@ -38,16 +50,65 @@ export class HomeComponent implements OnInit{
               private moduleService: ModuleService,
               private toastController: ToastController,
               private alertController: AlertController) {
-    addIcons({ personOutline,shareSocialOutline, logOutOutline, calculatorOutline, addCircleSharp, schoolOutline, codeSlashOutline });
+    addIcons({
+      personOutline,
+      shareSocialOutline,
+      logOutOutline,
+      calculatorOutline,
+      addCircleSharp,
+      schoolOutline,
+      codeSlashOutline,
+      pencilSharp,
+      trashSharp
+    });
     this.isLoggedIn = this.isAuth();
   }
 
   ngOnInit() {
-    this.initializeSwipeGesture();
     this.checkLoginStatus();
     this.loadModules();
     this.loadUserModules();
     this.checkForUpdates();
+  }
+
+  updateModule(module: { category: any; }){
+    this.router.navigate(['/card-detail'], { queryParams: { category: module.category, edit: 'true' } });
+  }
+
+
+  async presentDeleteConfirm(module: { category: any; }) {
+    const alert = await this.alertController.create({
+      header: 'Löschen',
+      message: 'Möchten Sie dieses Modul wirklich löschen?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {
+            console.log('Löschen abgebrochen');
+          }
+        },
+        {
+          text: 'Löschen',
+          handler: () => {
+            this.deleteModule(module);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async deleteModule(module: { category: any; }) {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      this.moduleService.deleteUserModule(module.category).then(() => {
+        this.presentToast('Modul erfolgreich gelöscht', 'middle');
+        this.loadUserModules();  // Reload the modules after deletion
+      });
+    }
   }
 
   async shareMyModules() {
@@ -98,10 +159,9 @@ export class HomeComponent implements OnInit{
   }
 
 
-
-  async presentToast(position: 'middle') {
+  async presentToast(message: string, position: 'middle') {
     const toast = await this.toastController.create({
-      message: this.errorMessage,
+      message: message,
       duration: 10000,
       position: position,
     });
@@ -144,7 +204,6 @@ export class HomeComponent implements OnInit{
   }
 
 
-
   checkForUpdates(): void {
     this.moduleService.checkForUpdates().subscribe(
       (response) => {
@@ -169,7 +228,7 @@ export class HomeComponent implements OnInit{
       },
       error => {
         console.error('Error loading modules:', error);
-        this.presentToast('middle');
+        this.presentToast('No Connection to External Server! :cry:', 'middle');
       }
     );
   }
@@ -221,28 +280,6 @@ export class HomeComponent implements OnInit{
   openLoginForm(): void {
     this.router.navigate(['/login']);
     this.navCtrl.pop();
-  }
-
-  //Gesture to navigate to neighbor site from footer
-  initializeSwipeGesture() {
-    const content = document.querySelector('ion-content');
-    if (content) {
-      const gesture = this.gestureCtrl.create({
-        el: content as HTMLElement,
-        gestureName: 'swipe',
-        onMove: ev => this.onSwipe(ev)
-      });
-      gesture.enable();
-    } else {
-      console.error('Ion content not found');
-    }
-  }
-
-  onSwipe(ev: GestureDetail) {
-    const deltaX = ev.deltaX;
-    if (deltaX < -50) {
-      this.router.navigate(['/statistik']);
-    }
   }
 
 
