@@ -5,8 +5,8 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {AuthService} from "../../services/auth.service";
 import {ModuleService} from "../../services/module.service";
 import {addIcons} from "ionicons";
-import {alert, close} from "ionicons/icons";
-import {catchError} from "rxjs";
+import {close, trashSharp} from "ionicons/icons";
+
 
 interface Question {
   question: string;
@@ -66,7 +66,7 @@ export class CardDetailComponent implements OnInit{
               private toastController: ToastController,
               private navCtrl:NavController,
               private route: ActivatedRoute,) {
-    addIcons({close})
+    addIcons({close,trashSharp})
   }
 
   ngOnInit(): void {
@@ -210,7 +210,12 @@ export class CardDetailComponent implements OnInit{
   async updateModuleInFirebase() {
     if (this.currentQuestionIndex !== null) {
       await this.moduleService.updateUserModuleInFirestore(this.currentQuestion, this.category, this.currentQuestionIndex);
-    }  }
+    }
+  }
+
+  presentQuestionDelete(){
+
+  }
 
   async alertCancel() {
     const user = await this.authService.getCurrentUser();
@@ -261,5 +266,32 @@ export class CardDetailComponent implements OnInit{
   navigateSelf(category:string){
     this.addMode = true;
     this.router.navigate(['/card-detail'], {queryParams: {category: category}});
+  }
+
+  async deleteQuestion(index: number) {
+    const alert = await this.alertController.create({
+      header: 'Frage löschen',
+      message: 'Möchten Sie diese Frage wirklich löschen?',
+      buttons: [
+        {
+          text: 'Ja',
+          handler: async () => {
+            this.modules.splice(index, 1);
+            await this.moduleService.deleteQuestion(this.category, index);
+            await this.presentToast("Frage erfolgreich gelöscht!", "bottom");
+          }
+        },
+        {
+          text: 'Abbrechen',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {
+            console.log('Löschvorgang abgebrochen');
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 }

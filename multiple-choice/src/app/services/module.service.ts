@@ -265,6 +265,39 @@ export class ModuleService {
     }
   }
 
+  async deleteQuestion(category: string, questionIndex: number): Promise<void> {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      const userRef = doc(this.firestore, `users/${user.uid}`);
+      try {
+        const userDoc = await getDoc(userRef);
+        if (!userDoc.exists()) throw new Error('User document not found');
+        const data = userDoc.data();
+
+        // Find the index of the module with the matching category
+        const modules = data['selfmademodules'] || [];
+        const moduleIndex = modules.findIndex((mod: any) => mod.category === category);
+
+        if (moduleIndex !== -1) {
+          // Remove the specific question from the module
+          const module = modules[moduleIndex];
+          if (module && module.modules && module.modules[questionIndex]) {
+            module.modules.splice(questionIndex, 1);
+            // Update the Firestore document
+            await updateDoc(userRef, { selfmademodules: modules });
+            console.log('Question deleted successfully');
+          } else {
+            console.error('Question not found for the specified index');
+          }
+        } else {
+          console.error('Module not found for the specified category');
+        }
+      } catch (error) {
+        console.error('Error deleting question:', error);
+      }
+    }
+  }
+
 
 
   async saveSession(userID: string, sessionData: any) {
