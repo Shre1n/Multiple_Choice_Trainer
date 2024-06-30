@@ -1,5 +1,5 @@
 import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
-import { Router } from '@angular/router';
+import {Router} from '@angular/router';
 import {GestureController, GestureDetail, IonicModule, NavController} from "@ionic/angular";
 import {addIcons} from "ionicons";
 import {
@@ -11,15 +11,17 @@ import {
   addCircleSharp,
   codeSlashOutline,
   pencilSharp,
-  trashSharp
+  trashSharp,
+  searchOutline,
 } from 'ionicons/icons';
 import {AuthService} from "../services/auth.service";
 import {ModuleService} from "../services/module.service";
-import {AlertController, ToastController} from "@ionic/angular/standalone";
+import {AlertController, ToastController, IonSearchbar} from "@ionic/angular/standalone";
 import {NgStyle} from "@angular/common";
 import {ModuleModule} from "../module/module.module";
 import {FooterComponent} from "../footer/footer.component";
 import {Share} from '@capacitor/share';
+import {FormsModule} from "@angular/forms";
 
 @Component({
   selector: 'app-home',
@@ -28,20 +30,24 @@ import {Share} from '@capacitor/share';
   imports: [
     IonicModule,
     NgStyle,
-    FooterComponent
+    FooterComponent,
+    FormsModule,
   ],
   standalone: true
 })
-export class HomeComponent implements OnInit{
+export class HomeComponent implements OnInit {
 
-  isLoggedIn!:boolean;
+  isLoggedIn!: boolean;
   modules: any[] = [];
   userModules: any[] = [];
   categories: string[] = [];
   isDragging = false;
+  showSearchbar: boolean = false;
+  searchText: string = "";
+  filtermodule: any[] = [];
 
-  @ViewChild('cardContent', { read: ElementRef }) cardContent!: ElementRef;
-
+  @ViewChild('cardContent', {read: ElementRef}) cardContent!: ElementRef;
+  @ViewChild('searchbar') searchbar!: IonSearchbar;
 
   constructor(private router: Router,
               public navCtrl: NavController,
@@ -59,7 +65,8 @@ export class HomeComponent implements OnInit{
       schoolOutline,
       codeSlashOutline,
       pencilSharp,
-      trashSharp
+      trashSharp,
+      searchOutline
     });
     this.isLoggedIn = this.isAuth();
   }
@@ -71,8 +78,8 @@ export class HomeComponent implements OnInit{
     this.checkForUpdates();
   }
 
-  updateModule(module: { category: any; }){
-    this.router.navigate(['/card-detail'], { queryParams: { category: module.category, edit: 'true' } });
+  updateModule(module: { category: any; }) {
+    this.router.navigate(['/card-detail'], {queryParams: {category: module.category, edit: 'true'}});
   }
 
 
@@ -100,6 +107,40 @@ export class HomeComponent implements OnInit{
 
     await alert.present();
   }
+
+  search() {
+    this.showSearchbar = !this.showSearchbar;
+    if (this.showSearchbar) {
+      setTimeout(() => {
+        this.searchbar.setFocus();
+      }, 100);
+    }
+  }
+
+  closeSearch() {
+    this.searchText = "";
+  }
+
+  clear() {
+    this.searchText = "";
+    this.filterModule();
+  }
+
+  filterModule() {
+    if (this.searchText.trim() === '') {
+      this.filtermodule = this.categories
+    } else {
+      console.log(this.categories);
+      console.log(this.userModules);
+      // @ts-ignore
+
+      this.filtermodule = this.categories.filter(category =>
+        category.toLowerCase().includes(this.searchText.toLowerCase())
+      );
+      console.log(this.filtermodule);
+    }
+  }
+
 
   async deleteModule(module: { category: any; }) {
     const user = await this.authService.getCurrentUser();
@@ -219,12 +260,13 @@ export class HomeComponent implements OnInit{
     );
   }
 
-  async loadModules(){
+  async loadModules() {
     this.moduleService.loadExternalModule().subscribe(
       response => {
         console.log('Modules loaded:', response);
         this.modules = response;
         this.extractCategories(response);
+        this.filtermodule = this.categories;
       },
       error => {
         console.error('Error loading modules:', error);
@@ -256,13 +298,13 @@ export class HomeComponent implements OnInit{
   }
 
 
-  ionViewDidEnter(){
+  ionViewDidEnter() {
     this.authService.getCurrentUser()
     this.isLoggedIn = this.authService.isAuth();
   }
 
 
-  isAuth(): boolean{
+  isAuth(): boolean {
     return this.authService.isAuth();
   }
 

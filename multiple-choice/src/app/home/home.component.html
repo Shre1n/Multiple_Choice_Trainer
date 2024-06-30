@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title slot="start">Multiple-Choice Trainer</ion-title>
+    <ion-title >Multiple-Choice Trainer</ion-title>
     <ion-buttons slot="end">
       @if (userModules.length > 0) {
         <ion-button (click)="shareMyModules()">
@@ -11,10 +11,27 @@
         <ion-button class="ion-color" slot="end" (click)="logout()">
           <ion-icon name="log-out-outline" style="color: #CEDBEB"></ion-icon>
         </ion-button>
+        <ion-button (click)="search()">
+          <ion-icon slot="icon-only" name="search-outline"></ion-icon>
+        </ion-button>
       }
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (showSearchbar){
+    <ion-searchbar
+      #searchbar
+      placeholder="Suchen"
+      [(ngModel)]="searchText"
+      (ionCancel)="closeSearch()"
+      (ionClear)="clear()"
+      (ionInput)="filterModule()" >
+
+
+    </ion-searchbar>
+  }
 
 <ion-content [fullscreen]="true">
   <ion-grid>
@@ -29,7 +46,7 @@
         </ion-card>
       </ion-col>
 
-      @for (module of userModules; track userModules; let i = $index; ) {
+      @for ( module of userModules; track userModules; ) {
         <ion-col size="6">
           <ion-item-sliding>
             <ion-item>
@@ -56,7 +73,7 @@
         </ion-col>
       }
 
-      @for (category of categories; track categories; ) {
+      @for (category of searchText ? filtermodule : categories; track categories; ) {
         <ion-col size="6">
           <ion-card button (click)="navSession(category)"
                     [ngStyle]="{'background-color': getCategoryBackground(category)}">
@@ -72,7 +89,17 @@
     </ion-row>
   </ion-grid>
 
+  @if (searchText && filtermodule.length === 0){
+    <ion-grid>
+      <ion-row>
+        <ion-col>
+          <div class="ion-text-center">
+            Keine Passenden Einträge gefunden!
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  }
 </ion-content>
 
 <app-footer></app-footer>
-
