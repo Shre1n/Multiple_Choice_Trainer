@@ -1,13 +1,14 @@
-import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {GestureDetail, IonicModule} from "@ionic/angular";
 import {Router} from "@angular/router";
 import {ModuleService} from "../../services/module.service";
 import {AuthService} from "../../services/auth.service";
-import {AlertController, ToastController} from "@ionic/angular/standalone";
+import {AlertController, IonSearchbar, ToastController} from "@ionic/angular/standalone";
 import {FooterComponent} from "../../footer/footer.component";
 import {addIcons} from "ionicons";
-import {addCircleSharp,shareSocialOutline} from "ionicons/icons";
+import {addCircleSharp,shareSocialOutline, searchOutline} from "ionicons/icons";
 import {Share} from '@capacitor/share';
+import {FormsModule} from "@angular/forms";
 
 @Component({
   selector: 'app-card-list',
@@ -15,7 +16,8 @@ import {Share} from '@capacitor/share';
   styleUrls: ['./card-list.component.scss'],
   imports: [
     IonicModule,
-    FooterComponent
+    FooterComponent,
+    FormsModule
   ],
   standalone: true
 })
@@ -23,6 +25,12 @@ export class CardListComponent  implements OnInit {
 
   savedModules: any[] = [];
   userSessions: any[] = [];
+  showSearchBar: boolean = false;
+  searchText: string = "";
+  filterUsermodule: any[] = [];
+
+
+  @ViewChild('searchbar') searchbar!: IonSearchbar;
 
   constructor(private router:Router,
               private moduleService: ModuleService,
@@ -30,11 +38,42 @@ export class CardListComponent  implements OnInit {
               private alertController: AlertController,
               private toastController: ToastController,
               private cdr: ChangeDetectorRef) {
-    addIcons({addCircleSharp,shareSocialOutline});
+    addIcons({addCircleSharp,shareSocialOutline,searchOutline});
   }
 
   async ngOnInit() {
     this.fetchSessionSavedModules();
+  }
+
+  search() {
+    this.showSearchBar = !this.showSearchBar;
+    if (this.showSearchBar) {
+      setTimeout(() => {
+        this.searchbar.setFocus();
+      }, 100);
+    }
+  }
+
+  closeSearch() {
+    this.searchText = '';
+    this.filterModule();
+  }
+
+  clear() {
+    this.searchText = "";
+    this.filterUsermodule = [...this.savedModules]
+  }
+
+  filterModule() {
+    if (this.searchText.trim() === '') {
+      this.filterUsermodule = [...this.savedModules]
+    } else {
+      this.filterUsermodule = this.savedModules.filter(module =>
+        module.category.toLowerCase().includes(this.searchText.toLowerCase())
+      );
+      this.filterUsermodule = [...this.filterUsermodule]
+      console.log(this.filterUsermodule)
+    }
   }
 
   async loadAndSortUserSessions() {
