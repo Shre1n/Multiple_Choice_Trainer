@@ -2,9 +2,11 @@
   <ion-toolbar>
     <ion-title slot="start">Multiple-Choice Trainer</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="shareMyModules()">
-        <ion-icon name="share-social-outline"></ion-icon>
-      </ion-button>
+      @if (userModules.length > 0) {
+        <ion-button (click)="shareMyModules()">
+          <ion-icon name="share-social-outline"></ion-icon>
+        </ion-button>
+      }
       @if (isLoggedIn) {
         <ion-button class="ion-color" slot="end" (click)="logout()">
           <ion-icon name="log-out-outline" style="color: #CEDBEB"></ion-icon>
