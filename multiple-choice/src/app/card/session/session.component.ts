@@ -22,6 +22,7 @@ export class SessionComponent  implements OnInit {
   showCorrectAnswers: boolean = false;
   selectedAnswer: string = '';
   sessionCompleted: boolean = false;
+  progress: number = 0;
 
   constructor(
     private moduleService: ModuleService,
@@ -195,6 +196,11 @@ export class SessionComponent  implements OnInit {
       this.loadFehler();
       await this.saveSessionProgress();
     }
+    this.updateProgress();
+  }
+
+  updateProgress() {
+    this.progress = this.currentIndex / this.modules.length;
   }
 
 }
