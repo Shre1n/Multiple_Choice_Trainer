@@ -2,7 +2,7 @@
   "1": {
     "id": "1",
     "name": "First Steps",
-    "description": "Complete your first task.",
+    "description": "Start your first task.",
     "achieved": false,
     "icon": "footsteps-outline"
   },
@@ -16,56 +16,56 @@
   "3": {
     "id": "3",
     "name": "Explorer",
-    "description": "Visit every section of the app.",
+    "description": "You have learned the whole category!",
     "achieved": false,
     "icon": "rocket-outline"
   },
   "4": {
     "id": "4",
-    "name": "Contributor",
-    "description": "Submit your first feedback.",
+    "name": "The maker",
+    "description": "You successfully added a new module!",
     "achieved": false,
     "icon": "thumbs-up-outline"
   },
   "5": {
     "id": "5",
-    "name": "Marathoner",
-    "description": "Use the app every day for a week.",
+    "name": "Delete-Master",
+    "description": "You have successfully deleted a module!",
     "achieved": false,
     "icon": "ribbon-outline"
   },
   "6": {
     "id": "6",
     "name": "Perfectionist",
-    "description": "Complete all tasks without any mistakes.",
+    "description": "You have successfully edited your module!",
     "achieved": false,
     "icon": "sparkles-outline"
   },
   "7": {
     "id": "7",
-    "name": "Veteran",
-    "description": "Use the app for 30 consecutive days.",
+    "name": "Spirit",
+    "description": "You have successfully logged out!",
     "achieved": false,
     "icon": "body-outline"
   },
   "8": {
     "id": "8",
     "name": "Socializer",
-    "description": "Share your progress on social media.",
+    "description": "You have shared succesfully your progress! ",
     "achieved": false,
     "icon": "share-social-outline"
   },
   "9": {
     "id": "9",
     "name": "Problem Solver",
-    "description": "Resolve 10 issues reported by other users.",
+    "description": "You have successfully searched for something!",
     "achieved": false,
     "icon": "trophy-outline"
   },
   "10": {
     "id": "10",
     "name": "Speedster",
-    "description": "Complete a task in record time.",
+    "description": "You have started 5 modules ",
     "achieved": false,
     "icon": "school-outline"
   }

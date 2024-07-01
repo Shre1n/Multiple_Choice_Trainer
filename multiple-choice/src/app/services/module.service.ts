@@ -14,6 +14,7 @@ import {
 import {ModuleModule} from "../module/module.module";
 import {environment} from "../../environments/environment.prod";
 import {AuthService} from "./auth.service";
+import {AchievementsService} from "./achievements.service";
 
 
 @Injectable({
@@ -30,7 +31,8 @@ export class ModuleService {
 
   constructor(private http: HttpClient,
               private firestore: Firestore,
-              private authService: AuthService) {
+              private authService: AuthService,
+              private achievements: AchievementsService,) {
     this.modulesCollectionRef = collection(firestore, 'modules');
     const modulesJSON: string | null = localStorage.getItem('modules');
 
@@ -57,6 +59,22 @@ export class ModuleService {
     localStorage.setItem('records', JSON.stringify(this.modules));
     localStorage.setItem('nextId', this.nextId.toString());
   }
+
+  async checkForSessions () {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      const userRef = doc(this.firestore, `users/${user.uid}`);
+      const userDoc = await getDoc(userRef);
+      if (!userDoc.exists()) throw new Error('User document not found');
+      const userData = userDoc.data();
+
+      console.log(userData['sessions'].length);
+      if (userData['sessions'].length == 5) {
+        await this.achievements.setIndexAchievement(user.uid, 10);
+      }
+    }
+  };
+
 
   async getDataForUpdate(category: string): Promise<any> {
     const user = await this.authService.getCurrentUser();

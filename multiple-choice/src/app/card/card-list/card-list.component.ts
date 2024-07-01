@@ -9,6 +9,7 @@ import {addIcons} from "ionicons";
 import {addCircleSharp,shareSocialOutline, searchOutline} from "ionicons/icons";
 import {Share} from '@capacitor/share';
 import {FormsModule} from "@angular/forms";
+import {AchievementsService} from "../../services/achievements.service";
 
 @Component({
   selector: 'app-card-list',
@@ -37,12 +38,14 @@ export class CardListComponent  implements OnInit {
               private authService: AuthService,
               private alertController: AlertController,
               private toastController: ToastController,
+              private achievements: AchievementsService,
               private cdr: ChangeDetectorRef) {
     addIcons({addCircleSharp,shareSocialOutline,searchOutline});
   }
 
   async ngOnInit() {
     this.fetchSessionSavedModules();
+    await this.moduleService.checkForSessions();
   }
 
   search() {

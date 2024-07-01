@@ -7,6 +7,7 @@ import { NgClass, Location } from "@angular/common";
 import { AuthService } from "../../services/auth.service";
 import {addIcons} from "ionicons";
 import {close} from "ionicons/icons";
+import {AchievementsService} from "../../services/achievements.service";
 
 @Component({
   selector: 'app-session',
@@ -30,7 +31,9 @@ export class SessionComponent  implements OnInit {
     private authService: AuthService,
     private location: Location,
     private alertController: AlertController,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private achievements: AchievementsService,
+
   ) {addIcons({close})}
 
 
@@ -43,11 +46,9 @@ export class SessionComponent  implements OnInit {
 
   async loadFehler(){
     const currentModule = this.modules[this.currentIndex];
-
     //this.kartenRichtig = currentModule.answeredCorrectlyCount;
     //this.wrongAnswers = currentModule.answeredIncorrectlyCount;
     this.kartenInsgesammt = this.kartenRichtig + this.wrongAnswers;
-
 
     console.log("richtig:" + this.kartenRichtig);
     console.log("Server richtig " + currentModule.answeredCorrectlyCount);
@@ -60,6 +61,7 @@ export class SessionComponent  implements OnInit {
     this.route.params.subscribe(params => {
       this.category = params['category']; // assuming category is passed as a parameter
       this.loadModules();
+
     });
   }
 
@@ -114,7 +116,9 @@ export class SessionComponent  implements OnInit {
       };
       await this.moduleService.saveSession(user.uid, sessionData).then(() => {
         console.log('Session saved successfully');
-
+        this.achievements.setIndexAchievement(user.uid, 1);
+        this.achievements.setIndexAchievement(user.uid, 3);
+        //Toast rein machen !!
       }).catch(error => {
         console.error('Error saving session:', error);
       });
