@@ -22,6 +22,7 @@ export class SessionComponent  implements OnInit {
   showCorrectAnswers: boolean = false;
   selectedAnswer: string = '';
   sessionCompleted: boolean = false;
+  wrongAnswers: number = 0;
 
   constructor(
     private moduleService: ModuleService,
@@ -123,6 +124,7 @@ export class SessionComponent  implements OnInit {
       currentModule.answeredCorrectlyCount++;
     } else {
       currentModule.answeredIncorrectlyCount++;
+      this.wrongAnswers++;
     }
   }
 
@@ -142,6 +144,8 @@ export class SessionComponent  implements OnInit {
 
   showStatistic() {
     this.router.navigate(['statistik/session-statistik']);
+    //this.router.navigate(['/statistik', this.wrongAnswers]);
+
 
   }
 }
