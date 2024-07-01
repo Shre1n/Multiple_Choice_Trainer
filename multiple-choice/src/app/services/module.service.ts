@@ -106,6 +106,30 @@ export class ModuleService {
     }
   }
 
+  async renderUserCategories(): Promise<string[]> {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      const userRef = doc(this.firestore, `users/${user.uid}`);
+      const userDoc = await getDoc(userRef);
+      let existingData: any = {};
+      if (userDoc.exists()) {
+        existingData = userDoc.data();
+      }
+
+      if (!existingData.selfmademodules) {
+        existingData.selfmademodules = [];
+      }
+
+      // Extrahiere nur die Kategorien der Module
+      let categories = existingData.selfmademodules.map((module: any) => module.category);
+
+      return categories;
+    } else {
+      // Return an empty array if user is not logged in
+      return [];
+    }
+  }
+
   async getSavedModulesForUser(): Promise<any[]> {
     const user = await this.authService.getCurrentUser();
     if (user) {
@@ -398,7 +422,6 @@ export class ModuleService {
     });
     this.saveLocal();
   return  this.modules;
-  console.log(this.findAll())
   }
 
 

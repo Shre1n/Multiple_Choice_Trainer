@@ -1,5 +1,5 @@
 import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
-import { Router } from '@angular/router';
+import {Router} from '@angular/router';
 import {GestureController, GestureDetail, IonicModule, NavController} from "@ionic/angular";
 import {addIcons} from "ionicons";
 import {
@@ -11,15 +11,17 @@ import {
   addCircleSharp,
   codeSlashOutline,
   pencilSharp,
-  trashSharp
+  trashSharp,
+  searchOutline,
 } from 'ionicons/icons';
 import {AuthService} from "../services/auth.service";
 import {ModuleService} from "../services/module.service";
-import {AlertController, ToastController} from "@ionic/angular/standalone";
+import {AlertController, ToastController, IonSearchbar} from "@ionic/angular/standalone";
 import {NgStyle} from "@angular/common";
 import {ModuleModule} from "../module/module.module";
 import {FooterComponent} from "../footer/footer.component";
 import {Share} from '@capacitor/share';
+import {FormsModule} from "@angular/forms";
 
 @Component({
   selector: 'app-home',
@@ -28,20 +30,25 @@ import {Share} from '@capacitor/share';
   imports: [
     IonicModule,
     NgStyle,
-    FooterComponent
+    FooterComponent,
+    FormsModule,
   ],
   standalone: true
 })
-export class HomeComponent implements OnInit{
+export class HomeComponent implements OnInit {
 
-  isLoggedIn!:boolean;
+  isLoggedIn!: boolean;
   modules: any[] = [];
   userModules: any[] = [];
   categories: string[] = [];
-  isDragging = false;
+  showSearchBar: boolean = false;
+  searchText: string = "";
+  filterServermodule: any[] = [];
+  filterUsermodule: any[] = [];
 
-  @ViewChild('cardContent', { read: ElementRef }) cardContent!: ElementRef;
 
+  @ViewChild('cardContent', {read: ElementRef}) cardContent!: ElementRef;
+  @ViewChild('searchbar') searchbar!: IonSearchbar;
 
   constructor(private router: Router,
               public navCtrl: NavController,
@@ -59,7 +66,8 @@ export class HomeComponent implements OnInit{
       schoolOutline,
       codeSlashOutline,
       pencilSharp,
-      trashSharp
+      trashSharp,
+      searchOutline
     });
     this.isLoggedIn = this.isAuth();
   }
@@ -69,10 +77,16 @@ export class HomeComponent implements OnInit{
     this.loadModules();
     this.loadUserModules();
     this.checkForUpdates();
+    console.log(this.filterServermodule)
+    console.log(this.filterUsermodule)
   }
 
-  updateModule(module: { category: any; }){
-    this.router.navigate(['/card-detail'], { queryParams: { category: module.category, edit: 'true' } });
+  toggleSearchBar() {
+    this.showSearchBar = !this.showSearchBar;
+  }
+
+  updateModule(module: { category: any; }) {
+    this.router.navigate(['/card-detail'], {queryParams: {category: module.category, edit: 'true'}});
   }
 
 
@@ -101,6 +115,43 @@ export class HomeComponent implements OnInit{
     await alert.present();
   }
 
+  search() {
+    this.showSearchBar = !this.showSearchBar;
+    if (this.showSearchBar) {
+      setTimeout(() => {
+        this.searchbar.setFocus();
+      }, 100);
+    }
+  }
+
+  closeSearch() {
+    this.searchText = '';
+    this.filterModule();
+  }
+
+  clear() {
+    this.searchText = "";
+    this.filterServermodule = [...this.categories];
+    this.filterUsermodule = [...this.filterUsermodule]
+  }
+
+  filterModule() {
+    if (this.searchText.trim() === '') {
+      this.filterServermodule = [...this.categories];
+      this.filterUsermodule = [...this.filterUsermodule]
+    } else {
+      this.filterServermodule = this.categories.filter(category =>
+        category.toLowerCase().includes(this.searchText.toLowerCase())
+      );
+      this.filterUsermodule = this.userModules.filter(module =>
+        module.toLowerCase().includes(this.searchText.toLowerCase())
+      );
+      this.filterServermodule = [...this.filterServermodule];
+      this.filterUsermodule = [...this.filterUsermodule]
+    }
+  }
+
+
   async deleteModule(module: { category: any; }) {
     const user = await this.authService.getCurrentUser();
     if (user) {
@@ -114,7 +165,7 @@ export class HomeComponent implements OnInit{
   async shareMyModules() {
     let msgText = "Hallo, \ndas sind meine Module:\nKategorien:\n";
 
-    this.userModules = await this.moduleService.getSavedModulesForUser();
+    this.userModules = await this.moduleService.renderUserCategories();
 
     this.userModules.forEach(mod => {
       msgText += `${mod.category}\n`;
@@ -142,7 +193,8 @@ export class HomeComponent implements OnInit{
   async loadUserModules() {
     const user = await this.authService.getCurrentUser();
     if (user) {
-      const savedModules = await this.moduleService.getSavedModulesForUser();
+      const savedModules = await this.moduleService.renderUserCategories();
+      console.log(savedModules)
       if (savedModules) {
         this.userModules = savedModules;
       } else {
@@ -219,7 +271,7 @@ export class HomeComponent implements OnInit{
     );
   }
 
-  async loadModules(){
+  async loadModules() {
     this.moduleService.loadExternalModule().subscribe(
       response => {
         console.log('Modules loaded:', response);
@@ -256,13 +308,13 @@ export class HomeComponent implements OnInit{
   }
 
 
-  ionViewDidEnter(){
+  ionViewDidEnter() {
     this.authService.getCurrentUser()
     this.isLoggedIn = this.authService.isAuth();
   }
 
 
-  isAuth(): boolean{
+  isAuth(): boolean {
     return this.authService.isAuth();
   }
 
