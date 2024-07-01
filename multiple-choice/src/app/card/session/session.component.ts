@@ -33,6 +33,29 @@ export class SessionComponent  implements OnInit {
     private toastController: ToastController
   ) {addIcons({close})}
 
+
+
+  //Übergang
+  kartenInsgesammt: number = 0;
+  kartenRichtig: number = 0;
+  wrongAnswers: number = 0;
+
+
+  async loadFehler(){
+    const currentModule = this.modules[this.currentIndex];
+
+    //this.kartenRichtig = currentModule.answeredCorrectlyCount;
+    //this.wrongAnswers = currentModule.answeredIncorrectlyCount;
+    this.kartenInsgesammt = this.kartenRichtig + this.wrongAnswers;
+
+
+    console.log("richtig:" + this.kartenRichtig);
+    console.log("Server richtig " + currentModule.answeredCorrectlyCount);
+    console.log("falsch: " + this.wrongAnswers);
+    console.log("Server flasch: " + currentModule.answeredIncorrectlyCount);
+
+  }
+
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.category = params['category']; // assuming category is passed as a parameter
@@ -81,6 +104,7 @@ export class SessionComponent  implements OnInit {
     this.router.navigate(['/card-list']);
   }
 
+
   async saveSessionProgress() {
     const user = await this.authService.getCurrentUser();
     if (user) {
@@ -90,6 +114,7 @@ export class SessionComponent  implements OnInit {
       };
       await this.moduleService.saveSession(user.uid, sessionData).then(() => {
         console.log('Session saved successfully');
+
       }).catch(error => {
         console.error('Error saving session:', error);
       });
@@ -151,10 +176,14 @@ export class SessionComponent  implements OnInit {
     const currentModule = this.modules[this.currentIndex];
     if (this.selectedAnswer === currentModule.correctAnswer) {
       currentModule.answeredCorrectlyCount++;
+      this.kartenRichtig++;
     } else {
       currentModule.answeredIncorrectlyCount++;
+      this.wrongAnswers++;
     }
   }
+
+
 
   async nextQuestion() {
     this.showCorrectAnswers = false;
@@ -163,12 +192,10 @@ export class SessionComponent  implements OnInit {
       this.currentIndex++;
     } else {
       this.sessionCompleted = true;
+      this.loadFehler();
       await this.saveSessionProgress();
     }
   }
-
-
-
 
 }
 
