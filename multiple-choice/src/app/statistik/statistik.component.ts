@@ -16,9 +16,9 @@ import {FooterComponent} from "../footer/footer.component";
 export class StatistikComponent implements OnInit{
 
   //wichtig
-  wrongAnswers: number = 5;
+  wrongAnswers: number = 0;
   kartenInsgesammt: number = 10;
-  kartenRichtig: number = 5;
+  kartenRichtig: number = 10;
   prozErfolg: number = 0;
 
   constructor(private router: Router,

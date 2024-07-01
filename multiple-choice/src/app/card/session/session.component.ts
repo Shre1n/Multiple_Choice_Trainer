@@ -22,7 +22,6 @@ export class SessionComponent  implements OnInit {
   showCorrectAnswers: boolean = false;
   selectedAnswer: string = '';
   sessionCompleted: boolean = false;
-  wrongAnswers: number = 0;
 
   constructor(
     private moduleService: ModuleService,
@@ -33,6 +32,29 @@ export class SessionComponent  implements OnInit {
     private alertController: AlertController,
     private toastController: ToastController
   ) {addIcons({close})}
+
+
+
+  //Übergang
+  kartenInsgesammt: number = 0;
+  kartenRichtig: number = 0;
+  wrongAnswers: number = 0;
+
+
+  async loadFehler(){
+    const currentModule = this.modules[this.currentIndex];
+
+    //this.kartenRichtig = currentModule.answeredCorrectlyCount;
+    //this.wrongAnswers = currentModule.answeredIncorrectlyCount;
+    this.kartenInsgesammt = this.kartenRichtig + this.wrongAnswers;
+
+
+    console.log("richtig:" + this.kartenRichtig);
+    console.log("Server richtig " + currentModule.answeredCorrectlyCount);
+    console.log("falsch: " + this.wrongAnswers);
+    console.log("Server flasch: " + currentModule.answeredIncorrectlyCount);
+
+  }
 
   ngOnInit() {
     this.route.params.subscribe(params => {
@@ -154,6 +176,7 @@ export class SessionComponent  implements OnInit {
     const currentModule = this.modules[this.currentIndex];
     if (this.selectedAnswer === currentModule.correctAnswer) {
       currentModule.answeredCorrectlyCount++;
+      this.kartenRichtig++;
     } else {
       currentModule.answeredIncorrectlyCount++;
       this.wrongAnswers++;
@@ -169,17 +192,11 @@ export class SessionComponent  implements OnInit {
       this.currentIndex++;
     } else {
       this.sessionCompleted = true;
+      this.loadFehler();
       await this.saveSessionProgress();
     }
   }
 
-
-  showStatistic() {
-    this.router.navigate(['statistik/session-statistik']);
-    //this.router.navigate(['/statistik', this.wrongAnswers]);
-
-
-  }
 }
 
 
