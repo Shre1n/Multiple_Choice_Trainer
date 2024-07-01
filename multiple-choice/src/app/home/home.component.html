@@ -1,22 +1,81 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title slot="start">Multiple-Choice Trainer</ion-title>
-    @if (isLoggedIn) {
-      <ion-button class="ion-color" slot="end" (click)="logout()">
-        <ion-icon name="log-out-outline" style="color: #CEDBEB"></ion-icon>
-      </ion-button>
-    }
+    <ion-title >Multiple-Choice Trainer</ion-title>
+    <ion-buttons slot="end">
+      @if (isLoggedIn) {
+        @if (userModules.length > 0) {
+          <ion-button (click)="shareMyModules()">
+            <ion-icon name="share-social-outline"></ion-icon>
+          </ion-button>
+        }
+        <ion-button class="ion-color" slot="end" (click)="logout()">
+          <ion-icon name="log-out-outline" style="color: #CEDBEB"></ion-icon>
+        </ion-button>
+        <ion-button (click)="search()">
+          <ion-icon slot="icon-only" name="search-outline"></ion-icon>
+        </ion-button>
+      }
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
+
+  @if (showSearchBar){
+    <ion-searchbar
+      #searchbar
+      placeholder="Suchen"
+      [(ngModel)]="searchText"
+      (ionCancel)="closeSearch()"
+      (ionClear)="clear()"
+      (ionInput)="filterModule()" >
+    </ion-searchbar>
+  }
   <ion-grid>
     <ion-row>
-      @for (category of categories; track categories;) {
+      <ion-col size="6">
+        <ion-card button (click)="navigateToCardDetail()" class="global_blue">
+          <ion-card-content class="ion-text-center">
+            <ion-icon class="global_shine_blue" name="add-circle-sharp"></ion-icon>
+            <ion-card-subtitle>Modul Hinzufügen</ion-card-subtitle>
+          </ion-card-content>
+
+        </ion-card>
+      </ion-col>
+
+      @for (module of searchText ? filterUsermodule : userModules; track userModules;) {
         <ion-col size="6">
-          <ion-card button (click)="navSession(category)" [ngStyle]="{'background-color': getCategoryBackground(category)}">
+          <ion-item-sliding>
+            <ion-item>
+              <ion-card button (click)="navSession(module)"
+                        [ngStyle]="{'background-color': getCategoryBackground(module)}">
+                <ion-card-header class="ion-text-center">
+                  <ion-card-title class="categoryTitle">{{ module }}</ion-card-title>
+                </ion-card-header>
+              </ion-card>
+            </ion-item>
+
+            <ion-item-options side="start">
+              <ion-item-option color="primary" expandable (click)="updateModule(module)">
+                <ion-icon slot="icon-only" name="pencil-sharp"></ion-icon>
+              </ion-item-option>
+            </ion-item-options>
+
+            <ion-item-options side="end">
+              <ion-item-option color="danger" expandable (click)="presentDeleteConfirm(module)">
+                <ion-icon slot="icon-only" name="trash-sharp"></ion-icon>
+              </ion-item-option>
+            </ion-item-options>
+          </ion-item-sliding>
+        </ion-col>
+      }
+
+      @for (category of searchText ? filterServermodule : categories; track categories;) {
+        <ion-col size="6">
+          <ion-card button (click)="navSession(category)"
+                    [ngStyle]="{'background-color': getCategoryBackground(category)}">
             <ion-card-header class="ion-text-center">
-              <ion-card-title id="categoryTitle">{{ category }}</ion-card-title>
+              <ion-card-title class="categoryTitle">{{ category }}</ion-card-title>
             </ion-card-header>
             <ion-card-content class="ion-text-center">
               <ion-icon [name]="getCategoryIcon(category)" style="color: #f6f7f9"></ion-icon>
@@ -27,7 +86,17 @@
     </ion-row>
   </ion-grid>
 
+  @if (searchText && filterServermodule.length === 0){
+    <ion-grid>
+      <ion-row>
+        <ion-col>
+          <div class="ion-text-center">
+            Keine Passenden Einträge gefunden!
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  }
 </ion-content>
 
 <app-footer></app-footer>
-

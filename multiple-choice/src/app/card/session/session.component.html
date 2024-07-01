@@ -38,6 +38,7 @@
               @if (showCorrectAnswers) {
 
                 @for (answer of modules[currentIndex].answers; track showCorrectAnswers) {
+
                   <ion-item id=checkItemBG
                             [ngClass]="{'correct-answer': answer === modules[currentIndex].correctAnswer, 'wrong-answer': answer !== modules[currentIndex].correctAnswer && answer === selectedAnswer}">
                     <ion-label>{{ answer }}</ion-label>
