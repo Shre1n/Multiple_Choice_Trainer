@@ -3,7 +3,7 @@ import {GestureController, GestureDetail, IonicModule, NavController, ToastContr
 import {Achievement, AchievementsService} from "../services/achievements.service";
 import {AuthService} from "../services/auth.service";
 import {NgOptimizedImage} from "@angular/common";
-import {logOutOutline, personOutline} from "ionicons/icons";
+import {logOutOutline, personOutline, footstepsOutline,golfOutline,rocketOutline,thumbsUpOutline,ribbonOutline,sparklesOutline,bodyOutline,shareSocialOutline,trophyOutline,schoolOutline} from "ionicons/icons";
 import {addIcons} from "ionicons";
 import {Router} from "@angular/router";
 import {FooterComponent} from "../footer/footer.component";
@@ -34,7 +34,7 @@ export class AchivementsComponent implements OnInit{
               private navCtrl: NavController,
               private gestureCtrl: GestureController
               ) {
-    addIcons({logOutOutline});
+    addIcons({logOutOutline,footstepsOutline,golfOutline,rocketOutline,thumbsUpOutline,ribbonOutline,sparklesOutline,bodyOutline,shareSocialOutline,trophyOutline,schoolOutline});
 
   }
 
@@ -107,13 +107,14 @@ export class AchivementsComponent implements OnInit{
       if (!achievements) {
         return [];
       }
+
       // @ts-ignore
       return Object.values(achievements.achievements).map((achievement: Achievement) => ({
         id: achievement.id,
         name: achievement.name,
         description: achievement.description,
         achieved: achievement.achieved,
-        img: achievement.img
+        icon: achievement.icon,
       }));
     } catch (error) {
       console.error('Error loading server achievements:', error);

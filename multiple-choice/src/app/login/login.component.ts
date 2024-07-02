@@ -1,10 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
-import { IonicModule, NavController } from '@ionic/angular';
-import { FormsModule, NgForm } from '@angular/forms';
+import { IonicModule, IonInput, NavController } from '@ionic/angular';
+import {FormsModule, NgForm, Validators} from '@angular/forms';
 import { ToastController } from '@ionic/angular/standalone';
 import { AchievementsService } from '../services/achievements.service';
+import {addIcons} from "ionicons";
+import {close} from "ionicons/icons";
 
 @Component({
   selector: 'app-login',
@@ -25,15 +27,34 @@ export class LoginComponent implements OnInit {
   errorMessage: string = '';
   isToastOpen = false;
 
+  #IonInput: IonInput | undefined;
+  @ViewChild( IonInput)
+  set searchbar(II: IonInput) {
+    if (II) {
+      II.setFocus();
+      this.#IonInput = II;
+    }
+    setTimeout(() => II.setFocus(), 1);
+  }
+
   constructor(private authService: AuthService,
               private router: Router,
               private toastController: ToastController,
               private navCtrl: NavController,
               private achievements: AchievementsService) {
+    addIcons({close})
   }
 
   ngOnInit() {
     this.resetForm();
+  }
+
+  clearEmail(){
+    this.email="";
+  }
+
+  clearPassword(){
+    this.password="";
   }
 
   resetForm() {

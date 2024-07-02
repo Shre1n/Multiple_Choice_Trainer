@@ -11,7 +11,7 @@ export interface Achievement {
   name: string;
   description: string;
   achieved: boolean;
-  img: string
+  icon:string
 }
 
 @Injectable({
@@ -43,7 +43,7 @@ export class AchievementsService {
             name: achievement.name,
             description: achievement.description,
             achieved: achievement.achieved,
-            img: achievement.img
+            icon: achievement.icon,
           }));
 
       }else {
@@ -70,7 +70,7 @@ export class AchievementsService {
             name: achievement.name,
             description: achievement.description,
             achieved: achievement.achieved,
-            img: achievement.img
+            icon: achievement.icon,
           }));
 
       }else {

@@ -4,69 +4,69 @@
     "name": "First Steps",
     "description": "Complete your first task.",
     "achieved": false,
-    "img": "assets/achivments/test.jpg"
+    "icon": "footsteps-outline"
   },
   "2": {
     "id": "2",
     "name": "Getting Started",
     "description": "Log in for the first time.",
     "achieved": false,
-    "img": "assets/achivments/test.jpg"
+    "icon": "golf-outline"
   },
   "3": {
     "id": "3",
     "name": "Explorer",
     "description": "Visit every section of the app.",
     "achieved": false,
-    "img": "assets/achivments/test.jpg"
+    "icon": "rocket-outline"
   },
   "4": {
     "id": "4",
     "name": "Contributor",
     "description": "Submit your first feedback.",
     "achieved": false,
-    "img": "assets/achivments/test.jpg"
+    "icon": "thumbs-up-outline"
   },
   "5": {
     "id": "5",
     "name": "Marathoner",
     "description": "Use the app every day for a week.",
     "achieved": false,
-    "img": "assets/achivments/test.jpg"
+    "icon": "ribbon-outline"
   },
   "6": {
     "id": "6",
     "name": "Perfectionist",
     "description": "Complete all tasks without any mistakes.",
     "achieved": false,
-    "img": "assets/achivments/test.jpg"
+    "icon": "sparkles-outline"
   },
   "7": {
     "id": "7",
     "name": "Veteran",
     "description": "Use the app for 30 consecutive days.",
     "achieved": false,
-    "img": "assets/achivments/test.jpg"
+    "icon": "body-outline"
   },
   "8": {
     "id": "8",
     "name": "Socializer",
     "description": "Share your progress on social media.",
     "achieved": false,
-    "img": "assets/achivments/test.jpg"
+    "icon": "share-social-outline"
   },
   "9": {
     "id": "9",
     "name": "Problem Solver",
     "description": "Resolve 10 issues reported by other users.",
     "achieved": false,
-    "img": "assets/achivments/test.jpg"
+    "icon": "trophy-outline"
   },
   "10": {
     "id": "10",
     "name": "Speedster",
     "description": "Complete a task in record time.",
     "achieved": false,
-    "img": "assets/achivments/test.jpg"
+    "icon": "school-outline"
   }
 }
