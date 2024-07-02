@@ -6,7 +6,7 @@ import { FormsModule } from "@angular/forms";
 import { NgClass, Location } from "@angular/common";
 import { AuthService } from "../../services/auth.service";
 import {addIcons} from "ionicons";
-import {close} from "ionicons/icons";
+import {close, checkmark} from "ionicons/icons";
 
 @Component({
   selector: 'app-session',
@@ -31,7 +31,7 @@ export class SessionComponent  implements OnInit {
     private location: Location,
     private alertController: AlertController,
     private toastController: ToastController
-  ) {addIcons({close})}
+  ) {addIcons({close, checkmark})}
 
   ngOnInit() {
     this.route.params.subscribe(params => {
