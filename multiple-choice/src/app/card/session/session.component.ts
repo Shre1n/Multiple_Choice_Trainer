@@ -7,6 +7,7 @@ import { NgClass, Location } from "@angular/common";
 import { AuthService } from "../../services/auth.service";
 import {addIcons} from "ionicons";
 import {close} from "ionicons/icons";
+import {ModuleModule} from "../../module/module.module";
 
 @Component({
   selector: 'app-session',
@@ -48,12 +49,6 @@ export class SessionComponent  implements OnInit {
     //this.kartenRichtig = currentModule.answeredCorrectlyCount;
     //this.wrongAnswers = currentModule.answeredIncorrectlyCount;
     this.kartenInsgesammt = this.kartenRichtig + this.wrongAnswers;
-
-
-    console.log("richtig:" + this.kartenRichtig);
-    console.log("Server richtig " + currentModule.answeredCorrectlyCount);
-    console.log("falsch: " + this.wrongAnswers);
-    console.log("Server flasch: " + currentModule.answeredIncorrectlyCount);
 
   }
 
@@ -133,8 +128,9 @@ export class SessionComponent  implements OnInit {
           answers: this.shuffleArray([...module.answers]), // Use spread operator to clone array
           correctAnswer: module.correctAnswer,
           answeredCorrectlyCount: module.answeredCorrectlyCount,
-          answeredIncorrectlyCount: module.answeredIncorrectlyCount
+          answeredIncorrectlyCount: module.answeredIncorrectlyCount,
         }));
+
       } else {
         console.error('No modules found for this category:', this.category);
       }
@@ -149,13 +145,16 @@ export class SessionComponent  implements OnInit {
   loadAllCategoryModules() {
     this.moduleService.loadExternalModule().subscribe(data => {
       if (data && data[this.category] && data[this.category].modules) {
-        this.modules = data[this.category].modules.map((module: any) => ({
-          question: module.question,
-          answers: this.shuffleArray(module.answers),
-          correctAnswer: module.correctAnswer,
-          answeredCorrectlyCount: module.answeredCorrectlyCount,
-          answeredIncorrectlyCount: module.answeredIncorrectlyCount
-        }));
+        this.modules = data[this.category].modules
+          .filter((module: ModuleModule) => module.correctStreak < 6)
+          .map((module: any) => ({
+            question: module.question,
+            answers: this.shuffleArray(module.answers),
+            correctAnswer: module.correctAnswer,
+            answeredCorrectlyCount: module.answeredCorrectlyCount,
+            answeredIncorrectlyCount: module.answeredIncorrectlyCount,
+            correctStreak: module.correctStreak
+          }));
       } else {
         console.error('No modules found for this category:', this.category);
       }
@@ -163,6 +162,7 @@ export class SessionComponent  implements OnInit {
       console.error('Error loading modules:', error);
     });
   }
+
 
   shuffleArray(array: any[]): any[] {
     for (let i = array.length - 1; i > 0; i--) {
@@ -178,17 +178,29 @@ export class SessionComponent  implements OnInit {
     if (this.selectedAnswer === currentModule.correctAnswer) {
       currentModule.answeredCorrectlyCount++;
       this.kartenRichtig++;
+      this.moduleService.setStreak(currentModule.correctStreak++);
     } else {
       currentModule.answeredIncorrectlyCount++;
       this.wrongAnswers++;
+      this.moduleService.setStreak(0);
     }
+    console.log(this.moduleService.getStreak())
   }
 
+  get currentModule() {
+    return this.modules[this.currentIndex];
+  }
 
 
   async nextQuestion() {
     this.showCorrectAnswers = false;
     this.selectedAnswer = '';
+    if (this.moduleService.getStreak() >= 6) {
+      this.modules.splice(this.currentIndex, 1);
+    } else {
+      this.currentIndex++;
+    }
+
     if (this.currentIndex < this.modules.length - 1) {
       this.currentIndex++;
     } else {

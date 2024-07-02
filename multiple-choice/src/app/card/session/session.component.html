@@ -17,7 +17,7 @@
     <ion-grid>
       <ion-row>
         <ion-col size="12">
-          <ion-progress-bar [value]="progress"></ion-progress-bar>
+          <ion-progress-bar [value]="currentIndex / (modules.length || 1)"></ion-progress-bar>
         </ion-col>
       </ion-row>
     </ion-grid>
