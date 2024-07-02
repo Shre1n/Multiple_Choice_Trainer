@@ -381,7 +381,7 @@ export class ModuleService {
   }
 
   async getCorrectStreakOfModule() {
-    const modulesInfo: {index: number; question: string; correctStreak: number }[] = [];
+    const modulesInfo: {index: number; question: string;}[] = [];
     const user = await this.authService.getCurrentUser();
     if (user) {
       const userRef = doc(this.firestore, `users/${user.uid}`);
@@ -405,17 +405,11 @@ export class ModuleService {
                 modulesInfo.push({
                   index: index,
                   question: module.question,
-                  correctStreak: module.correctStreak
                 });
               }
             });
           });
         }
-
-        console.log('Correct Streaks:', modulesInfo);
-
-
-
       } catch (error) {
         console.error('Error saving session:', error);
       }
@@ -427,10 +421,6 @@ export class ModuleService {
 
   setStreak(streak: number) {
     this.correctSteak = streak;
-  }
-
-  getStreak(){
-    return this.correctSteak;
   }
 
   async getUserSessions(userID: string): Promise<any[]> {

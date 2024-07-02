@@ -59,14 +59,18 @@ export class SessionComponent  implements OnInit {
     });
   }
 
-  loadModules() {
-    Promise.all([this.loadUserSavedModules(), this.loadAllCategoryModules()]).then(() => {
-      if (this.modules.length === 0) {
-        console.error('No modules found for this category:', this.category);
-      }
-    }).catch(error => {
-      console.error('Error loading modules:', error);
-    });
+  async loadModules() {
+    await Promise.all([this.loadUserSavedModules(), this.loadAllCategoryModules()]);
+
+    // Load correct streak modules after loading the user saved and category modules
+    const correctStreakModules = await this.moduleService.getCorrectStreakOfModule();
+    if (correctStreakModules.some(module => module.index === this.currentIndex)) {
+      this.modules.splice(this.currentIndex, 1);
+    }
+
+    if (this.modules.length === 0) {
+      console.error('No modules found for this category:', this.category);
+    }
   }
 
   async goBack(): Promise<void> {
@@ -143,10 +147,11 @@ export class SessionComponent  implements OnInit {
   //This Category loader Only loads from Server Modules
   //Must include the loading of user saved categories for card-list
   loadAllCategoryModules() {
+    const correctStreakModules = this.moduleService.getCorrectStreakOfModule();
     this.moduleService.loadExternalModule().subscribe(data => {
       if (data && data[this.category] && data[this.category].modules) {
         this.modules = data[this.category].modules
-          .filter((module: ModuleModule) => module.correctStreak < 6)
+          .filter((module: { correctStreak: number; }) => module.correctStreak < 6)
           .map((module: any) => ({
             question: module.question,
             answers: this.shuffleArray(module.answers),
@@ -184,7 +189,6 @@ export class SessionComponent  implements OnInit {
       this.wrongAnswers++;
       this.moduleService.setStreak(0);
     }
-    console.log(this.moduleService.getStreak())
   }
 
   get currentModule() {
@@ -195,7 +199,8 @@ export class SessionComponent  implements OnInit {
   async nextQuestion() {
     this.showCorrectAnswers = false;
     this.selectedAnswer = '';
-    if (this.moduleService.getStreak() >= 6) {
+    const correctStreakModules = await this.moduleService.getCorrectStreakOfModule();
+    if (correctStreakModules.some(module => module.index === this.currentIndex)) {
       this.modules.splice(this.currentIndex, 1);
     } else {
       this.currentIndex++;
