@@ -37,7 +37,7 @@
                   @for (answer of modules[currentIndex].answers; track modules[currentIndex]) {
                     <ion-item (click)="selectedAnswer = answer" id="answerItem">
                       <ion-label>{{ answer }}</ion-label>
-                      <ion-radio slot="end" [value]="answer"></ion-radio>
+                      <ion-radio mode="ios" slot="end" [value]="answer"></ion-radio>
                     </ion-item>
                   }
                 </ion-radio-group>
@@ -45,15 +45,13 @@
               @if (showCorrectAnswers) {
 
                 @for (answer of modules[currentIndex].answers; track showCorrectAnswers) {
-
                   <ion-item id=checkItemBG
                             [ngClass]="{'selected-answer': answer === selectedAnswer,'correct-answer': answer === modules[currentIndex].correctAnswer, 'wrong-answer': answer !== modules[currentIndex].correctAnswer && answer === selectedAnswer}">
                     <ion-label>{{ answer }}</ion-label>
                     @if(answer === selectedAnswer){
-                      <ion-icon name="checkmark" slot="end"></ion-icon>
+                      <ion-icon slot="end" name="checkmark"></ion-icon>
                     }
                   </ion-item>
-
                 }
 
               }

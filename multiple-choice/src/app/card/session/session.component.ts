@@ -32,8 +32,9 @@ export class SessionComponent  implements OnInit {
     private location: Location,
     private alertController: AlertController,
     private toastController: ToastController
-  ) {addIcons({close, checkmark})}
-
+  ) {
+    addIcons({close, checkmark})
+  }
 
 
   //Übergang
@@ -42,7 +43,7 @@ export class SessionComponent  implements OnInit {
   wrongAnswers: number = 0;
 
 
-  async loadFehler(){
+  async loadFehler() {
     const currentModule = this.modules[this.currentIndex];
 
     //this.kartenRichtig = currentModule.answeredCorrectlyCount;
@@ -76,28 +77,28 @@ export class SessionComponent  implements OnInit {
 
   async goBack(): Promise<void> {
 
-      const alert = await this.alertController.create({
-        header: 'Beenden',
-        message: 'Möchten Sie die Lernsession wirklich beenden?',
-        buttons: [
-          {
-            text: 'Nein',
-            role: 'cancel',
-            cssClass: 'secondary',
-            handler: () => {
-              console.log('Confirm Cancel');
-            }
-          },
-          {
-            text: 'Ja',
-            handler: () => {
-              this.router.navigate(['/home'])
-            }
+    const alert = await this.alertController.create({
+      header: 'Beenden',
+      message: 'Möchten Sie die Lernsession wirklich beenden?',
+      buttons: [
+        {
+          text: 'Nein',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {
+            console.log('Confirm Cancel');
           }
-        ]
-      });
+        },
+        {
+          text: 'Ja',
+          handler: () => {
+            this.router.navigate(['/home'])
+          }
+        }
+      ]
+    });
 
-      await alert.present();
+    await alert.present();
 
   }
 
@@ -185,7 +186,6 @@ export class SessionComponent  implements OnInit {
   }
 
 
-
   async nextQuestion() {
     this.showCorrectAnswers = false;
     this.selectedAnswer = '';
@@ -203,6 +203,12 @@ export class SessionComponent  implements OnInit {
     this.progress = this.currentIndex / this.modules.length;
   }
 
+  isChecked(answer:any){
+    return answer === this.selectedAnswer;
+
+  }
 }
+
+
 
 
