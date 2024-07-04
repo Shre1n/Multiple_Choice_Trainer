@@ -7,7 +7,6 @@ import { NgClass, Location } from "@angular/common";
 import { AuthService } from "../../services/auth.service";
 import {addIcons} from "ionicons";
 import {close} from "ionicons/icons";
-import {ModuleModule} from "../../module/module.module";
 
 @Component({
   selector: 'app-session',
@@ -21,6 +20,7 @@ export class SessionComponent  implements OnInit {
   modules: any[] = [];
   currentIndex: number = 0;
   showCorrectAnswers: boolean = false;
+  sessionData: any[] = []
   selectedAnswer: string = '';
   sessionCompleted: boolean = false;
   progress: number = 0;
@@ -62,11 +62,11 @@ export class SessionComponent  implements OnInit {
   async loadModules() {
     await Promise.all([this.loadUserSavedModules(), this.loadAllCategoryModules()]);
 
-    // Load correct streak modules after loading the user saved and category modules
-    const correctStreakModules = await this.moduleService.getCorrectStreakOfModule();
-    if (correctStreakModules.some(module => module.index === this.currentIndex)) {
-      this.modules.splice(this.currentIndex, 1);
-    }
+    // // Load correct streak modules after loading the user saved and category modules
+    // const correctStreakModules = await this.moduleService.getCorrectStreakOfModule();
+    // if (correctStreakModules.some(module => module.index === this.currentIndex)) {
+    //   this.modules.splice(this.currentIndex, 1);
+    // }
 
     if (this.modules.length === 0) {
       console.error('No modules found for this category:', this.category);
@@ -75,28 +75,28 @@ export class SessionComponent  implements OnInit {
 
   async goBack(): Promise<void> {
 
-      const alert = await this.alertController.create({
-        header: 'Beenden',
-        message: 'Möchten Sie die Lernsession wirklich beenden?',
-        buttons: [
-          {
-            text: 'Nein',
-            role: 'cancel',
-            cssClass: 'secondary',
-            handler: () => {
-              console.log('Confirm Cancel');
-            }
-          },
-          {
-            text: 'Ja',
-            handler: () => {
-              this.router.navigate(['/home'])
-            }
+    const alert = await this.alertController.create({
+      header: 'Beenden',
+      message: 'Möchten Sie die Lernsession wirklich beenden?',
+      buttons: [
+        {
+          text: 'Nein',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {
+            console.log('Confirm Cancel');
           }
-        ]
-      });
+        },
+        {
+          text: 'Ja',
+          handler: () => {
+            this.router.navigate(['/home'])
+          }
+        }
+      ]
+    });
 
-      await alert.present();
+    await alert.present();
 
   }
 
@@ -133,6 +133,7 @@ export class SessionComponent  implements OnInit {
           correctAnswer: module.correctAnswer,
           answeredCorrectlyCount: module.answeredCorrectlyCount,
           answeredIncorrectlyCount: module.answeredIncorrectlyCount,
+          correctStreak: module.correctStreak
         }));
 
       } else {
