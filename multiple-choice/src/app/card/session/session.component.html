@@ -14,6 +14,13 @@
 
 <ion-content>
   @if (!sessionCompleted) {
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12">
+          <ion-progress-bar [value]="progress"></ion-progress-bar>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
     @if (modules.length > 0) {
       <ion-grid>
         <ion-row>
