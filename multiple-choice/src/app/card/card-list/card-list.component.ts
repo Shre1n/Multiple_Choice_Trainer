@@ -163,18 +163,5 @@ export class CardListComponent  implements OnInit {
     }
   }
 
-  onSwipe(ev: GestureDetail) {
-    const deltaX = ev.deltaX;
-    if (deltaX < -50) {
-      this.router.navigate(['/statistik']);
-    }else {
-      if (deltaX < 50) {
-        this.router.navigate(['/achivements'])
-      }
-    }
-  }
-
-
-
 }
 
