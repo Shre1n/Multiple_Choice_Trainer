@@ -8,7 +8,8 @@
       "answeredCorrectlyCount": 0,
       "answeredIncorrectlyCount": 0,
       "answers": ["H2O", "O2", "CO2", "H2"],
-      "correctAnswer": "H2O"
+      "correctAnswer": "H2O",
+      "correctStreak": 0
     },
     {
       "name": "Module 2",
@@ -17,7 +18,8 @@
       "answeredCorrectlyCount": 0,
       "answeredIncorrectlyCount": 0,
       "answers": ["Mars", "Earth", "Jupiter", "Venus"],
-      "correctAnswer": "Mars"
+      "correctAnswer": "Mars",
+      "correctStreak": 0
     },
     {
       "name": "Module 3",
@@ -26,7 +28,8 @@
       "answeredCorrectlyCount": 0,
       "answeredIncorrectlyCount": 0,
       "answers": ["Carbon Dioxide", "Oxygen", "Nitrogen", "Hydrogen"],
-      "correctAnswer": "Carbon Dioxide"
+      "correctAnswer": "Carbon Dioxide",
+      "correctStreak": 0
     },
     {
       "name": "Module 4",
@@ -35,7 +38,8 @@
       "answeredCorrectlyCount": 0,
       "answeredIncorrectlyCount": 0,
       "answers": ["Nucleus", "Electron", "Proton", "Neutron"],
-      "correctAnswer": "Nucleus"
+      "correctAnswer": "Nucleus",
+      "correctStreak": 0
     },
     {
       "name": "Module 5",
@@ -44,7 +48,8 @@
       "answeredCorrectlyCount": 0,
       "answeredIncorrectlyCount": 0,
       "answers": ["Gravity", "Magnetism", "Electromagnetism", "Friction"],
-      "correctAnswer": "Gravity"
+      "correctAnswer": "Gravity",
+      "correctStreak": 0
     },
     {
       "name": "Module 6",
@@ -53,7 +58,8 @@
       "answeredCorrectlyCount": 0,
       "answeredIncorrectlyCount": 0,
       "answers": ["Diamond", "Gold", "Iron", "Platinum"],
-      "correctAnswer": "Diamond"
+      "correctAnswer": "Diamond",
+      "correctStreak": 0
     }
   ]
 }
