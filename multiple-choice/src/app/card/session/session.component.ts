@@ -182,7 +182,6 @@ export class SessionComponent implements OnInit {
       } else {
         console.error('No modules found for this category:', this.category);
       }
-      console.log("Modules: ", this.modules)
     }).catch(error => {
       console.error('Error loading modules:', error);
     });
