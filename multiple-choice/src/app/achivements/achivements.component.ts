@@ -32,7 +32,8 @@ export class AchivementsComponent implements OnInit{
               private authService: AuthService,
               private toastCtrl: ToastController,
               private navCtrl: NavController,
-              private gestureCtrl: GestureController
+              private gestureCtrl: GestureController,
+
               ) {
     addIcons({logOutOutline,footstepsOutline,golfOutline,rocketOutline,thumbsUpOutline,ribbonOutline,sparklesOutline,bodyOutline,shareSocialOutline,trophyOutline,schoolOutline});
 
@@ -72,12 +73,6 @@ export class AchivementsComponent implements OnInit{
       await this.presentToast('top', 'Sign Up to collect Achievements!');
       console.error('User is not authenticated');
     }
-  }
-
-  async logout() {
-    await this.authService.logout();
-    this.isLoggedIn = false;
-    await this.navCtrl.navigateRoot(['/achivements']);
   }
 
   async loadServerAchievements():Promise<Achievement[]> {

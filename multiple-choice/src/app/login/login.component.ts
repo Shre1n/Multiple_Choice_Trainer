@@ -90,7 +90,7 @@ export class LoginComponent implements OnInit {
 
     try {
       const user = await this.authService.login(this.email, this.password);
-      await this.achievements.setIndexAchievement(user.uid, 1);
+      await this.achievements.setIndexAchievement(user.uid, 2);
       // MARKIERT: Zeige Erfolgsnachricht bei erfolgreichem Login
       await this.presentToast('Sie haben sich erfolgreich eingeloggt!', 2000);
       await this.navCtrl.navigateRoot(['/home']);

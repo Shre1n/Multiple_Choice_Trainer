@@ -3,9 +3,10 @@ import { IonicModule, AlertController, ToastController } from "@ionic/angular";
 import { ModuleService } from "../../services/module.service";
 import { ActivatedRoute, Router } from "@angular/router";
 import { FormsModule } from "@angular/forms";
-import { NgClass, Location } from "@angular/common";
+import { NgClass } from "@angular/common";
 import { AuthService } from "../../services/auth.service";
 import {addIcons} from "ionicons";
+import {AchievementsService} from "../../services/achievements.service";
 import {close, shareSocialOutline, checkmark} from "ionicons/icons";
 import {Share} from "@capacitor/share";
 
@@ -33,10 +34,11 @@ export class SessionComponent  implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private authService: AuthService,
-    private alertController: AlertController
-  ) {
-    addIcons({close,shareSocialOutline, checkmark})
-  }
+    private alertController: AlertController,
+    private achievements: AchievementsService,
+
+  ) {addIcons({close,shareSocialOutline, checkmark})}
+
 
 
   //Übergang
@@ -157,7 +159,9 @@ export class SessionComponent  implements OnInit {
       };
       await this.moduleService.saveSession(user.uid, sessionData).then(() => {
         console.log('Session saved successfully');
-
+        this.achievements.setIndexAchievement(user.uid, 1);
+        this.achievements.setIndexAchievement(user.uid, 3);
+        //Toast rein machen !!
       }).catch(error => {
         console.error('Error saving session:', error);
       });

@@ -6,6 +6,7 @@ import {AuthService} from "../../services/auth.service";
 import {ModuleService} from "../../services/module.service";
 import {addIcons} from "ionicons";
 import {close, trashSharp} from "ionicons/icons";
+import {AchievementsService} from "../../services/achievements.service";
 
 
 interface Question {
@@ -67,7 +68,8 @@ export class CardDetailComponent implements OnInit{
               private alertController: AlertController,
               private toastController: ToastController,
               private navCtrl:NavController,
-              private route: ActivatedRoute,) {
+              private route: ActivatedRoute,
+              private achievements: AchievementsService,) {
     addIcons({close,trashSharp})
   }
 
@@ -177,6 +179,10 @@ export class CardDetailComponent implements OnInit{
   async saveModule() {
     this.moduleData.category = this.category;
     this.moduleData.modules.push({ ...this.currentQuestion });
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      await this.achievements.setIndexAchievement(user.uid, 4);
+    };
   }
 
   trackByIndex(index: number, obj: any): any {
@@ -190,6 +196,10 @@ export class CardDetailComponent implements OnInit{
       await this.navCtrl.pop();
     } else {
       await this.saveModuleToFirebase();
+      const user = await this.authService.getCurrentUser();
+      if (user) {
+        await this.achievements.setIndexAchievement(user.uid, 6);
+      }
       this.resetAnswers();
     }
 

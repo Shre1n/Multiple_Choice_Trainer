@@ -22,6 +22,7 @@ import {NgStyle} from "@angular/common";
 import {FooterComponent} from "../footer/footer.component";
 import {Share} from '@capacitor/share';
 import {FormsModule} from "@angular/forms";
+import {AchievementsService} from "../services/achievements.service";
 
 @Component({
   selector: 'app-home',
@@ -53,7 +54,8 @@ export class HomeComponent implements OnInit {
               private authService: AuthService,
               private moduleService: ModuleService,
               private toastController: ToastController,
-              private alertController: AlertController) {
+              private alertController: AlertController,
+              private achievements: AchievementsService,) {
     addIcons({
       personOutline,
       shareSocialOutline,
@@ -128,7 +130,7 @@ export class HomeComponent implements OnInit {
     this.filterUsermodule = [...this.filterUsermodule]
   }
 
-  filterModule() {
+  async filterModule() {
     if (this.searchText.trim() === '') {
       this.filterServermodule = [...this.categories];
       this.filterUsermodule = [...this.filterUsermodule]
@@ -142,6 +144,10 @@ export class HomeComponent implements OnInit {
       this.filterServermodule = [...this.filterServermodule];
       this.filterUsermodule = [...this.filterUsermodule]
     }
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      await this.achievements.setIndexAchievement(user.uid, 9);
+    };
   }
 
 
@@ -151,6 +157,7 @@ export class HomeComponent implements OnInit {
       this.moduleService.deleteUserModule(module.category).then(() => {
         this.presentToast('Modul erfolgreich gelöscht', 'middle');
         this.loadUserModules();  // Reload the modules after deletion
+        this.achievements.setIndexAchievement(user.uid, 5);
       });
     }
   }
@@ -159,6 +166,10 @@ export class HomeComponent implements OnInit {
     let msgText = "Hallo, \ndas sind meine Module:\nKategorien:\n";
 
     this.userModules = await this.moduleService.renderUserCategories();
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      await this.achievements.setIndexAchievement(user.uid, 8);
+    };
 
     this.userModules.forEach(mod => {
       msgText += `${mod.category}\n`;
@@ -311,6 +322,10 @@ export class HomeComponent implements OnInit {
   }
 
   async logout() {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      await this.achievements.setIndexAchievement(user.uid, 7);
+    };
     await this.authService.logout();
     this.isLoggedIn = false;
     await this.navCtrl.navigateRoot(['/landingpage']);
