@@ -55,8 +55,6 @@ export class SessionComponent implements OnInit {
     this.kartenInsgesammt = this.kartenRichtig + this.wrongAnswers;
 
     this.rate = (this.kartenRichtig / this.kartenInsgesammt) * 100;
-    console.log(this.rate);
-
   }
 
   ngOnInit() {
@@ -83,6 +81,7 @@ export class SessionComponent implements OnInit {
     }else if (this.modules.length === 0) {
       console.error('No modules found for this category:', this.category);
     }
+
 
   }
 
@@ -216,7 +215,7 @@ export class SessionComponent implements OnInit {
   }
 
 
-  shuffleArray(array: any[]): any[] {
+  shuffleArray(array: object[]): object[] {
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [array[i], array[j]] = [array[j], array[i]];
