@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { IonicModule, AlertController, ToastController } from "@ionic/angular";
-import { ModuleService } from "../../services/module.service";
-import { ActivatedRoute, Router } from "@angular/router";
-import { FormsModule } from "@angular/forms";
-import { NgClass, Location } from "@angular/common";
-import { AuthService } from "../../services/auth.service";
+import {Component, OnInit} from '@angular/core';
+import {IonicModule, AlertController, ToastController} from "@ionic/angular";
+import {ModuleService} from "../../services/module.service";
+import {ActivatedRoute, Router} from "@angular/router";
+import {FormsModule} from "@angular/forms";
+import {NgClass, Location} from "@angular/common";
+import {AuthService} from "../../services/auth.service";
 import {addIcons} from "ionicons";
 import {close} from "ionicons/icons";
 
@@ -12,18 +12,19 @@ import {close} from "ionicons/icons";
   selector: 'app-session',
   templateUrl: './session.component.html',
   styleUrls: ['./session.component.scss'],
-  imports: [IonicModule, FormsModule, NgClass],standalone:true
+  imports: [IonicModule, FormsModule, NgClass], standalone: true
 })
-export class SessionComponent  implements OnInit {
+export class SessionComponent implements OnInit {
 
   category: string = '';
   modules: any[] = [];
   currentIndex: number = 0;
   showCorrectAnswers: boolean = false;
-  sessionData: any[] = []
   selectedAnswer: string = '';
   sessionCompleted: boolean = false;
   progress: number = 0;
+  correctStreakModules:  { index: number; question: string; }[] = [];
+  allModulesLearned: boolean = false;
 
   constructor(
     private moduleService: ModuleService,
@@ -33,8 +34,9 @@ export class SessionComponent  implements OnInit {
     private location: Location,
     private alertController: AlertController,
     private toastController: ToastController
-  ) {addIcons({close})}
-
+  ) {
+    addIcons({close})
+  }
 
 
   //Übergang
@@ -43,7 +45,7 @@ export class SessionComponent  implements OnInit {
   wrongAnswers: number = 0;
 
 
-  async loadFehler(){
+  async loadFehler() {
     const currentModule = this.modules[this.currentIndex];
 
     //this.kartenRichtig = currentModule.answeredCorrectlyCount;
@@ -63,14 +65,20 @@ export class SessionComponent  implements OnInit {
     await Promise.all([this.loadUserSavedModules(), this.loadAllCategoryModules()]);
 
     // Load correct streak modules after loading the user saved and category modules
-    const correctStreakModules = await this.moduleService.getCorrectStreakOfModule(this.category);
-    if (correctStreakModules.some(module => module.index === this.currentIndex)) {
-    this.modules.splice(this.currentIndex, 1);
+    this.correctStreakModules = await this.moduleService.getCorrectStreakOfModule(this.category);
+    if (this.correctStreakModules.some(module => module.index === this.currentIndex)) {
+      this.modules.splice(this.currentIndex, 1);
     }
 
-    if (this.modules.length === 0) {
+    if (this.modules.every(module => module.correctStreak >= 6)) {
+      console.log('All modules correctly learned for this category:', this.category);
+      this.allModulesLearned = true;
+      this.sessionCompleted = true;
+
+    }else if (this.modules.length === 0) {
       console.error('No modules found for this category:', this.category);
     }
+
   }
 
   async goBack(): Promise<void> {
@@ -209,10 +217,9 @@ export class SessionComponent  implements OnInit {
     }
 
     const indicesToRemove = correctStreakModules.map(module => module.index);
-    console.log("indexToTRemoce", indicesToRemove)
     indicesToRemove.forEach((index) => {
       this.modules.splice(index, 1);
-      if (index <= this.currentIndex){
+      if (index <= this.currentIndex) {
         this.currentIndex--;
       }
     })
@@ -230,7 +237,4 @@ export class SessionComponent  implements OnInit {
   updateProgress() {
     this.progress = this.currentIndex / this.modules.length;
   }
-
 }
-
-
