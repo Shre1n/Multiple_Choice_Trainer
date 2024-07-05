@@ -72,7 +72,6 @@ export class SessionComponent implements OnInit {
     }
 
     if (this.modules.every(module => module.correctStreak >= 6)) {
-      console.log('All modules correctly learned for this category:', this.category);
       this.allModulesLearned = true;
       this.sessionCompleted = true;
 
@@ -223,7 +222,6 @@ export class SessionComponent implements OnInit {
   async checkAnswer() {
     this.showCorrectAnswers = true;
     const currentModule = this.modules[this.currentIndex];
-    console.log("CheckAnswer: ", this.modules)
     if (this.selectedAnswer === currentModule.correctAnswer) {
       currentModule.answeredCorrectlyCount++;
       this.kartenRichtig++;
@@ -244,7 +242,6 @@ export class SessionComponent implements OnInit {
     this.showCorrectAnswers = false;
     this.selectedAnswer = '';
     const correctStreakModules = await this.moduleService.getCorrectStreakOfModule(this.category);
-    console.log("CorrectStreakFound: ", correctStreakModules);
 
     if (!this.category) {
       console.error('Category is not defined');
