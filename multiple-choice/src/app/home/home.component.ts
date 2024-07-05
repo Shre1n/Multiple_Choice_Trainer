@@ -1,6 +1,6 @@
-import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {Component,OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
-import {GestureController, GestureDetail, IonicModule, NavController} from "@ionic/angular";
+import {IonicModule, NavController} from "@ionic/angular";
 import {addIcons} from "ionicons";
 import {
   personOutline,
@@ -13,12 +13,12 @@ import {
   pencilSharp,
   trashSharp,
   searchOutline,
+  telescopeOutline
 } from 'ionicons/icons';
 import {AuthService} from "../services/auth.service";
 import {ModuleService} from "../services/module.service";
 import {AlertController, ToastController, IonSearchbar} from "@ionic/angular/standalone";
 import {NgStyle} from "@angular/common";
-import {ModuleModule} from "../module/module.module";
 import {FooterComponent} from "../footer/footer.component";
 import {Share} from '@capacitor/share';
 import {FormsModule} from "@angular/forms";
@@ -47,14 +47,11 @@ export class HomeComponent implements OnInit {
   filterServermodule: any[] = [];
   filterUsermodule: any[] = [];
 
-
-  @ViewChild('cardContent', {read: ElementRef}) cardContent!: ElementRef;
   @ViewChild('searchbar') searchbar!: IonSearchbar;
 
   constructor(private router: Router,
               public navCtrl: NavController,
               private authService: AuthService,
-              private gestureCtrl: GestureController,
               private moduleService: ModuleService,
               private toastController: ToastController,
               private alertController: AlertController,
@@ -69,7 +66,8 @@ export class HomeComponent implements OnInit {
       codeSlashOutline,
       pencilSharp,
       trashSharp,
-      searchOutline
+      searchOutline,
+      telescopeOutline
     });
     this.isLoggedIn = this.isAuth();
   }
@@ -79,13 +77,8 @@ export class HomeComponent implements OnInit {
     this.loadModules();
     this.loadUserModules();
     this.checkForUpdates();
-    console.log(this.filterServermodule)
-    console.log(this.filterUsermodule)
   }
 
-  toggleSearchBar() {
-    this.showSearchBar = !this.showSearchBar;
-  }
 
   updateModule(module: { category: any; }) {
     this.router.navigate(['/card-detail'], {queryParams: {category: module.category, edit: 'true'}});
@@ -205,7 +198,6 @@ export class HomeComponent implements OnInit {
     const user = await this.authService.getCurrentUser();
     if (user) {
       const savedModules = await this.moduleService.renderUserCategories();
-      console.log(savedModules)
       if (savedModules) {
         this.userModules = savedModules;
       } else {
@@ -214,11 +206,6 @@ export class HomeComponent implements OnInit {
     } else {
       this.userModules = []; // Fallback to empty array if user is not logged in
     }
-  }
-
-  async addModule(module: any) {
-    await this.moduleService.saveUserModulesToFirestore(module);
-    this.loadUserModules();
   }
 
 
@@ -273,7 +260,7 @@ export class HomeComponent implements OnInit {
         if (response.updatesAvailable) {
           console.log('Updates available, reloading modules...');
         } else {
-          console.log('No updates available');
+          console.info('No updates available');
         }
       },
       (error) => {
@@ -285,13 +272,12 @@ export class HomeComponent implements OnInit {
   async loadModules() {
     this.moduleService.loadExternalModule().subscribe(
       response => {
-        console.log('Modules loaded:', response);
         this.modules = response;
         this.extractCategories(response);
       },
       error => {
         console.error('Error loading modules:', error);
-        this.presentToast('No Connection to External Server! :cry:', 'middle');
+        this.presentToast('No Connection to External Server! :(', 'middle');
       }
     );
   }
@@ -304,7 +290,8 @@ export class HomeComponent implements OnInit {
     const icons: { [key: string]: string } = {
       'Mathematics': 'calculator-outline',
       'TypeScript': 'code-slash-outline',
-      // Füge hier weitere Kategorien und entsprechende Icons hinzu
+      'Science': 'telescope-outline'
+      // More....
     };
     return icons[category] || 'help-outline'; // Standardicon, wenn keine Kategorie übereinstimmt
   }
@@ -342,11 +329,6 @@ export class HomeComponent implements OnInit {
     await this.authService.logout();
     this.isLoggedIn = false;
     await this.navCtrl.navigateRoot(['/landingpage']);
-  }
-
-  openLoginForm(): void {
-    this.router.navigate(['/login']);
-    this.navCtrl.pop();
   }
 
 

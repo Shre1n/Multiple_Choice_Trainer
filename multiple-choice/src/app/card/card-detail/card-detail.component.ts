@@ -15,6 +15,7 @@ interface Question {
   correctAnswer: string | null;
   answeredCorrectlyCount: number;
   answeredIncorrectlyCount: number;
+  correctStreak: number;
 }
 
 @Component({
@@ -38,7 +39,8 @@ export class CardDetailComponent implements OnInit{
     answers: ['', '', '', ''],
     correctAnswer: null,
     answeredCorrectlyCount: 0,
-    answeredIncorrectlyCount: 0
+    answeredIncorrectlyCount: 0,
+    correctStreak: 0
   };
 
   isEditMode: boolean = false;
@@ -174,16 +176,6 @@ export class CardDetailComponent implements OnInit{
     this.currentQuestion.correctAnswer = this.currentQuestion.answers[index];
   }
 
-  clearCurrentQuestion() {
-    this.currentQuestion = {
-      question: '',
-      answers: ['', '', '', ''],
-      correctAnswer: null,
-      answeredCorrectlyCount: 0,
-      answeredIncorrectlyCount: 0
-    };
-  }
-
   async saveModule() {
     this.moduleData.category = this.category;
     this.moduleData.modules.push({ ...this.currentQuestion });
@@ -221,10 +213,6 @@ export class CardDetailComponent implements OnInit{
     if (this.currentQuestionIndex !== null) {
       await this.moduleService.updateUserModuleInFirestore(this.currentQuestion, this.category, this.currentQuestionIndex);
     }
-  }
-
-  presentQuestionDelete(){
-
   }
 
   async alertCancel() {
