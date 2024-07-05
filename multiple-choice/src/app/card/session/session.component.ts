@@ -120,7 +120,7 @@ export class SessionComponent implements OnInit {
         Share.share({
           title: 'Meine Statistik',
           text: msgText,
-          dialogTitle: 'Module teilen'
+          dialogTitle: 'Statistik teilen'
         }).then((v) =>
           console.log('ok: ', v))
           .catch(err => console.log(err));
