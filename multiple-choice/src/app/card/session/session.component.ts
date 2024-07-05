@@ -112,6 +112,19 @@ export class SessionComponent implements OnInit {
     this.router.navigate(['/card-list']);
   }
 
+  successRate(): string {
+    if ((this.kartenRichtig / this.kartenInsgesammt)*100 >= 30)
+      return "da musst du wohl noch etwas üben :("
+    else if (30 < (this.kartenRichtig / this.kartenInsgesammt) *100 && (this.kartenRichtig / this.kartenInsgesammt)*100 < 60)
+      return "da geht doch noch mehr.."
+    else if (60<(this.kartenRichtig / this.kartenInsgesammt) * 100 && (this.kartenRichtig / this.kartenInsgesammt) * 100<= 90)
+      return "Gut gemacht, beim nächsten mal schaffst du bestimmt die 100%?"
+    else if ((this.kartenRichtig / this.kartenInsgesammt) * 100 === 100)
+      return "Was für eine Runde! Teile deinen Erfolg mit Andreren um zu zeigen, was für eine Leistung du erbracht hast!"
+    return `Erfolgsrate: ${(this.kartenRichtig / this.kartenInsgesammt)*100}%`
+  }
+
+
 
   async saveSessionProgress() {
     const user = await this.authService.getCurrentUser();
