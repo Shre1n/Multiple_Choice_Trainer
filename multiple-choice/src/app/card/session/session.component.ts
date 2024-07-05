@@ -6,7 +6,8 @@ import {FormsModule} from "@angular/forms";
 import {NgClass, Location} from "@angular/common";
 import {AuthService} from "../../services/auth.service";
 import {addIcons} from "ionicons";
-import {close} from "ionicons/icons";
+import {close, shareSocialOutline} from "ionicons/icons";
+import {Share} from "@capacitor/share";
 
 @Component({
   selector: 'app-session',
@@ -25,6 +26,7 @@ export class SessionComponent implements OnInit {
   progress: number = 0;
   correctStreakModules:  { index: number; question: string; }[] = [];
   allModulesLearned: boolean = false;
+  rate: number = 0;
 
   constructor(
     private moduleService: ModuleService,
@@ -35,7 +37,7 @@ export class SessionComponent implements OnInit {
     private alertController: AlertController,
     private toastController: ToastController
   ) {
-    addIcons({close})
+    addIcons({close,shareSocialOutline})
   }
 
 
@@ -51,6 +53,9 @@ export class SessionComponent implements OnInit {
     //this.kartenRichtig = currentModule.answeredCorrectlyCount;
     //this.wrongAnswers = currentModule.answeredIncorrectlyCount;
     this.kartenInsgesammt = this.kartenRichtig + this.wrongAnswers;
+
+    this.rate = (this.kartenRichtig / this.kartenInsgesammt) * 100;
+    console.log(this.rate);
 
   }
 
@@ -108,20 +113,41 @@ export class SessionComponent implements OnInit {
 
   }
 
+  shareMyStats(category: string){
+    let msgText = `Hallo,\ndas ist meine Statistik zu ${category}:\nKarten Insgeammt: ${this.kartenInsgesammt}\nflasche Karten: ${this.wrongAnswers}\nErfolgsrate: ${this.rate}%`;
+    Share.canShare().then(canShare => {
+      if (canShare.value) {
+        Share.share({
+          title: 'Meine Angefangenen Module',
+          text: msgText,
+          dialogTitle: 'Module teilen'
+        }).then((v) =>
+          console.log('ok: ', v))
+          .catch(err => console.log(err));
+      } else {
+        console.log('Error: Sharing not available!');
+      }
+    });
+  }
+
+
   goToHome() {
     this.router.navigate(['/card-list']);
   }
 
   successRate(): string {
-    if ((this.kartenRichtig / this.kartenInsgesammt)*100 >= 30)
-      return "da musst du wohl noch etwas üben :("
-    else if (30 < (this.kartenRichtig / this.kartenInsgesammt) *100 && (this.kartenRichtig / this.kartenInsgesammt)*100 < 60)
-      return "da geht doch noch mehr.."
-    else if (60<(this.kartenRichtig / this.kartenInsgesammt) * 100 && (this.kartenRichtig / this.kartenInsgesammt) * 100<= 90)
-      return "Gut gemacht, beim nächsten mal schaffst du bestimmt die 100%?"
-    else if ((this.kartenRichtig / this.kartenInsgesammt) * 100 === 100)
-      return "Was für eine Runde! Teile deinen Erfolg mit Andreren um zu zeigen, was für eine Leistung du erbracht hast!"
-    return `Erfolgsrate: ${(this.kartenRichtig / this.kartenInsgesammt)*100}%`
+    if (this.rate < 30) {
+      return "Da musst du wohl noch etwas üben :(";
+    } else if (this.rate >= 30 && this.rate < 60) {
+      return "Da geht doch noch mehr..";
+    } else if (this.rate >= 60 && this.rate < 90) {
+      return "Gut gemacht, beim nächsten Mal schaffst du bestimmt die 100%?";
+    } else if (this.rate === 100) {
+      return "Was für eine Runde! Teile deinen Erfolg mit anderen, um zu zeigen, was für eine Leistung du erbracht hast!";
+    }
+
+    // Standardnachricht zurückgeben, falls keine der obigen Bedingungen erfüllt ist
+    return `Erfolgsrate: ${this.rate.toFixed(2)}%`;
   }
 
 
