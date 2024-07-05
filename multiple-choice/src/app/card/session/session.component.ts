@@ -1,21 +1,21 @@
-import {Component, OnInit} from '@angular/core';
-import {IonicModule, AlertController, ToastController} from "@ionic/angular";
-import {ModuleService} from "../../services/module.service";
-import {ActivatedRoute, Router} from "@angular/router";
-import {FormsModule} from "@angular/forms";
-import {NgClass, Location} from "@angular/common";
-import {AuthService} from "../../services/auth.service";
+import { Component, OnInit } from '@angular/core';
+import { IonicModule, AlertController, ToastController } from "@ionic/angular";
+import { ModuleService } from "../../services/module.service";
+import { ActivatedRoute, Router } from "@angular/router";
+import { FormsModule } from "@angular/forms";
+import { NgClass, Location } from "@angular/common";
+import { AuthService } from "../../services/auth.service";
 import {addIcons} from "ionicons";
-import {close, shareSocialOutline} from "ionicons/icons";
+import {close, shareSocialOutline, checkmark} from "ionicons/icons";
 import {Share} from "@capacitor/share";
 
 @Component({
   selector: 'app-session',
   templateUrl: './session.component.html',
   styleUrls: ['./session.component.scss'],
-  imports: [IonicModule, FormsModule, NgClass], standalone: true
+  imports: [IonicModule, FormsModule, NgClass],standalone:true
 })
-export class SessionComponent implements OnInit {
+export class SessionComponent  implements OnInit {
 
   category: string = '';
   modules: any[] = [];
@@ -35,7 +35,7 @@ export class SessionComponent implements OnInit {
     private authService: AuthService,
     private alertController: AlertController
   ) {
-    addIcons({close,shareSocialOutline})
+    addIcons({close,shareSocialOutline, checkmark})
   }
 
 
@@ -45,7 +45,7 @@ export class SessionComponent implements OnInit {
   wrongAnswers: number = 0;
 
 
-  async loadFehler() {
+  async loadFehler(){
     const currentModule = this.modules[this.currentIndex];
 
     //this.kartenRichtig = currentModule.answeredCorrectlyCount;
@@ -84,28 +84,28 @@ export class SessionComponent implements OnInit {
 
   async goBack(): Promise<void> {
 
-    const alert = await this.alertController.create({
-      header: 'Beenden',
-      message: 'Möchten Sie die Lernsession wirklich beenden?',
-      buttons: [
-        {
-          text: 'Nein',
-          role: 'cancel',
-          cssClass: 'secondary',
-          handler: () => {
-            console.log('Confirm Cancel');
+      const alert = await this.alertController.create({
+        header: 'Beenden',
+        message: 'Möchten Sie die Lernsession wirklich beenden?',
+        buttons: [
+          {
+            text: 'Nein',
+            role: 'cancel',
+            cssClass: 'secondary',
+            handler: () => {
+              console.log('Confirm Cancel');
+            }
+          },
+          {
+            text: 'Ja',
+            handler: () => {
+              this.router.navigate(['/home'])
+            }
           }
-        },
-        {
-          text: 'Ja',
-          handler: () => {
-            this.router.navigate(['/home'])
-          }
-        }
-      ]
-    });
+        ]
+      });
 
-    await alert.present();
+      await alert.present();
 
   }
 
@@ -269,4 +269,11 @@ export class SessionComponent implements OnInit {
   updateProgress() {
     this.progress = this.currentIndex / this.modules.length;
   }
+
+  isChecked(answer:any){
+    return answer === this.selectedAnswer;
+
+  }
 }
+
+

@@ -39,7 +39,7 @@ export class AchivementsComponent implements OnInit{
   }
 
   ngOnInit() {
-    this.initializeSwipeGesture();
+
   }
 
 
@@ -47,27 +47,7 @@ export class AchivementsComponent implements OnInit{
     this.checkLoginStatus();
   }
 
-  //Gesture to navigate to neighbor site from footer
-  initializeSwipeGesture() {
-    const content = document.querySelector('ion-content');
-    if (content) {
-      const gesture = this.gestureCtrl.create({
-        el: content as HTMLElement,
-        gestureName: 'swipe',
-        onMove: ev => this.onSwipe(ev)
-      });
-      gesture.enable();
-    } else {
-      console.error('Ion content not found');
-    }
-  }
 
-  onSwipe(ev: GestureDetail) {
-    const deltaX = ev.deltaX;
-    if (deltaX > 50) {
-      this.router.navigate(['/card-list']);
-    }
-  }
 
 
   async checkLoginStatus() {
