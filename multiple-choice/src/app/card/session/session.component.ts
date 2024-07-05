@@ -118,7 +118,7 @@ export class SessionComponent implements OnInit {
     Share.canShare().then(canShare => {
       if (canShare.value) {
         Share.share({
-          title: 'Meine Angefangenen Module',
+          title: 'Meine Statistik',
           text: msgText,
           dialogTitle: 'Module teilen'
         }).then((v) =>
