@@ -380,7 +380,7 @@ export class ModuleService {
     }
   }
 
-  async getCorrectStreakOfModule() {
+  async getCorrectStreakOfModule(category: string) {
     const modulesInfo: {index: number; question: string;}[] = [];
     const user = await this.authService.getCurrentUser();
     if (user) {
@@ -399,6 +399,7 @@ export class ModuleService {
 
         if (existingData.sessions) {
           existingData.sessions.forEach((session: any) => {
+            if(session.category === category)
             session.modules.forEach((module: any, index: number) => {
               // Überprüfen, ob die correctStreak >= 6 ist
               if (module.correctStreak >= 6) {

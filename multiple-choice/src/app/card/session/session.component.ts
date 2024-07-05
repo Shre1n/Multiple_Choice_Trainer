@@ -62,11 +62,11 @@ export class SessionComponent  implements OnInit {
   async loadModules() {
     await Promise.all([this.loadUserSavedModules(), this.loadAllCategoryModules()]);
 
-    // // Load correct streak modules after loading the user saved and category modules
-    // const correctStreakModules = await this.moduleService.getCorrectStreakOfModule();
-    // if (correctStreakModules.some(module => module.index === this.currentIndex)) {
-    //   this.modules.splice(this.currentIndex, 1);
-    // }
+    // Load correct streak modules after loading the user saved and category modules
+    const correctStreakModules = await this.moduleService.getCorrectStreakOfModule(this.category);
+    if (correctStreakModules.some(module => module.index === this.currentIndex)) {
+    this.modules.splice(this.currentIndex, 1);
+    }
 
     if (this.modules.length === 0) {
       console.error('No modules found for this category:', this.category);
@@ -135,10 +135,10 @@ export class SessionComponent  implements OnInit {
           answeredIncorrectlyCount: module.answeredIncorrectlyCount,
           correctStreak: module.correctStreak
         }));
-
       } else {
         console.error('No modules found for this category:', this.category);
       }
+      console.log("Modules: ", this.modules)
     }).catch(error => {
       console.error('Error loading modules:', error);
     });
@@ -148,7 +148,6 @@ export class SessionComponent  implements OnInit {
   //This Category loader Only loads from Server Modules
   //Must include the loading of user saved categories for card-list
   loadAllCategoryModules() {
-    const correctStreakModules = this.moduleService.getCorrectStreakOfModule();
     this.moduleService.loadExternalModule().subscribe(data => {
       if (data && data[this.category] && data[this.category].modules) {
         this.modules = data[this.category].modules
@@ -181,6 +180,7 @@ export class SessionComponent  implements OnInit {
   async checkAnswer() {
     this.showCorrectAnswers = true;
     const currentModule = this.modules[this.currentIndex];
+    console.log("CheckAnswer: ", this.modules)
     if (this.selectedAnswer === currentModule.correctAnswer) {
       currentModule.answeredCorrectlyCount++;
       this.kartenRichtig++;
@@ -200,12 +200,22 @@ export class SessionComponent  implements OnInit {
   async nextQuestion() {
     this.showCorrectAnswers = false;
     this.selectedAnswer = '';
-    const correctStreakModules = await this.moduleService.getCorrectStreakOfModule();
-    if (correctStreakModules.some(module => module.index === this.currentIndex)) {
-      this.modules.splice(this.currentIndex, 1);
-    } else {
-      this.currentIndex++;
+    const correctStreakModules = await this.moduleService.getCorrectStreakOfModule(this.category);
+    console.log("CorrectStreakFound: ", correctStreakModules);
+
+    if (!this.category) {
+      console.error('Category is not defined');
+      return;
     }
+
+    const indicesToRemove = correctStreakModules.map(module => module.index);
+    console.log("indexToTRemoce", indicesToRemove)
+    indicesToRemove.forEach((index) => {
+      this.modules.splice(index, 1);
+      if (index <= this.currentIndex){
+        this.currentIndex--;
+      }
+    })
 
     if (this.currentIndex < this.modules.length - 1) {
       this.currentIndex++;
