@@ -33,9 +33,7 @@ export class SessionComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private authService: AuthService,
-    private location: Location,
-    private alertController: AlertController,
-    private toastController: ToastController
+    private alertController: AlertController
   ) {
     addIcons({close,shareSocialOutline})
   }
