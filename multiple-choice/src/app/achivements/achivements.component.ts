@@ -32,14 +32,15 @@ export class AchivementsComponent implements OnInit{
               private authService: AuthService,
               private toastCtrl: ToastController,
               private navCtrl: NavController,
-              private gestureCtrl: GestureController
+              private gestureCtrl: GestureController,
+
               ) {
     addIcons({logOutOutline,footstepsOutline,golfOutline,rocketOutline,thumbsUpOutline,ribbonOutline,sparklesOutline,bodyOutline,shareSocialOutline,trophyOutline,schoolOutline});
 
   }
 
   ngOnInit() {
-    this.initializeSwipeGesture();
+
   }
 
 
@@ -47,27 +48,7 @@ export class AchivementsComponent implements OnInit{
     this.checkLoginStatus();
   }
 
-  //Gesture to navigate to neighbor site from footer
-  initializeSwipeGesture() {
-    const content = document.querySelector('ion-content');
-    if (content) {
-      const gesture = this.gestureCtrl.create({
-        el: content as HTMLElement,
-        gestureName: 'swipe',
-        onMove: ev => this.onSwipe(ev)
-      });
-      gesture.enable();
-    } else {
-      console.error('Ion content not found');
-    }
-  }
 
-  onSwipe(ev: GestureDetail) {
-    const deltaX = ev.deltaX;
-    if (deltaX > 50) {
-      this.router.navigate(['/card-list']);
-    }
-  }
 
 
   async checkLoginStatus() {
@@ -92,12 +73,6 @@ export class AchivementsComponent implements OnInit{
       await this.presentToast('top', 'Sign Up to collect Achievements!');
       console.error('User is not authenticated');
     }
-  }
-
-  async logout() {
-    await this.authService.logout();
-    this.isLoggedIn = false;
-    await this.navCtrl.navigateRoot(['/achivements']);
   }
 
   async loadServerAchievements():Promise<Achievement[]> {

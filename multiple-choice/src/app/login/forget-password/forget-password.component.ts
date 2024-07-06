@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import {IonicModule, NavController} from "@ionic/angular";
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {IonicModule, IonInput, NavController} from "@ionic/angular";
 import {FormsModule} from "@angular/forms";
 import {AuthService} from "../../services/auth.service";
 import {Router} from "@angular/router";
@@ -22,6 +22,16 @@ export class ForgetPasswordComponent implements OnInit {
   errorMessage: string = '';
   successMessage: string = '';
   isToastOpen = false;
+
+  #IonInput: IonInput | undefined;
+  @ViewChild( IonInput)
+  set searchbar(II: IonInput) {
+    if (II) {
+      II.setFocus();
+      this.#IonInput = II;
+    }
+    setTimeout(() => II.setFocus(), 1);
+  }
 
   constructor(private authService: AuthService, private router: Router, private toastController: ToastController, private navController: NavController) {
     addIcons({close})

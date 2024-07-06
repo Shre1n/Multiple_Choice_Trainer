@@ -47,6 +47,10 @@ ion-item{
   color: white;
 }
 
+ion-radio{
+  --color: white;
+  --color-checked: white;
+}
 ion-header{
   --ion-background-color: #5A7699;
 }
@@ -55,3 +59,7 @@ ion-button{
   --color: black;
 }
 
+ion-icon{
+  color: white;
+  font-size: 22px;
+}

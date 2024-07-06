@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {GestureController, GestureDetail, IonicModule} from "@ionic/angular";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {FooterComponent} from "../footer/footer.component";
 
 @Component({
@@ -15,15 +15,23 @@ import {FooterComponent} from "../footer/footer.component";
 })
 export class StatistikComponent implements OnInit{
 
+  //wichtig
+  wrongAnswers: number = 0;
+  kartenInsgesammt: number = 10;
+  kartenRichtig: number = 10;
+  prozErfolg: number = 0;
+
   constructor(private router: Router,
-              private gestureCtrl: GestureController) { }
+              private gestureCtrl: GestureController,
+              //wichtig
+              private route: ActivatedRoute) { }
 
   ngOnInit() {
     this.initializeSwipeGesture();
-  }
+    this.wrongAnswers = +this.route.snapshot.paramMap.get('wrongAnswers')!;  }
 
 
-  //Gesture to navigate to neighbor site from footer
+
   initializeSwipeGesture() {
     const content = document.querySelector('ion-content');
     if (content) {
@@ -49,4 +57,7 @@ export class StatistikComponent implements OnInit{
     }
   }
 
+  goToHome() {
+    this.router.navigate(['/card-list']);
+  }
 }

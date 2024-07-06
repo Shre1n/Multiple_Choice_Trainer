@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
-import { IonicModule, NavController } from '@ionic/angular';
-import { FormsModule, NgForm } from '@angular/forms';
+import { IonicModule, IonInput, NavController } from '@ionic/angular';
+import {FormsModule, NgForm, Validators} from '@angular/forms';
 import { ToastController } from '@ionic/angular/standalone';
 import { AchievementsService } from '../services/achievements.service';
 import {addIcons} from "ionicons";
@@ -26,6 +26,16 @@ export class LoginComponent implements OnInit {
   password: string = '';
   errorMessage: string = '';
   isToastOpen = false;
+
+  #IonInput: IonInput | undefined;
+  @ViewChild( IonInput)
+  set searchbar(II: IonInput) {
+    if (II) {
+      II.setFocus();
+      this.#IonInput = II;
+    }
+    setTimeout(() => II.setFocus(), 1);
+  }
 
   constructor(private authService: AuthService,
               private router: Router,
@@ -80,7 +90,7 @@ export class LoginComponent implements OnInit {
 
     try {
       const user = await this.authService.login(this.email, this.password);
-      await this.achievements.setIndexAchievement(user.uid, 1);
+      await this.achievements.setIndexAchievement(user.uid, 2);
       // MARKIERT: Zeige Erfolgsnachricht bei erfolgreichem Login
       await this.presentToast('Sie haben sich erfolgreich eingeloggt!', 2000);
       await this.navCtrl.navigateRoot(['/home']);

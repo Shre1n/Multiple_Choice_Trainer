@@ -1,14 +1,28 @@
-import {Component, Input, OnInit} from '@angular/core';
-import { Router } from '@angular/router';
-import {GestureController, GestureDetail, IonicModule, NavController} from "@ionic/angular";
+import {Component,OnInit, ViewChild} from '@angular/core';
+import {Router} from '@angular/router';
+import {IonicModule, NavController} from "@ionic/angular";
 import {addIcons} from "ionicons";
-import { personOutline, logOutOutline, calculatorOutline, schoolOutline,addCircleSharp, codeSlashOutline } from 'ionicons/icons';
+import {
+  personOutline,
+  logOutOutline,
+  shareSocialOutline,
+  calculatorOutline,
+  schoolOutline,
+  addCircleSharp,
+  codeSlashOutline,
+  pencilSharp,
+  trashSharp,
+  searchOutline,
+  telescopeOutline
+} from 'ionicons/icons';
 import {AuthService} from "../services/auth.service";
 import {ModuleService} from "../services/module.service";
-import {AlertController, ToastController} from "@ionic/angular/standalone";
+import {AlertController, ToastController, IonSearchbar} from "@ionic/angular/standalone";
 import {NgStyle} from "@angular/common";
-import {ModuleModule} from "../module/module.module";
 import {FooterComponent} from "../footer/footer.component";
+import {Share} from '@capacitor/share';
+import {FormsModule} from "@angular/forms";
+import {AchievementsService} from "../services/achievements.service";
 
 @Component({
   selector: 'app-home',
@@ -17,36 +31,163 @@ import {FooterComponent} from "../footer/footer.component";
   imports: [
     IonicModule,
     NgStyle,
-    FooterComponent
+    FooterComponent,
+    FormsModule,
   ],
   standalone: true
 })
-export class HomeComponent implements OnInit{
+export class HomeComponent implements OnInit {
 
-  isLoggedIn!:boolean;
+  isLoggedIn!: boolean;
   modules: any[] = [];
   userModules: any[] = [];
-  errorMessage: string = 'No Connection to External Server! :cry:';
   categories: string[] = [];
+  showSearchBar: boolean = false;
+  searchText: string = "";
+  filterServermodule: any[] = [];
+  filterUsermodule: any[] = [];
 
+  @ViewChild('searchbar') searchbar!: IonSearchbar;
 
   constructor(private router: Router,
               public navCtrl: NavController,
               private authService: AuthService,
-              private gestureCtrl: GestureController,
               private moduleService: ModuleService,
               private toastController: ToastController,
-              private alertController: AlertController) {
-    addIcons({ personOutline, logOutOutline, calculatorOutline, addCircleSharp, schoolOutline, codeSlashOutline });
+              private alertController: AlertController,
+              private achievements: AchievementsService,) {
+    addIcons({
+      personOutline,
+      shareSocialOutline,
+      logOutOutline,
+      calculatorOutline,
+      addCircleSharp,
+      schoolOutline,
+      codeSlashOutline,
+      pencilSharp,
+      trashSharp,
+      searchOutline,
+      telescopeOutline
+    });
     this.isLoggedIn = this.isAuth();
   }
 
   ngOnInit() {
-    this.initializeSwipeGesture();
     this.checkLoginStatus();
     this.loadModules();
     this.loadUserModules();
     this.checkForUpdates();
+  }
+
+
+  updateModule(module: { category: any; }) {
+    this.router.navigate(['/card-detail'], {queryParams: {category: module.category, edit: 'true'}});
+  }
+
+
+  async presentDeleteConfirm(module: { category: any; }) {
+    const alert = await this.alertController.create({
+      header: 'Löschen',
+      message: 'Möchten Sie dieses Modul wirklich löschen?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {
+            console.log('Löschen abgebrochen');
+          }
+        },
+        {
+          text: 'Löschen',
+          handler: () => {
+            this.deleteModule(module);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  search() {
+    this.showSearchBar = !this.showSearchBar;
+    if (this.showSearchBar) {
+      setTimeout(() => {
+        this.searchbar.setFocus();
+      }, 100);
+    }
+  }
+
+  closeSearch() {
+    this.searchText = '';
+    this.filterModule();
+  }
+
+  clear() {
+    this.searchText = "";
+    this.filterServermodule = [...this.categories];
+    this.filterUsermodule = [...this.filterUsermodule]
+  }
+
+  async filterModule() {
+    if (this.searchText.trim() === '') {
+      this.filterServermodule = [...this.categories];
+      this.filterUsermodule = [...this.filterUsermodule]
+    } else {
+      this.filterServermodule = this.categories.filter(category =>
+        category.toLowerCase().includes(this.searchText.toLowerCase())
+      );
+      this.filterUsermodule = this.userModules.filter(module =>
+        module.toLowerCase().includes(this.searchText.toLowerCase())
+      );
+      this.filterServermodule = [...this.filterServermodule];
+      this.filterUsermodule = [...this.filterUsermodule]
+    }
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      await this.achievements.setIndexAchievement(user.uid, 9);
+    };
+  }
+
+
+  async deleteModule(module: { category: any; }) {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      this.moduleService.deleteUserModule(module.category).then(() => {
+        this.presentToast('Modul erfolgreich gelöscht', 'middle');
+        this.loadUserModules();  // Reload the modules after deletion
+        this.achievements.setIndexAchievement(user.uid, 5);
+      });
+    }
+  }
+
+  async shareMyModules() {
+    let msgText = "Hallo, \ndas sind meine Module:\nKategorien:\n";
+
+    this.userModules = await this.moduleService.renderUserCategories();
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      await this.achievements.setIndexAchievement(user.uid, 8);
+    };
+
+    this.userModules.forEach(mod => {
+      msgText += `${mod.category}\n`;
+    });
+
+    Share.canShare().then(canShare => {
+      if (canShare.value) {
+        Share.share({
+          title: 'Meine Angefangenen Module',
+          text: msgText,
+          dialogTitle: 'Module teilen'
+        }).then((v) =>
+          console.log('ok: ', v))
+          .catch(err => console.log(err));
+      } else {
+        console.log('Error: Sharing not available!');
+      }
+    });
   }
 
   navigateToCardDetail() {
@@ -56,7 +197,7 @@ export class HomeComponent implements OnInit{
   async loadUserModules() {
     const user = await this.authService.getCurrentUser();
     if (user) {
-      const savedModules = await this.moduleService.getSavedModulesForUser();
+      const savedModules = await this.moduleService.renderUserCategories();
       if (savedModules) {
         this.userModules = savedModules;
       } else {
@@ -67,16 +208,10 @@ export class HomeComponent implements OnInit{
     }
   }
 
-  async addModule(module: any) {
-    await this.moduleService.saveUserModulesToFirestore(module);
-    this.loadUserModules();
-  }
 
-
-
-  async presentToast(position: 'middle') {
+  async presentToast(message: string, position: 'middle') {
     const toast = await this.toastController.create({
-      message: this.errorMessage,
+      message: message,
       duration: 10000,
       position: position,
     });
@@ -119,14 +254,13 @@ export class HomeComponent implements OnInit{
   }
 
 
-
   checkForUpdates(): void {
     this.moduleService.checkForUpdates().subscribe(
       (response) => {
         if (response.updatesAvailable) {
           console.log('Updates available, reloading modules...');
         } else {
-          console.log('No updates available');
+          console.info('No updates available');
         }
       },
       (error) => {
@@ -135,16 +269,15 @@ export class HomeComponent implements OnInit{
     );
   }
 
-  async loadModules(){
+  async loadModules() {
     this.moduleService.loadExternalModule().subscribe(
       response => {
-        console.log('Modules loaded:', response);
         this.modules = response;
         this.extractCategories(response);
       },
       error => {
         console.error('Error loading modules:', error);
-        this.presentToast('middle');
+        this.presentToast('No Connection to External Server! :(', 'middle');
       }
     );
   }
@@ -157,7 +290,8 @@ export class HomeComponent implements OnInit{
     const icons: { [key: string]: string } = {
       'Mathematics': 'calculator-outline',
       'TypeScript': 'code-slash-outline',
-      // Füge hier weitere Kategorien und entsprechende Icons hinzu
+      'Science': 'telescope-outline'
+      // More....
     };
     return icons[category] || 'help-outline'; // Standardicon, wenn keine Kategorie übereinstimmt
   }
@@ -172,13 +306,13 @@ export class HomeComponent implements OnInit{
   }
 
 
-  ionViewDidEnter(){
+  ionViewDidEnter() {
     this.authService.getCurrentUser()
     this.isLoggedIn = this.authService.isAuth();
   }
 
 
-  isAuth(): boolean{
+  isAuth(): boolean {
     return this.authService.isAuth();
   }
 
@@ -188,36 +322,13 @@ export class HomeComponent implements OnInit{
   }
 
   async logout() {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      await this.achievements.setIndexAchievement(user.uid, 7);
+    };
     await this.authService.logout();
     this.isLoggedIn = false;
     await this.navCtrl.navigateRoot(['/landingpage']);
-  }
-
-  openLoginForm(): void {
-    this.router.navigate(['/login']);
-    this.navCtrl.pop();
-  }
-
-  //Gesture to navigate to neighbor site from footer
-  initializeSwipeGesture() {
-    const content = document.querySelector('ion-content');
-    if (content) {
-      const gesture = this.gestureCtrl.create({
-        el: content as HTMLElement,
-        gestureName: 'swipe',
-        onMove: ev => this.onSwipe(ev)
-      });
-      gesture.enable();
-    } else {
-      console.error('Ion content not found');
-    }
-  }
-
-  onSwipe(ev: GestureDetail) {
-    const deltaX = ev.deltaX;
-    if (deltaX < -50) {
-      this.router.navigate(['/statistik']);
-    }
   }
 
 

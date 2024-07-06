@@ -1,4 +1,3 @@
-
 :root {
   --ion-color-primary: #3880ff;
   --ion-color-secondary: #0cd1e8;
@@ -25,9 +24,29 @@ ion-card{
   justify-content: center;
 }
 
-#categoryTitle{
-  color: white;
+.icon-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
+.button-container {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.button-container.show-buttons {
+  opacity: 1;
+}
+
+
+.categoryTitle{
+  color: white;
+  font-size: medium;
+}
+
+ion-card.active {
+  box-shadow: var(--ion-color-warning) 0px 4px 16px;
 }
 
 ion-toolbar{

@@ -1,16 +1,38 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>
+    <ion-title slot="start">
       Angefangene Module
     </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="shareLearnedModules()">
+        <ion-icon name="share-social-outline"></ion-icon>
+      </ion-button>
+      <ion-button (click)="search()">
+        <ion-icon slot="icon-only" name="search-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
+
+  @if (showSearchBar){
+    <ion-searchbar
+      #searchbar
+      placeholder="Suchen"
+      [(ngModel)]="searchText"
+      (ionCancel)="closeSearch()"
+      (ionClear)="clear()"
+      (ionInput)="filterModule()" >
+    </ion-searchbar>
+  }
+
+
+
   @if (savedModules.length > 0) {
     <ion-grid>
       <ion-row>
-        @for (module of savedModules; track savedModules) {
+        @for (module of searchText ? filterUsermodule : savedModules; track savedModules) {
           <ion-col size="6">
             <ion-card button (click)="navSession(module.category)" class="global_blue">
               <ion-card-header class="ion-text-center">
@@ -25,6 +47,18 @@
   @if (savedModules.length === 0) {
     <p>Du hast noch keine LernSessions Gestartet!</p>
     <ion-button>Starte eine Zufällige Lernsession!</ion-button>
+  }
+
+  @if (searchText && filterUsermodule.length === 0){
+    <ion-grid>
+      <ion-row>
+        <ion-col>
+          <div class="ion-text-center">
+            Keine Passenden Einträge gefunden!
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
   }
 </ion-content>
 

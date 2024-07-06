@@ -13,10 +13,9 @@ import {
 } from "@angular/fire/firestore";
 import {ModuleModule} from "../module/module.module";
 import {environment} from "../../environments/environment.prod";
-import {recording} from "ionicons/icons";
 import {AuthService} from "./auth.service";
-import index from "eslint-plugin-jsdoc";
-import {get} from "@angular/fire/database";
+import {AchievementsService} from "./achievements.service";
+
 
 @Injectable({
   providedIn: 'root'
@@ -25,6 +24,7 @@ export class ModuleService {
 
   private modules: ModuleModule[];
   private nextId: number;
+  private correctSteak!: number;
 
   modulesCollectionRef: CollectionReference<DocumentData>;
 
@@ -32,10 +32,10 @@ export class ModuleService {
 
   constructor(private http: HttpClient,
               private firestore: Firestore,
-              private authService: AuthService) {
+              private authService: AuthService,
+              private achievements: AchievementsService,) {
     this.modulesCollectionRef = collection(firestore, 'modules');
     const modulesJSON: string | null = localStorage.getItem('modules');
-
     if (modulesJSON) {
       this.modules = JSON.parse(modulesJSON);
       this.nextId = parseInt(localStorage.getItem('nextId') ?? "1", 10);
@@ -43,7 +43,7 @@ export class ModuleService {
       this.modules = [];
       this.nextId = 1;
       if (!environment.production) {
-        this.persist(new ModuleModule(8, "Design", "GASM1", "Grundlagen und Anwendungen"));
+        this.persist(new ModuleModule(8, "Design", "GASM1", "Grundlagen und Anwendungen",0));
       }
     }
   }
@@ -58,6 +58,42 @@ export class ModuleService {
   private saveLocal() {
     localStorage.setItem('records', JSON.stringify(this.modules));
     localStorage.setItem('nextId', this.nextId.toString());
+  }
+
+  async checkForSessions () {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      const userRef = doc(this.firestore, `users/${user.uid}`);
+      const userDoc = await getDoc(userRef);
+      if (!userDoc.exists()) throw new Error('User document not found');
+      const userData = userDoc.data();
+
+      console.log(userData['sessions'].length);
+      if (userData['sessions'].length == 5) {
+        await this.achievements.setIndexAchievement(user.uid, 10);
+      }
+    }
+  };
+
+
+  async getDataForUpdate(category: string): Promise<any> {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      const userRef = doc(this.firestore, `users/${user.uid}`);
+      const userDoc = await getDoc(userRef);
+      if (!userDoc.exists()) throw new Error('User document not found');
+      const userData = userDoc.data();
+
+      // Überprüfen, ob das Feld selfmademodules im Benutzerdokument existiert und ein Array ist
+      const modulesData = userData && Array.isArray(userData['selfmademodules']) ? userData['selfmademodules'] : [];
+
+      // Filtern der Module nach der angegebenen Kategorie
+      const filteredModules = modulesData.filter((module: any) => module.category === category);
+      console.log(filteredModules);
+      return filteredModules;
+
+
+    }
   }
 
   async sortModulesByLastStudied(userSessions: any[]): Promise<void> {
@@ -88,70 +124,27 @@ export class ModuleService {
     }
   }
 
-  async saveModule(moduleData: any) {
-    const user = await this.authService.getCurrentUser();
-    if (user){
-      const userRef = doc(this.firestore, `users/${user.uid}`);
-      try {
-        const userDoc = await getDoc(userRef);
-        let existingData: any = {};
-        if (userDoc.exists()) {
-          existingData = userDoc.data();
-        }
-        if (!existingData.selfmademodules) {
-          existingData.selfmademodules = [];
-        }
-
-        // Prüfe, ob die Kategorie bereits existiert
-        const existingCategoryIndex = existingData.selfmademodules.findIndex((selfmademodule: any) => selfmademodule.category === moduleData.category);
-
-        if (existingCategoryIndex !== -1) {
-          // Kategorie existiert bereits, füge die neuen Module hinzu oder aktualisiere bestehende Module
-          moduleData.modules.forEach((newModule: any) => {
-            const existingModuleIndex = existingData.selfmademodules[existingCategoryIndex].modules.findIndex((module: any) => module.question === newModule.question);
-            if (existingModuleIndex !== -1) {
-              // Modul existiert bereits, aktualisiere answeredCorrectlyCount und answeredIncorrectlyCount
-              existingData.selfmademodules[existingCategoryIndex].modules[existingModuleIndex].answeredCorrectlyCount += newModule.answeredCorrectlyCount;
-              existingData.selfmademodules[existingCategoryIndex].modules[existingModuleIndex].answeredIncorrectlyCount += newModule.answeredIncorrectlyCount;
-            } else {
-              // Modul existiert noch nicht, füge es hinzu
-              existingData.selfmademodules[existingCategoryIndex].modules.push(newModule);
-            }
-          });
-        } else {
-          // Füge die neue Kategorie hinzu, da sie noch nicht existiert
-          existingData.selfmademodules.push(moduleData);
-        }
-
-        await setDoc(userRef, existingData, { merge: true });
-        console.log('Module saved successfully');
-
-      } catch (error) {
-        console.error('Error saving module:', error);
-      }
-    }
-  }
-
-
-  async saveUserModulesToFirestore(module: any): Promise<void> {
+  async renderUserCategories(): Promise<string[]> {
     const user = await this.authService.getCurrentUser();
     if (user) {
       const userRef = doc(this.firestore, `users/${user.uid}`);
-      try {
-        const userDoc = await getDoc(userRef);
-        let existingData: any = {};
-        if (userDoc.exists()) {
-          existingData = userDoc.data();
-        }
-        if (!existingData.selfmademodules) {
-          existingData.selfmademodules = [];
-        }
-
-        existingData.selfmademodules.push(module);
-        await setDoc(userRef, existingData, { merge: true });
-      } catch (error) {
-        console.error('Error saving module:', error);
+      const userDoc = await getDoc(userRef);
+      let existingData: any = {};
+      if (userDoc.exists()) {
+        existingData = userDoc.data();
       }
+
+      if (!existingData.selfmademodules) {
+        existingData.selfmademodules = [];
+      }
+
+      // Extrahiere nur die Kategorien der Module
+      let categories = existingData.selfmademodules.map((module: any) => module.category);
+
+      return categories;
+    } else {
+      // Return an empty array if user is not logged in
+      return [];
     }
   }
 
@@ -178,6 +171,175 @@ export class ModuleService {
     } else {
       // Return an empty array if user is not logged in
       return [];
+    }
+  }
+
+  async deleteUserModule(category: string): Promise<void> {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      const userRef = doc(this.firestore, `users/${user.uid}`);
+      try {
+        const userDoc = await getDoc(userRef);
+        let existingData: any = {};
+        if (userDoc.exists()) {
+          existingData = userDoc.data();
+        }
+        if (!existingData.selfmademodules) {
+          existingData.selfmademodules = [];
+        }
+
+        existingData.selfmademodules = existingData.selfmademodules.filter((selfmademodule: any) => selfmademodule.category !== category);
+        await setDoc(userRef, existingData, { merge: true });
+        console.log('Module deleted successfully');
+      } catch (error) {
+        console.error('Error saving module:', error);
+      }
+    }
+  }
+
+  async saveModule(moduleData: any) {
+    const user = await this.authService.getCurrentUser();
+    if (user){
+      const userRef = doc(this.firestore, `users/${user.uid}`);
+      try {
+        const userDoc = await getDoc(userRef);
+        let existingData: any = {};
+        if (userDoc.exists()) {
+          existingData = userDoc.data();
+        }
+        if (!existingData.selfmademodules) {
+          existingData.selfmademodules = [];
+        }
+
+        // Prüfe, ob die Kategorie bereits existiert
+        const existingCategoryIndex = existingData.selfmademodules.findIndex((selfmademodule: any) => selfmademodule.category === moduleData.category);
+
+        if (existingCategoryIndex !== -1) {
+          // Kategorie existiert bereits, füge die neuen Module hinzu oder aktualisiere bestehende Module
+          moduleData.modules.forEach((newModule: any) => {
+            const existingModuleIndex = existingData.selfmademodules[existingCategoryIndex].modules.findIndex((module: any) => module.question === newModule.question);
+            if (existingModuleIndex !== -1) {
+              // Modul existiert bereits, aktualisiere answeredCorrectlyCount und answeredIncorrectlyCount
+              existingData.selfmademodules[existingCategoryIndex].modules[existingModuleIndex].answeredCorrectlyCount += newModule.answeredCorrectlyCount;
+              existingData.selfmademodules[existingCategoryIndex].modules[existingModuleIndex].answeredIncorrectlyCount += newModule.answeredIncorrectlyCount;
+              existingData.selfmademodules[existingCategoryIndex].modules[existingModuleIndex].correctStreak = newModule.correctStreak;
+            } else {
+              // Modul existiert noch nicht, füge es hinzu
+              existingData.selfmademodules[existingCategoryIndex].modules.push(newModule);
+            }
+          });
+        } else {
+          // Füge die neue Kategorie hinzu, da sie noch nicht existiert
+          existingData.selfmademodules.push(moduleData);
+        }
+
+        await setDoc(userRef, existingData, { merge: true });
+        console.log('Module saved successfully');
+
+      } catch (error) {
+        console.error('Error saving module:', error);
+      }
+    }
+  }
+
+
+
+
+  async saveUserModulesToFirestore(moduleData: any): Promise<void> {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      const userRef = doc(this.firestore, `users/${user.uid}`);
+      try {
+        const userDoc = await getDoc(userRef);
+        let existingData: any = {};
+        if (userDoc.exists()) {
+          existingData = userDoc.data();
+        }
+        if (!existingData.selfmademodules) {
+          existingData.selfmademodules = [];
+        }
+
+        let categoryFound = false;
+        for (let i = 0; i < existingData.selfmademodules.length; i++) {
+          if (existingData.selfmademodules[i].category === moduleData.category) {
+            existingData.selfmademodules[i].modules.push(...moduleData.modules);
+            categoryFound = true;
+            break;
+          }
+        }
+
+        if (!categoryFound) {
+          existingData.selfmademodules.push(moduleData);
+        }
+
+        await setDoc(userRef, existingData, { merge: true });
+      } catch (error) {
+        console.error('Error saving module:', error);
+      }
+    }
+  }
+
+  async updateUserModuleInFirestore(updatedQuestion: any, category: string, questionIndex: number): Promise<void> {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      const userRef = doc(this.firestore, `users/${user.uid}`);
+      try {
+        const userDoc = await getDoc(userRef);
+        if (!userDoc.exists()) throw new Error('User document not found');
+        const data = userDoc.data();
+
+        // Find the index of the module with the matching category
+        const modules = data['selfmademodules'] || [];
+        const moduleIndex = modules.findIndex((mod: any) => mod.category === category);
+
+        if (moduleIndex !== -1) {
+          // Update the specific question within the module
+          const module = modules[moduleIndex];
+          if (module && module.modules && module.modules[questionIndex]) {
+            module.modules[questionIndex] = updatedQuestion;
+            await updateDoc(userRef, { selfmademodules: modules });
+          } else {
+            console.error('Question not found for the specified index');
+          }
+        } else {
+          console.error('Module not found for the specified category');
+        }
+      } catch (error) {
+        console.error('Error updating module:', error);
+      }
+    }
+  }
+
+  async deleteQuestion(category: string, questionIndex: number): Promise<void> {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      const userRef = doc(this.firestore, `users/${user.uid}`);
+      try {
+        const userDoc = await getDoc(userRef);
+        if (!userDoc.exists()) throw new Error('User document not found');
+        const data = userDoc.data();
+
+        // Find the index of the module with the matching category
+        const modules = data['selfmademodules'] || [];
+        const moduleIndex = modules.findIndex((mod: any) => mod.category === category);
+
+        if (moduleIndex !== -1) {
+          // Remove the specific question from the module
+          const module = modules[moduleIndex];
+          if (module && module.modules && module.modules[questionIndex]) {
+            module.modules.splice(questionIndex, 1);
+            // Update the Firestore document
+            await updateDoc(userRef, { selfmademodules: modules });
+            console.log('Question deleted successfully');
+          } else {
+            console.error('Question not found for the specified index');
+          }
+        } else {
+          console.error('Module not found for the specified category');
+        }
+      } catch (error) {
+        console.error('Error deleting question:', error);
+      }
     }
   }
 
@@ -209,6 +371,12 @@ export class ModuleService {
             if (existingModuleIndex !== -1) {
               existingData.sessions[existingSessionIndex].modules[existingModuleIndex].answeredCorrectlyCount += newModule.answeredCorrectlyCount;
               existingData.sessions[existingSessionIndex].modules[existingModuleIndex].answeredIncorrectlyCount += newModule.answeredIncorrectlyCount;
+              existingData.sessions[existingSessionIndex].modules[existingModuleIndex].correctStreak += newModule.correctStreak;
+              this.setStreak(existingData.sessions[existingSessionIndex].modules[existingModuleIndex].correctStreak);
+              if (newModule.correctStreak === 0) {
+                existingData.sessions[existingSessionIndex].modules[existingModuleIndex].correctStreak = 0;
+                this.setStreak(0);
+              }
             }
           });
           existingData.sessions[existingSessionIndex].lastStudied = new Date().toISOString();
@@ -221,12 +389,57 @@ export class ModuleService {
 
         await setDoc(userRef, existingData, { merge: true });
         console.log('Session saved successfully');
+        return
       } catch (error) {
         console.error('Error saving session:', error);
       }
     } else {
       console.error('No user is logged in');
     }
+  }
+
+  async getCorrectStreakOfModule(category: string) {
+    const modulesInfo: {index: number; question: string;}[] = [];
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      const userRef = doc(this.firestore, `users/${user.uid}`);
+      try {
+
+        const userDoc = await getDoc(userRef);
+        let existingData: any = {};
+        if (userDoc.exists()) {
+          existingData = userDoc.data();
+        }
+
+        if (!existingData.sessions) {
+          existingData.sessions = [];
+        }
+
+        if (existingData.sessions) {
+          existingData.sessions.forEach((session: any) => {
+            if(session.category === category)
+            session.modules.forEach((module: any, index: number) => {
+              // Überprüfen, ob die correctStreak >= 6 ist
+              if (module.correctStreak >= 6) {
+                modulesInfo.push({
+                  index: index,
+                  question: module.question,
+                });
+              }
+            });
+          });
+        }
+      } catch (error) {
+        console.error('Error saving session:', error);
+      }
+    }else {
+      console.error('No user is logged in');
+    }
+    return modulesInfo;
+  }
+
+  setStreak(streak: number) {
+    this.correctSteak = streak;
   }
 
   async getUserSessions(userID: string): Promise<any[]> {
@@ -268,8 +481,6 @@ export class ModuleService {
     return existingData.sessions;
   }
 
-
-
   async findAll(): Promise<ModuleModule[]> {
     const filterQuery = query(this.modulesCollectionRef)
     const moduleDocs = await getDocs(filterQuery);
@@ -283,7 +494,6 @@ export class ModuleService {
     });
     this.saveLocal();
   return  this.modules;
-  console.log(this.findAll())
   }
 
 
@@ -292,7 +502,6 @@ export class ModuleService {
     const url: string = `${this.baseUrl}/load-all-modules`;
     return this.http.get<any>(url);
   }
-
 
   checkForUpdates(): Observable<{ updatesAvailable: boolean }> {
     const url = `${this.baseUrl}/check-updates`;
