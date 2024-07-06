@@ -147,7 +147,7 @@ export class HomeComponent implements OnInit {
     const user = await this.authService.getCurrentUser();
     if (user) {
       await this.achievements.setIndexAchievement(user.uid, 9);
-    };
+    }
   }
 
 

@@ -1,12 +1,12 @@
 import {ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
-import {GestureDetail, IonicModule} from "@ionic/angular";
+import {GestureDetail, IonicModule, NavController} from "@ionic/angular";
 import {Router} from "@angular/router";
 import {ModuleService} from "../../services/module.service";
 import {AuthService} from "../../services/auth.service";
 import {AlertController, IonSearchbar, ToastController} from "@ionic/angular/standalone";
 import {FooterComponent} from "../../footer/footer.component";
 import {addIcons} from "ionicons";
-import {addCircleSharp,shareSocialOutline, searchOutline} from "ionicons/icons";
+import {addCircleSharp, shareSocialOutline, searchOutline, logOutOutline} from "ionicons/icons";
 import {Share} from '@capacitor/share';
 import {FormsModule} from "@angular/forms";
 import {AchievementsService} from "../../services/achievements.service";
@@ -24,6 +24,7 @@ import {AchievementsService} from "../../services/achievements.service";
 })
 export class CardListComponent  implements OnInit {
 
+  isLoggedIn!: boolean;
   savedModules: any[] = [];
   userSessions: any[] = [];
   showSearchBar: boolean = false;
@@ -34,13 +35,14 @@ export class CardListComponent  implements OnInit {
   @ViewChild('searchbar') searchbar!: IonSearchbar;
 
   constructor(private router:Router,
+              public navCtrl: NavController,
               private moduleService: ModuleService,
               private authService: AuthService,
               private alertController: AlertController,
               private toastController: ToastController,
               private achievements: AchievementsService,
               private cdr: ChangeDetectorRef) {
-    addIcons({addCircleSharp,shareSocialOutline,searchOutline});
+    addIcons({addCircleSharp,shareSocialOutline,searchOutline,logOutOutline});
   }
 
   async ngOnInit() {
@@ -164,6 +166,16 @@ export class CardListComponent  implements OnInit {
       });
       toast.present();
     }
+  }
+
+  async logout() {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      await this.achievements.setIndexAchievement(user.uid, 7);
+    };
+    await this.authService.logout();
+    this.isLoggedIn = false;
+    await this.navCtrl.navigateRoot(['/landingpage']);
   }
 
 }

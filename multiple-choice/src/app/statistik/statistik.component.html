@@ -1,5 +1,15 @@
-
-
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Multiple-Choice Trainer</ion-title>
+    <ion-buttons slot="end">
+      @if (isLoggedIn) {
+        <ion-button class="ion-color" slot="end" (click)="logout()">
+          <ion-icon name="log-out-outline" style="color: #CEDBEB"></ion-icon>
+        </ion-button>
+      }
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
 
 
 <app-footer></app-footer>
