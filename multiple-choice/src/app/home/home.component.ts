@@ -13,7 +13,8 @@ import {
   pencilSharp,
   trashSharp,
   searchOutline,
-  telescopeOutline
+  telescopeOutline,
+  addSharp
 } from 'ionicons/icons';
 import {AuthService} from "../services/auth.service";
 import {ModuleService} from "../services/module.service";
@@ -67,7 +68,8 @@ export class HomeComponent implements OnInit {
       pencilSharp,
       trashSharp,
       searchOutline,
-      telescopeOutline
+      telescopeOutline,
+      addSharp
     });
     this.isLoggedIn = this.isAuth();
   }

@@ -7,7 +7,7 @@
       @if (isEditMode){
         {{category}} bearbeiten
       } @else {
-        'Neues Modul erstellen'
+        Modul erstellen
       }
     </ion-title>
   </ion-toolbar>
@@ -34,58 +34,87 @@
     </ion-list>
   } @else {
     <form (ngSubmit)="saveModule()">
-      <!-- Category Input -->
-      @if (!isEditMode && !addMode) {
-        <ion-item>
-          <ion-label position="floating">Kategorie</ion-label>
-          <ion-input [(ngModel)]="category" name="category" [readonly]="categoryAdded" required maxlength="50"
-                     [counter]="true">
-          </ion-input>
-        </ion-item>
-      }
+      <ion-grid>
+        <!-- Category Input -->
+        @if (!isEditMode && !addMode) {
+          <ion-row>
+            <ion-col size="12">
+              <ion-item>
+                <ion-label position="floating">Kategorie</ion-label>
+                <ion-input
+                  [(ngModel)]="category"
+                  name="category"
+                  [readonly]="categoryAdded"
+                  required
+                  maxlength="50"
+                  [counter]="true">
+                </ion-input>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+        }
 
-      <!-- Question Input -->
-      <ion-item>
-        <ion-label position="floating">Frage</ion-label>
-        <ion-input [(ngModel)]="currentQuestion.question" name="question" required maxlength="50" [counter]="true">
-          <ion-button (click)="clearQuestion()" slot="end" type="button">
-            <ion-icon slot="icon-only" name="close">
-            </ion-icon>
-          </ion-button>
-        </ion-input>
-      </ion-item>
+        <!-- Question Input -->
+        <ion-row>
+          <ion-col size="12">
+            <ion-item>
+              <ion-label position="floating">Frage</ion-label>
+              <ion-input
+                [(ngModel)]="currentQuestion.question"
+                name="question"
+                required
+                maxlength="50"
+                clearInput
+                [counter]="true">
+              </ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
 
+        <!-- Answer Inputs -->
+        @for (answer of currentQuestion.answers; track trackByIndex; let i = $index) {
+          <ion-row>
+            <ion-col size="12">
+              <ion-item lines="none" class="answer-item">
+                <ion-radio-group slot="start" value="default" (ionChange)="setCorrectAnswer(i)">
+                  <ion-radio [(ngModel)]="currentQuestion.correctAnswer" name="answer" [value]="answer"></ion-radio>
+                </ion-radio-group>
+                <ion-label position="floating">Antwort {{ i + 1 }}</ion-label>
+                <ion-input
+                  [(ngModel)]="currentQuestion.answers[i]"
+                  name="answer{{ i }}"
+                  required
+                  maxlength="50"
+                  clearInput
+                  [counter]="true">
+                </ion-input>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+        }
 
-      <!-- Answer Inputs -->
-      @for (answer of currentQuestion.answers; track trackByIndex; let i = $index) {
-        <ion-item lines="none" class="answer-item">
-          <ion-radio-group slot="start" value="default" (ionChange)="setCorrectAnswer(i)">
-            <ion-radio [(ngModel)]="currentQuestion.correctAnswer" name="answer" [value]="answer"></ion-radio>
-          </ion-radio-group>
-          <ion-label position="floating">Antwort {{ i + 1 }}</ion-label>
-          <ion-input [(ngModel)]="currentQuestion.answers[i]" name="answer{{ i }}" required maxlength="50"
-                     [counter]="true">
-            <ion-button (click)="clearAnswer(i)" slot="end" type="button">
-              <ion-icon slot="icon-only" name="close"></ion-icon>
-            </ion-button>
-          </ion-input>
-        </ion-item>
-      }
+        <!-- Add Answer Button -->
+        @if (currentQuestion.answers.length < 6) {
+          <ion-row>
+            <ion-col size="12">
+              <ion-button expand="block" (click)="addAnswerField()" type="button">
+                <ion-icon name="add-circle-sharp"></ion-icon>
+                Antwort hinzufügen
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        }
 
-      <!-- Add Answer Button -->
-      @if (currentQuestion.answers.length < 6) {
-        <ion-button expand="block" (click)="addAnswerField()" type="button">
-          <ion-icon name="add-circle-sharp"></ion-icon>
-          Antwort hinzufügen
-        </ion-button>
-      }
-
-      <!-- Control Buttons -->
-
-      <ion-button expand="block" type="submit" (click)="save()">Weiter</ion-button>
-      <ion-button expand="block" color="danger" (click)="alertCancel()">Speichern und beenden</ion-button>
-
-
+        <!-- Control Buttons -->
+        <ion-row>
+          <ion-col size="12">
+            <ion-button expand="block" type="submit" (click)="save()">Weiter</ion-button>
+          </ion-col>
+          <ion-col size="12">
+            <ion-button expand="block" color="danger" (click)="alertCancel()">Speichern und beenden</ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
     </form>
   }
 </ion-content>

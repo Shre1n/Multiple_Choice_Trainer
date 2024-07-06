@@ -11,10 +11,12 @@
   <form (ngSubmit)="register()" #registerForm="ngForm">
     <ion-item>
       <ion-label position="floating">Email</ion-label>
-      <ion-input  [(ngModel)]="email" name="email" type="email" required>
-        <ion-button (click)="clearEmail()" slot="end" type="button">
-          <ion-icon slot="icon-only" name="close"></ion-icon>
-        </ion-button>
+      <ion-input
+        [(ngModel)]="email"
+        name="email"
+        type="email"
+        clearInput
+        required>
       </ion-input>
 
     </ion-item>
@@ -26,7 +28,15 @@
     }
     <ion-item>
       <ion-label position="floating">Password</ion-label>
-      <ion-input [(ngModel)]="password" name="password" type="password" required maxlength="15" minlength="6" [counter]="true">
+      <ion-input
+        [(ngModel)]="password"
+        name="password"
+        type="password"
+        required
+        maxlength="15"
+        minlength="6"
+        clearInput
+        [counter]="true">
         <ion-button (click)="clearPasswort()" slot="end" type="button">
           <ion-icon slot="icon-only" name="close"></ion-icon>
         </ion-button>
@@ -47,10 +57,14 @@
 
     <ion-item>
       <ion-label position="floating">Name</ion-label>
-      <ion-input [(ngModel)]="additionalData.name" name="name" required maxlength="30" minlength="2" [counter]="true">
-        <ion-button (click)="clearName()" slot="end" type="button">
-          <ion-icon slot="icon-only" name="close"></ion-icon>
-        </ion-button>
+      <ion-input
+        [(ngModel)]="additionalData.name"
+        name="name"
+        required
+        maxlength="30"
+        minlength="2"
+        clearInput
+        [counter]="true">
       </ion-input>
     </ion-item>
 

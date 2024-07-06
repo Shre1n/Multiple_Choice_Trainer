@@ -27,7 +27,6 @@ export class ModuleService {
   private correctSteak!: number;
 
   modulesCollectionRef: CollectionReference<DocumentData>;
-  userCollectionRef!: CollectionReference<DocumentData>;
 
   private baseUrl = "http://localhost:8888";
 
@@ -36,8 +35,6 @@ export class ModuleService {
               private authService: AuthService,
               private achievements: AchievementsService,) {
     this.modulesCollectionRef = collection(firestore, 'modules');
-    this.userCollectionRef = collection(firestore,'users');
-    console.log(this.userCollectionRef);
     const modulesJSON: string | null = localStorage.getItem('modules');
     if (modulesJSON) {
       this.modules = JSON.parse(modulesJSON);
@@ -70,8 +67,6 @@ export class ModuleService {
       const userDoc = await getDoc(userRef);
       if (!userDoc.exists()) throw new Error('User document not found');
       const userData = userDoc.data();
-
-      console.log(userData['sessions'].length);
       if (userData['sessions'].length == 5) {
         await this.achievements.setIndexAchievement(user.uid, 10);
       }
