@@ -76,9 +76,13 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     this.checkLoginStatus();
-    this.loadModules();
-    this.loadUserModules();
+    this.loadInitialData()
     this.checkForUpdates();
+  }
+
+  async loadInitialData() {
+    await this.loadModules();
+    await this.loadUserModules();
   }
 
 
@@ -311,6 +315,7 @@ export class HomeComponent implements OnInit {
   ionViewDidEnter() {
     this.authService.getCurrentUser()
     this.isLoggedIn = this.authService.isAuth();
+    this.loadInitialData();
   }
 
 

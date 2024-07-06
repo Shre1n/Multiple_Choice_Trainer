@@ -87,7 +87,6 @@ export class ModuleService {
 
       // Filtern der Module nach der angegebenen Kategorie
       const filteredModules = modulesData.filter((module: any) => module.category === category);
-      console.log(filteredModules);
       return filteredModules;
 
 
