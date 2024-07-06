@@ -18,7 +18,7 @@ ion-icon {
   color: #CEDBEB;
 }
 
-ion-card{
+ion-card {
   height: 10em;
   display: flex;
   flex-direction: column;
@@ -41,7 +41,7 @@ ion-card{
 }
 
 
-.categoryTitle{
+.categoryTitle {
   color: white;
   font-size: medium;
 }
@@ -50,60 +50,81 @@ ion-card.active {
   box-shadow: var(--ion-color-warning) 0px 4px 16px;
 }
 
-ion-toolbar{
+ion-toolbar {
   --background: #5A7699;
   color: white;
 
 }
 
-ion-card-subtitle{
+ion-card-subtitle {
   color: white;
 
 }
 
-.search-button{
+.search-button {
   order: 1;
 }
 
-.share-button{
+.share-button {
   order: 2;
 }
 
-.logout-button{
+.logout-button {
   order: 3;
 }
 
 
-.card{
-    display: block;
-    width: 100%;
-  align-items: stretch;
-  height: 10em;
-  flex-direction: column;
-  justify-content: center;
-  background: black;
-  }
+//.card {
+//  display: block;
+//  width: 100%;
+//  align-items: stretch;
+//  flex-direction: column;
+//  justify-content: center;
+//}
 
-.item{
-  flex: 1;
-  width: 14em;
-  height: 10em;
-  display: block;
+
+.item {
+  border-radius: 8px; /* Abgerundete Ecken */
+  box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.1); /* Schatten für Karten-Effekt */
+  display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: black;
-
+  padding: 1em; /* Innenabstand anpassen */
+  margin-bottom: 1em; /* Außenabstand anpassen */
+  height: 100%; /* Höhe anpassen */
 }
 
-ion-item{
-  display: block;
-  width: 100%;
-  align-items: stretch;
-  height: 8em;
+.item ion-card {
+  width: 100%; /* Fülle die Breite des ion-card aus */
+  display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
+  height: 7em; /* Fülle die Höhe des ion-card aus */
 }
+
+
+.item ion-card-header,
+.item ion-card-content,
+.item ion-card-footer {
+  width: 100%;
+  text-align: center; /* Zentriert den Text */
+}
+
+.item ion-card-content {
+  flex: 1; /* Inhalte ausfüllen */
+}
+
+
+//ion-item {
+//  display: block;
+//  width: 100%;
+//  align-items: stretch;
+//  height: 10em;
+//  flex-direction: column;
+//  justify-content: center;
+//}
 
 
 
