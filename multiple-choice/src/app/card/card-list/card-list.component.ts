@@ -31,6 +31,8 @@ export class CardListComponent  implements OnInit {
   searchText: string = "";
   filterUsermodule: any[] = [];
 
+  categories: string[] = [];
+
 
   @ViewChild('searchbar') searchbar!: IonSearchbar;
 
@@ -41,7 +43,7 @@ export class CardListComponent  implements OnInit {
               private alertController: AlertController,
               private toastController: ToastController,
               private achievements: AchievementsService,
-              private cdr: ChangeDetectorRef) {
+              ) {
     addIcons({addCircleSharp,shareSocialOutline,searchOutline,logOutOutline});
   }
 
@@ -79,6 +81,32 @@ export class CardListComponent  implements OnInit {
       this.filterUsermodule = [...this.filterUsermodule]
       console.log(this.filterUsermodule)
     }
+  }
+
+  async presentToast(message: string, position: 'middle') {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 10000,
+      position: position,
+    });
+
+    await toast.present();
+  }
+
+  async loadModules() {
+    this.moduleService.loadExternalModule().subscribe(
+      response => {
+       this.extractCategories(response);
+      },
+      error => {
+        console.error('Error loading modules:', error);
+        this.presentToast('No Connection to External Server! :(', 'middle');
+      }
+    );
+  }
+
+  extractCategories(modules: any): void {
+    this.categories = Object.keys(modules).map(key => modules[key].category);
   }
 
   async loadAndSortUserSessions() {
@@ -124,7 +152,6 @@ export class CardListComponent  implements OnInit {
     if (user) {
       try {
         this.savedModules = await this.moduleService.getSavedSessionModulesForUser(user.uid);
-        this.cdr.detectChanges();
       } catch (error) {
         console.error('Error fetching saved modules:', error);
       }
@@ -168,11 +195,25 @@ export class CardListComponent  implements OnInit {
     }
   }
 
+  async startRandomSession() {
+    await this.loadModules();
+    if (this.savedModules.length === 0) {
+      const randomIndex = Math.floor(Math.random() * this.categories.length);
+      const randomCategory = this.categories[randomIndex];
+      await this.navSession(randomCategory);
+    }
+
+  }
+
+  ionViewDidEnter(){
+    this.fetchSessionSavedModules();
+  }
+
   async logout() {
     const user = await this.authService.getCurrentUser();
     if (user) {
       await this.achievements.setIndexAchievement(user.uid, 7);
-    };
+    }
     await this.authService.logout();
     this.isLoggedIn = false;
     await this.navCtrl.navigateRoot(['/landingpage']);

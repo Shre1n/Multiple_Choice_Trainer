@@ -493,6 +493,10 @@ export class ModuleService {
   return  this.modules;
   }
 
+  getAllCategories(){
+
+  }
+
 
   //Loads External Modules
   loadExternalModule(): Observable<any> {

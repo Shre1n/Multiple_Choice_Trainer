@@ -50,7 +50,7 @@
   }
   @if (savedModules.length === 0) {
     <p>Du hast noch keine LernSessions Gestartet!</p>
-    <ion-button>Starte eine Zufällige Lernsession!</ion-button>
+    <ion-button (click)="startRandomSession()">Starte eine Zufällige Lernsession!</ion-button>
   }
 
   @if (searchText && filterUsermodule.length === 0) {
