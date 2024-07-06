@@ -45,6 +45,7 @@ export class CardListComponent  implements OnInit {
               private achievements: AchievementsService,
               ) {
     addIcons({addCircleSharp,shareSocialOutline,searchOutline,logOutOutline});
+    this.isLoggedIn = this.isAuth();
   }
 
   async ngOnInit() {
@@ -59,6 +60,10 @@ export class CardListComponent  implements OnInit {
         this.searchbar.setFocus();
       }, 100);
     }
+  }
+
+  isAuth(): boolean {
+    return this.authService.isAuth();
   }
 
   closeSearch() {
