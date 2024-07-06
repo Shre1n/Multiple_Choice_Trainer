@@ -51,15 +51,27 @@ ion-radio{
   --color: white;
   --color-checked: white;
 }
-ion-header{
-  --ion-background-color: #5A7699;
-}
-ion-button{
-  --background:  #CEDBEB;
-  --color: black;
-}
 
 ion-icon{
-  color: white;
+  color: #CEDBEB;
   font-size: 22px;
 }
+
+ion-toolbar{
+  --background: #5A7699;
+}
+
+ion-button{
+  --background: #CEDBEB;
+  color: black;
+}
+
+#iconBack{
+  color: black;
+}
+
+#cardBg1, #cardBg2 ,#cardBg3{
+  --background: #2D496B;
+  color: white;
+}
+

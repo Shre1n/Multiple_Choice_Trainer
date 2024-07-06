@@ -3,16 +3,17 @@
     <ion-title >Multiple-Choice Trainer</ion-title>
     <ion-buttons slot="end">
       @if (isLoggedIn) {
+        <ion-button class="search-button" (click)="search()">
+          <ion-icon slot="icon-only" name="search-outline"></ion-icon>
+        </ion-button>
+
         @if (userModules.length > 0) {
-          <ion-button (click)="shareMyModules()">
+          <ion-button class="share-button" (click)="shareMyModules()">
             <ion-icon name="share-social-outline"></ion-icon>
           </ion-button>
         }
-        <ion-button class="ion-color" slot="end" (click)="logout()">
-          <ion-icon name="log-out-outline" style="color: #CEDBEB"></ion-icon>
-        </ion-button>
-        <ion-button (click)="search()">
-          <ion-icon slot="icon-only" name="search-outline"></ion-icon>
+        <ion-button class="logout-button" slot="end" (click)="logout()">
+          <ion-icon name="log-out-outline"></ion-icon>
         </ion-button>
       }
     </ion-buttons>
@@ -47,7 +48,7 @@
         <ion-col size="6">
           <ion-item-sliding>
             <ion-item>
-              <ion-card button (click)="navSession(module)"
+              <ion-card  class="card" button (click)="navSession(module)"
                         [ngStyle]="{'background-color': getCategoryBackground(module)}">
                 <ion-card-header class="ion-text-center">
                   <ion-card-title class="categoryTitle">{{ module }}</ion-card-title>

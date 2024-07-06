@@ -14,7 +14,8 @@
 }
 
 ion-icon {
-  scale: 150%;
+  font-size: 22px;
+  color: #CEDBEB;
 }
 
 ion-card{
@@ -59,6 +60,53 @@ ion-card-subtitle{
   color: white;
 
 }
+
+.search-button{
+  order: 1;
+}
+
+.share-button{
+  order: 2;
+}
+
+.logout-button{
+  order: 3;
+}
+
+
+.card{
+    display: block;
+    width: 100%;
+  align-items: stretch;
+  height: 10em;
+  flex-direction: column;
+  justify-content: center;
+  }
+
+.item{
+  flex: 1;
+  width: 13em;
+  display: block;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+}
+
+ion-item{
+  display: block;
+  width: 100%;
+  align-items: stretch;
+  height: 10em;
+  flex-direction: column;
+  justify-content: center;
+}
+
+
+
+
+
+
 
 
 

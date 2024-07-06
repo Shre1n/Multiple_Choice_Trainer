@@ -8,7 +8,7 @@
   @if (achievements && achievements.length > 0) {
     <ion-list>
       @if(achievements.length > 0){
-        <ion-card class="ion-margin-vertical ion-text-center ion-align-self-center">
+        <ion-card id="cardAchieved" class="ion-margin-vertical ion-text-center ion-align-self-center">
           <h3>Erfolgreich abgeschlossene Achievements!</h3>
         </ion-card>
       }
@@ -35,7 +35,7 @@
   @if (notAchieved && notAchieved.length > 0) {
     <ion-list>
       @if (notAchieved.length > 0){
-        <ion-card class="ion-margin-vertical ion-text-center ion-align-self-center">
+        <ion-card id="cardNotAchieved" class="ion-margin-vertical ion-text-center ion-align-self-center">
           <h3>Nicht abgeschlossene Achievements!</h3>
         </ion-card>
       }

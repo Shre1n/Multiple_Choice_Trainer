@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-button slot="start" (click)="goBack()">
-      <ion-icon slot="icon-only" name="close"></ion-icon>
+      <ion-icon id="iconBack" slot="icon-only" name="close"></ion-icon>
     </ion-button>
     @if (!sessionCompleted) {
       <ion-title class="sessionTitle" slot="start">{{ category }}</ion-title>
@@ -97,9 +97,9 @@
               <ion-card-title>Was für eine Runde!</ion-card-title>
             </ion-card-header>
             <ion-card-content>
-              <ion-card>Karten insgesammt: {{ kartenInsgesammt }}</ion-card>
-              <ion-card>falsche Antworten: {{ wrongAnswers }}</ion-card>
-              <ion-card class="ion-text-center">
+              <ion-card id="cardBg1">Karten insgesammt: {{ kartenInsgesammt }}</ion-card>
+              <ion-card id="cardBg2">falsche Antworten: {{ wrongAnswers }}</ion-card>
+              <ion-card id="cardBg3" class="ion-text-center">
                 <p>{{ successRate() }}</p>
                 <ion-button shape="round" (click)="goToHome()">Zurück zur Startseite</ion-button>
               </ion-card>
