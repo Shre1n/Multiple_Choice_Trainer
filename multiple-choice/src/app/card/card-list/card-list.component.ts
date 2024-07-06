@@ -1,12 +1,12 @@
 import {ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
-import {GestureDetail, IonicModule} from "@ionic/angular";
+import {GestureDetail, IonicModule, NavController} from "@ionic/angular";
 import {Router} from "@angular/router";
 import {ModuleService} from "../../services/module.service";
 import {AuthService} from "../../services/auth.service";
 import {AlertController, IonSearchbar, ToastController} from "@ionic/angular/standalone";
 import {FooterComponent} from "../../footer/footer.component";
 import {addIcons} from "ionicons";
-import {addCircleSharp,shareSocialOutline, searchOutline} from "ionicons/icons";
+import {addCircleSharp, shareSocialOutline, searchOutline, logOutOutline} from "ionicons/icons";
 import {Share} from '@capacitor/share';
 import {FormsModule} from "@angular/forms";
 import {AchievementsService} from "../../services/achievements.service";
@@ -24,23 +24,27 @@ import {AchievementsService} from "../../services/achievements.service";
 })
 export class CardListComponent  implements OnInit {
 
+  isLoggedIn!: boolean;
   savedModules: any[] = [];
   userSessions: any[] = [];
   showSearchBar: boolean = false;
   searchText: string = "";
   filterUsermodule: any[] = [];
 
+  categories: string[] = [];
+
 
   @ViewChild('searchbar') searchbar!: IonSearchbar;
 
   constructor(private router:Router,
+              public navCtrl: NavController,
               private moduleService: ModuleService,
               private authService: AuthService,
               private alertController: AlertController,
               private toastController: ToastController,
               private achievements: AchievementsService,
-              private cdr: ChangeDetectorRef) {
-    addIcons({addCircleSharp,shareSocialOutline,searchOutline});
+              ) {
+    addIcons({addCircleSharp,shareSocialOutline,searchOutline,logOutOutline});
   }
 
   async ngOnInit() {
@@ -77,6 +81,32 @@ export class CardListComponent  implements OnInit {
       this.filterUsermodule = [...this.filterUsermodule]
       console.log(this.filterUsermodule)
     }
+  }
+
+  async presentToast(message: string, position: 'middle') {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 10000,
+      position: position,
+    });
+
+    await toast.present();
+  }
+
+  async loadModules() {
+    this.moduleService.loadExternalModule().subscribe(
+      response => {
+       this.extractCategories(response);
+      },
+      error => {
+        console.error('Error loading modules:', error);
+        this.presentToast('No Connection to External Server! :(', 'middle');
+      }
+    );
+  }
+
+  extractCategories(modules: any): void {
+    this.categories = Object.keys(modules).map(key => modules[key].category);
   }
 
   async loadAndSortUserSessions() {
@@ -122,7 +152,6 @@ export class CardListComponent  implements OnInit {
     if (user) {
       try {
         this.savedModules = await this.moduleService.getSavedSessionModulesForUser(user.uid);
-        this.cdr.detectChanges();
       } catch (error) {
         console.error('Error fetching saved modules:', error);
       }
@@ -164,6 +193,30 @@ export class CardListComponent  implements OnInit {
       });
       toast.present();
     }
+  }
+
+  async startRandomSession() {
+    await this.loadModules();
+    if (this.savedModules.length === 0) {
+      const randomIndex = Math.floor(Math.random() * this.categories.length);
+      const randomCategory = this.categories[randomIndex];
+      await this.navSession(randomCategory);
+    }
+
+  }
+
+  ionViewDidEnter(){
+    this.fetchSessionSavedModules();
+  }
+
+  async logout() {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      await this.achievements.setIndexAchievement(user.uid, 7);
+    }
+    await this.authService.logout();
+    this.isLoggedIn = false;
+    await this.navCtrl.navigateRoot(['/landingpage']);
   }
 
 }

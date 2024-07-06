@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import {GestureController, GestureDetail, IonicModule} from "@ionic/angular";
+import {IonicModule, NavController} from "@ionic/angular";
 import {ActivatedRoute, Router} from "@angular/router";
 import {FooterComponent} from "../footer/footer.component";
+import {addIcons} from "ionicons";
+import {logOutOutline} from 'ionicons/icons';
+import {AuthService} from "../services/auth.service";
+import {AchievementsService} from "../services/achievements.service";
 
 @Component({
   selector: 'app-statistik',
@@ -16,45 +20,34 @@ import {FooterComponent} from "../footer/footer.component";
 export class StatistikComponent implements OnInit{
 
   //wichtig
+  isLoggedIn!: boolean;
   wrongAnswers: number = 0;
   kartenInsgesammt: number = 10;
   kartenRichtig: number = 10;
   prozErfolg: number = 0;
 
   constructor(private router: Router,
-              private gestureCtrl: GestureController,
-              //wichtig
-              private route: ActivatedRoute) { }
+              private route: ActivatedRoute,
+              public navCtrl: NavController,
+              private authService: AuthService,
+              private achievements: AchievementsService,
+              ) {
+    addIcons({logOutOutline})
+
+  }
 
   ngOnInit() {
-    this.initializeSwipeGesture();
     this.wrongAnswers = +this.route.snapshot.paramMap.get('wrongAnswers')!;  }
 
 
-
-  initializeSwipeGesture() {
-    const content = document.querySelector('ion-content');
-    if (content) {
-      const gesture = this.gestureCtrl.create({
-        el: content as HTMLElement,
-        gestureName: 'swipe',
-        onMove: ev => this.onSwipe(ev)
-      });
-      gesture.enable();
-    } else {
-      console.error('Ion content not found');
+  async logout() {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      await this.achievements.setIndexAchievement(user.uid, 7);
     }
-  }
-
-  onSwipe(ev: GestureDetail) {
-    const deltaX = ev.deltaX;
-    if (deltaX < -50) {
-      this.router.navigate(['/card-list']);
-    }else{
-      if (deltaX < 50){
-        this.router.navigate(['']);
-      }
-    }
+    await this.authService.logout();
+    this.isLoggedIn = false;
+    await this.navCtrl.navigateRoot(['/landingpage']);
   }
 
   goToHome() {

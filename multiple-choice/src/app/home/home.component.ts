@@ -13,7 +13,8 @@ import {
   pencilSharp,
   trashSharp,
   searchOutline,
-  telescopeOutline
+  telescopeOutline,
+  addSharp
 } from 'ionicons/icons';
 import {AuthService} from "../services/auth.service";
 import {ModuleService} from "../services/module.service";
@@ -67,25 +68,30 @@ export class HomeComponent implements OnInit {
       pencilSharp,
       trashSharp,
       searchOutline,
-      telescopeOutline
+      telescopeOutline,
+      addSharp
     });
     this.isLoggedIn = this.isAuth();
   }
 
   ngOnInit() {
     this.checkLoginStatus();
-    this.loadModules();
-    this.loadUserModules();
+    this.loadInitialData()
     this.checkForUpdates();
   }
 
-
-  updateModule(module: { category: any; }) {
-    this.router.navigate(['/card-detail'], {queryParams: {category: module.category, edit: 'true'}});
+  async loadInitialData() {
+    await this.loadModules();
+    await this.loadUserModules();
   }
 
 
-  async presentDeleteConfirm(module: { category: any; }) {
+  updateModule(module: { category: string; }) {
+    this.router.navigate(['/card-detail'], {queryParams: {category: module, edit: 'true'}});
+  }
+
+
+  async presentDeleteConfirm(module: { category: string; }) {
     const alert = await this.alertController.create({
       header: 'Löschen',
       message: 'Möchten Sie dieses Modul wirklich löschen?',
@@ -147,14 +153,14 @@ export class HomeComponent implements OnInit {
     const user = await this.authService.getCurrentUser();
     if (user) {
       await this.achievements.setIndexAchievement(user.uid, 9);
-    };
+    }
   }
 
 
-  async deleteModule(module: { category: any; }) {
+  async deleteModule(module: { category: string; }) {
     const user = await this.authService.getCurrentUser();
     if (user) {
-      this.moduleService.deleteUserModule(module.category).then(() => {
+      this.moduleService.deleteUserModule(module).then(() => {
         this.presentToast('Modul erfolgreich gelöscht', 'middle');
         this.loadUserModules();  // Reload the modules after deletion
         this.achievements.setIndexAchievement(user.uid, 5);
@@ -309,6 +315,7 @@ export class HomeComponent implements OnInit {
   ionViewDidEnter() {
     this.authService.getCurrentUser()
     this.isLoggedIn = this.authService.isAuth();
+    this.loadInitialData();
   }
 
 
