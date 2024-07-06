@@ -40,16 +40,14 @@
             <ion-icon class="global_shine_blue" name="add-circle-sharp"></ion-icon>
             <ion-card-subtitle>Modul Hinzufügen</ion-card-subtitle>
           </ion-card-content>
-
         </ion-card>
       </ion-col>
 
       @for (module of searchText ? filterUsermodule : userModules; track userModules;) {
         <ion-col size="6">
           <ion-item-sliding>
-            <ion-item>
-              <ion-card  class="card" button (click)="navSession(module)"
-                        [ngStyle]="{'background-color': getCategoryBackground(module)}">
+            <ion-item class="item">
+              <ion-card  class="card" button (click)="navSession(module)">
                 <ion-card-header class="ion-text-center">
                   <ion-card-title class="categoryTitle">{{ module }}</ion-card-title>
                 </ion-card-header>

@@ -81,15 +81,18 @@ ion-card-subtitle{
   height: 10em;
   flex-direction: column;
   justify-content: center;
+  background: black;
   }
 
 .item{
   flex: 1;
-  width: 13em;
+  width: 14em;
+  height: 10em;
   display: block;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  color: black;
 
 }
 
@@ -97,7 +100,7 @@ ion-item{
   display: block;
   width: 100%;
   align-items: stretch;
-  height: 10em;
+  height: 8em;
   flex-direction: column;
   justify-content: center;
 }
