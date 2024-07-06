@@ -302,13 +302,8 @@ export class HomeComponent implements OnInit {
     return icons[category] || 'help-outline'; // Standardicon, wenn keine Kategorie übereinstimmt
   }
 
-  getCategoryBackground(category: string): string {
-    const backgrounds: { [key: string]: string } = {
-      'Mathematics': '#2D496B',
-      'TypeScript': '#5A7699',
-      // Füge hier weitere Kategorien und entsprechende Hintergründe hinzu
-    };
-    return backgrounds[category] || 'var(--ion-color-light)'; // Standardhintergrund, wenn keine Kategorie übereinstimmt
+  getCategoryBackground(index: number) {
+    return index % 2 === 0 ? '#2D496B': '#5A7699';
   }
 
 
