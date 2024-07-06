@@ -33,12 +33,17 @@ export class StatistikComponent implements OnInit{
               private achievements: AchievementsService,
               ) {
     addIcons({logOutOutline})
+    this.isLoggedIn = this.isAuth();
 
   }
 
   ngOnInit() {
     this.wrongAnswers = +this.route.snapshot.paramMap.get('wrongAnswers')!;  }
 
+
+  isAuth(): boolean {
+    return this.authService.isAuth();
+  }
 
   async logout() {
     const user = await this.authService.getCurrentUser();
