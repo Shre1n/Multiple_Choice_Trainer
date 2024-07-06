@@ -3,7 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {
   collection,
-  CollectionReference,
+  CollectionReference, deleteDoc,
   doc,
   DocumentData,
   Firestore, getDoc,
@@ -27,6 +27,7 @@ export class ModuleService {
   private correctSteak!: number;
 
   modulesCollectionRef: CollectionReference<DocumentData>;
+  userCollectionRef!: CollectionReference<DocumentData>;
 
   private baseUrl = "http://localhost:8888";
 
@@ -35,6 +36,8 @@ export class ModuleService {
               private authService: AuthService,
               private achievements: AchievementsService,) {
     this.modulesCollectionRef = collection(firestore, 'modules');
+    this.userCollectionRef = collection(firestore,'users');
+    console.log(this.userCollectionRef);
     const modulesJSON: string | null = localStorage.getItem('modules');
     if (modulesJSON) {
       this.modules = JSON.parse(modulesJSON);
@@ -174,7 +177,7 @@ export class ModuleService {
     }
   }
 
-  async deleteUserModule(category: string): Promise<void> {
+  async deleteUserModule(category: { category: string }): Promise<void> {
     const user = await this.authService.getCurrentUser();
     if (user) {
       const userRef = doc(this.firestore, `users/${user.uid}`);
@@ -189,7 +192,7 @@ export class ModuleService {
         }
 
         existingData.selfmademodules = existingData.selfmademodules.filter((selfmademodule: any) => selfmademodule.category !== category);
-        await setDoc(userRef, existingData, { merge: true });
+        await updateDoc(userRef, { selfmademodules: existingData.selfmademodules });
         console.log('Module deleted successfully');
       } catch (error) {
         console.error('Error saving module:', error);

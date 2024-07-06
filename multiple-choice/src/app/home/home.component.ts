@@ -80,12 +80,12 @@ export class HomeComponent implements OnInit {
   }
 
 
-  updateModule(module: { category: any; }) {
+  updateModule(module: { category: string; }) {
     this.router.navigate(['/card-detail'], {queryParams: {category: module.category, edit: 'true'}});
   }
 
 
-  async presentDeleteConfirm(module: { category: any; }) {
+  async presentDeleteConfirm(module: { category: string; }) {
     const alert = await this.alertController.create({
       header: 'Löschen',
       message: 'Möchten Sie dieses Modul wirklich löschen?',
@@ -151,10 +151,10 @@ export class HomeComponent implements OnInit {
   }
 
 
-  async deleteModule(module: { category: any; }) {
+  async deleteModule(module: { category: string; }) {
     const user = await this.authService.getCurrentUser();
     if (user) {
-      this.moduleService.deleteUserModule(module.category).then(() => {
+      this.moduleService.deleteUserModule(module).then(() => {
         this.presentToast('Modul erfolgreich gelöscht', 'middle');
         this.loadUserModules();  // Reload the modules after deletion
         this.achievements.setIndexAchievement(user.uid, 5);
