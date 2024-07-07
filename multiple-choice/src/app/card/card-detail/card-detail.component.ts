@@ -229,7 +229,6 @@ export class CardDetailComponent implements OnInit{
             role: 'yes',
             cssClass: 'secondary',
             handler: async () => {
-              await this.save();
               await this.navCtrl.pop();
               await this.router.navigate(['/home']);
             }

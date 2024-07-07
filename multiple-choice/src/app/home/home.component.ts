@@ -205,7 +205,7 @@ export class HomeComponent implements OnInit {
     if (user) {
       const savedModules = await this.moduleService.renderUserCategories();
       if (savedModules) {
-        this.userModules = savedModules;
+        this.userModules = savedModules.sort();
       } else {
         this.userModules = []; // Fallback to empty array if savedModules is undefined
       }
@@ -289,7 +289,7 @@ export class HomeComponent implements OnInit {
   }
 
   extractCategories(modules: any): void {
-    this.categories = Object.keys(modules).map(key => modules[key].category);
+    this.categories = Object.keys(modules).map(key => modules[key].category).sort();
   }
 
   getCategoryIcon(category: string): string {
