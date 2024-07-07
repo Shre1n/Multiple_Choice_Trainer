@@ -1,15 +1,15 @@
 <ion-header>
   <ion-toolbar>
-    <ion-button slot="start" (click)="goBack()">
-      <ion-icon slot="icon-only" name="close"></ion-icon>
-    </ion-button>
     @if (!sessionCompleted) {
+      <ion-buttons slot="start">
+      <ion-back-button  (click)="goBack()"></ion-back-button>
+      </ion-buttons>
       <ion-title class="sessionTitle" slot="start">{{ category }}</ion-title>
     }
     @if (sessionCompleted) {
       <ion-title class="sessionTitle" slot="start">Lern Session beendet</ion-title>
       <ion-buttons slot="end">
-        <ion-button slot="end" (click)="shareMyStats(category)">
+        <ion-button id="share" slot="end" (click)="shareMyStats(category)">
           <ion-icon name="share-social-outline"></ion-icon>
         </ion-button>
       </ion-buttons>
@@ -97,9 +97,9 @@
               <ion-card-title>Was für eine Runde!</ion-card-title>
             </ion-card-header>
             <ion-card-content>
-              <ion-card>Karten insgesammt: {{ kartenInsgesammt }}</ion-card>
-              <ion-card>falsche Antworten: {{ wrongAnswers }}</ion-card>
-              <ion-card class="ion-text-center">
+              <ion-card id="cardBg1">Karten insgesammt: {{ kartenInsgesammt }}</ion-card>
+              <ion-card id="cardBg2">falsche Antworten: {{ wrongAnswers }}</ion-card>
+              <ion-card id="cardBg3" class="ion-text-center">
                 <p>{{ successRate() }}</p>
                 <ion-button shape="round" (click)="goToHome()">Zurück zur Startseite</ion-button>
               </ion-card>
@@ -108,6 +108,8 @@
         </ion-card>
       </ion-col>
     </ion-row>
+
+
 
     <!--
     <ion-row>
@@ -126,4 +128,6 @@
     </ion-row>
     -->
   }
+
 </ion-content>
+

@@ -7,7 +7,7 @@ import { NgClass } from "@angular/common";
 import { AuthService } from "../../services/auth.service";
 import {addIcons} from "ionicons";
 import {AchievementsService} from "../../services/achievements.service";
-import {close, shareSocialOutline, checkmark} from "ionicons/icons";
+import {arrowBack,addSharp,close, shareSocialOutline, checkmark} from "ionicons/icons";
 import {Share} from "@capacitor/share";
 
 @Component({
@@ -37,7 +37,7 @@ export class SessionComponent  implements OnInit {
     private alertController: AlertController,
     private achievements: AchievementsService,
 
-  ) {addIcons({close,shareSocialOutline, checkmark})}
+  ) {addIcons({arrowBack,addSharp,close,shareSocialOutline, checkmark})}
 
 
 

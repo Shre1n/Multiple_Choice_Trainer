@@ -3,16 +3,17 @@
     <ion-title>Multiple-Choice Trainer</ion-title>
     <ion-buttons slot="end">
       @if (isLoggedIn) {
+        <ion-button class="search-button" (click)="search()">
+          <ion-icon slot="icon-only" name="search-outline"></ion-icon>
+        </ion-button>
+
         @if (userModules.length > 0) {
-          <ion-button (click)="shareMyModules()">
+          <ion-button class="share-button" (click)="shareMyModules()">
             <ion-icon name="share-social-outline"></ion-icon>
           </ion-button>
         }
-        <ion-button class="ion-color" slot="end" (click)="logout()">
-          <ion-icon name="log-out-outline" style="color: #CEDBEB"></ion-icon>
-        </ion-button>
-        <ion-button (click)="search()">
-          <ion-icon slot="icon-only" name="search-outline"></ion-icon>
+        <ion-button class="logout-button" slot="end" (click)="logout()">
+          <ion-icon name="log-out-outline"></ion-icon>
         </ion-button>
       }
     </ion-buttons>
@@ -34,7 +35,7 @@
 
   <ion-fab horizontal="end" vertical="bottom" slot="fixed">
     <ion-fab-button>
-      <ion-icon name="add-sharp" (click)="navigateToCardDetail()"></ion-icon>
+      <ion-icon id="fab-button" name="add-sharp" (click)="navigateToCardDetail()"></ion-icon>
     </ion-fab-button>
   </ion-fab>
 

@@ -53,6 +53,41 @@ ion-radio{
 }
 
 ion-icon{
-  color: white;
   font-size: 22px;
 }
+
+ion-toolbar{
+  --background: #5A7699;
+}
+
+ion-button{
+  --background: #CEDBEB;
+  color: black;
+}
+
+#iconBack{
+  color: black;
+}
+
+#cardBg1, #cardBg2 ,#cardBg3{
+  --background: #2D496B;
+  color: white;
+}
+
+#share{
+  --color: #CEDBEB;
+  --background: transparentize();
+}
+
+ion-fab{
+  margin-bottom: 3.5em;
+  margin-left: 1em;
+
+}
+
+ion-back-button{
+  --color: #CEDBEB;
+}
+
+
+
