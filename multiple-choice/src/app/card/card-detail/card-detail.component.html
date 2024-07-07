@@ -74,7 +74,7 @@
 
       <!-- Add Answer Button -->
       @if (currentQuestion.answers.length < 6) {
-        <ion-button expand="block" (click)="addAnswerField()" type="button">
+        <ion-button id="save" expand="block" (click)="addAnswerField()" type="button">
           <ion-icon name="add-circle-sharp"></ion-icon>
           Antwort hinzufügen
         </ion-button>
@@ -82,8 +82,8 @@
 
       <!-- Control Buttons -->
 
-      <ion-button expand="block" type="submit" (click)="save()">Weiter</ion-button>
-      <ion-button expand="block" color="danger" (click)="alertCancel()">Speichern und beenden</ion-button>
+      <ion-button id="weiter" expand="block" type="submit" (click)="save()">Weiter</ion-button>
+      <ion-button id="saveAndEnd" expand="block" color="danger" (click)="alertCancel()">Speichern und beenden</ion-button>
 
 
     </form>

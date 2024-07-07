@@ -13,3 +13,19 @@ ion-card-title{
   color: white;
 }
 
+#buttonNoSession{
+  color: black;
+  --background:  #CEDBEB;
+  justify-content: center;
+}
+
+#cardText{
+  color: black;
+  font-size: 18px;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
