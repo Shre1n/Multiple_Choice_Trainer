@@ -1,8 +1,17 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title slot="start">Meine Statistik</ion-title>
+    <ion-title>Multiple-Choice Trainer</ion-title>
+    <ion-buttons slot="end">
+      @if (isLoggedIn) {
+        <ion-button class="ion-color" slot="end" (click)="logout()">
+          <ion-icon name="log-out-outline" style="color: #CEDBEB"></ion-icon>
+        </ion-button>
+      }
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
+
+
 
 <ion-content fullscreen>
 
@@ -15,10 +24,11 @@
     </ion-text>
 
     <ion-text class="ion-margin-vertical ion-text-center ion-align-self-center">
-        @if(abgeschlosseneModule.length>0){
-          <h2> Abgeschlossene Module: {{ abgeschlosseneModule }} </h2>
+      @if(abgeschlosseneModule.length>0){
+        <h2> Abgeschlossene Module: {{ abgeschlosseneModule }} </h2>
 
-        }
+      }
+
 
 
     </ion-text>

@@ -5,6 +5,8 @@ import {IonicModule, IonInput, NavController} from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { ToastController } from '@ionic/angular/standalone';
 import { AchievementsService } from '../../services/achievements.service';
+import {close} from "ionicons/icons";
+import {addIcons} from "ionicons";
 
 @Component({
   selector: 'app-register',
@@ -42,6 +44,7 @@ export class RegisterComponent implements OnInit {
               private toastController: ToastController,
               private navController: NavController,
               private achievements: AchievementsService) {
+    addIcons({close})
   }
 
   clearPasswort(){

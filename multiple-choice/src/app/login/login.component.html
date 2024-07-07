@@ -12,10 +12,12 @@
   <form (ngSubmit)="login()" #loginForm="ngForm">
     <ion-item>
       <ion-label  position="floating">Email</ion-label>
-      <ion-input [(ngModel)]="email" name="email" type="email" required>
-        <ion-button (click)="clearEmail()" slot="end"  type="button">
-          <ion-icon slot="icon-only" name="close"></ion-icon>
-        </ion-button>
+      <ion-input
+        [(ngModel)]="email"
+        name="email"
+        type="email"
+        clearInput
+        required>
       </ion-input>
     </ion-item>
     @if (loginForm.submitted && !email) {
@@ -25,10 +27,12 @@
     }
     <ion-item>
       <ion-label position="floating">Password</ion-label>
-      <ion-input [(ngModel)]="password" name="password" type="password" required>
-        <ion-button (click)="clearPassword()" slot="end" type="button">
-        <ion-icon slot="icon-only" name="close"></ion-icon>
-        </ion-button>
+      <ion-input
+        [(ngModel)]="password"
+        name="password"
+        type="password"
+        clearInput
+        required>
       </ion-input>
     </ion-item>
 
@@ -37,12 +41,6 @@
         Password is required.
       </ion-note>
     }
-
-
-
-
-
-
     <ion-button  expand="block" type="submit"  class="ion-margin-top">Login</ion-button>
     <ion-button  expand="block" type="button" (click)="openForgotPassword()" class="ion-margin-top">Forgot Password?</ion-button>
 

@@ -1,11 +1,13 @@
 <ion-header>
   <ion-toolbar>
     <ion-title slot="start">Achievements</ion-title>
-    @if (isLoggedIn) {
-      <ion-button class="ion-color" slot="end" (click)="logout()">
-        <ion-icon name="log-out-outline" style="color: #f6f7f9"></ion-icon>
-      </ion-button>
-    }
+    <ion-buttons slot="end">
+      @if (isLoggedIn) {
+        <ion-button class="ion-color" slot="end" (click)="logout()">
+          <ion-icon name="log-out-outline" style="color: #CEDBEB"></ion-icon>
+        </ion-button>
+      }
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -13,7 +15,7 @@
   @if (achievements && achievements.length > 0) {
     <ion-list>
       @if(achievements.length > 0){
-        <ion-card class="ion-margin-vertical ion-text-center ion-align-self-center">
+        <ion-card id="cardAchieved" class="ion-margin-vertical ion-text-center ion-align-self-center">
           <h3>Erfolgreich abgeschlossene Achievements!</h3>
         </ion-card>
       }
@@ -40,7 +42,7 @@
   @if (notAchieved && notAchieved.length > 0) {
     <ion-list>
       @if (notAchieved.length > 0){
-        <ion-card class="ion-margin-vertical ion-text-center ion-align-self-center">
+        <ion-card id="cardNotAchieved" class="ion-margin-vertical ion-text-center ion-align-self-center">
           <h3>Nicht abgeschlossene Achievements!</h3>
         </ion-card>
       }

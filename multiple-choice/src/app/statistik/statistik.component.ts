@@ -1,18 +1,17 @@
+import { NavController} from "@ionic/angular";
+import {ActivatedRoute, Router} from "@angular/router";
 import {Component, ElementRef, OnInit, QueryList, ViewChildren} from '@angular/core';
-import {GestureController, GestureDetail, IonicModule} from "@ionic/angular";
-import {Router} from "@angular/router";
+import { IonicModule} from "@ionic/angular";
 import {FooterComponent} from "../footer/footer.component";
-
-import {ModuleModule} from "../module/module.module";
-import {CardComponent} from "../card/card.component";
-import {Card} from "../card/card.model";
+import {addIcons} from "ionicons";
+import {logOutOutline} from 'ionicons/icons';
+import {AuthService} from "../services/auth.service";
+import {AchievementsService} from "../services/achievements.service";
 import { Chart, PieController, ArcElement, Tooltip, Legend } from 'chart.js';
 import {Share} from '@capacitor/share';
 import {ModuleService} from "../services/module.service";
 import {ToastController} from "@ionic/angular/standalone";
-import {AuthService} from "../services/auth.service";
 import {NgForOf, NgIf} from "@angular/common";
-
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 Chart.register(PieController, ArcElement, Tooltip, Legend, ChartDataLabels);
@@ -30,9 +29,10 @@ Chart.register(PieController, ArcElement, Tooltip, Legend, ChartDataLabels);
   ],
   standalone: true
 })
-
 export class StatistikComponent implements OnInit{
 
+  //wichtig
+  isLoggedIn!: boolean;
   counter0: number = 0;
   counter1: number = 0;
   counter2: number = 0;
@@ -78,11 +78,17 @@ export class StatistikComponent implements OnInit{
 
 
   constructor(private router: Router,
-              private gestureCtrl: GestureController,
+              private route: ActivatedRoute,
+              public navCtrl: NavController,
+              private achievements: AchievementsService,
               private moduleService: ModuleService,
               private toastController: ToastController,
-              private authService: AuthService,) {
+              private authService: AuthService, ) {
+    addIcons({logOutOutline})
+    this.isLoggedIn = this.isAuth();
+
   }
+
 
   async loadFehler(modulesData: any){
     const currentModule = this.modules[this.currentIndex];
@@ -104,7 +110,7 @@ export class StatistikComponent implements OnInit{
   }
 
   ngOnInit() {
-    this.initializeSwipeGesture();
+    this.wrongAnswers = +this.route.snapshot.paramMap.get('wrongAnswers')!;
     this.loadModules();
     this.fillStatisticData()
     this.loadUserSessions()
@@ -138,7 +144,9 @@ export class StatistikComponent implements OnInit{
     );
   }
 
-
+  isAuth(): boolean {
+    return this.authService.isAuth();
+  }
 
 
   async loadUserSessions() {
@@ -373,31 +381,15 @@ export class StatistikComponent implements OnInit{
   */
 
   //Gesture to navigate to neighbor site from footer
-  initializeSwipeGesture() {
-    const content = document.querySelector('ion-content');
-    if (content) {
-      const gesture = this.gestureCtrl.create({
-        el: content as HTMLElement,
-        gestureName: 'swipe',
-        onMove: ev => this.onSwipe(ev)
-      });
-      gesture.enable();
-    } else {
-      console.error('Ion content not found');
-    }
-  }
 
-  onSwipe(ev: GestureDetail) {
-    const deltaX = ev.deltaX;
-    if (deltaX < -50) {
-      this.router.navigate(['/card-list']);
-    }else{
-      if (deltaX < 50){
-        this.router.navigate(['']);
-      }
+  async logout() {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      await this.achievements.setIndexAchievement(user.uid, 7);
     }
+    await this.authService.logout();
+    this.isLoggedIn = false;
+    await this.navCtrl.navigateRoot(['/landingpage']);
   }
 
 }
-
-

@@ -1,6 +1,6 @@
-import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {Component,OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
-import {GestureController, GestureDetail, IonicModule, NavController} from "@ionic/angular";
+import {IonicModule, NavController} from "@ionic/angular";
 import {addIcons} from "ionicons";
 import {
   personOutline,
@@ -13,15 +13,17 @@ import {
   pencilSharp,
   trashSharp,
   searchOutline,
+  telescopeOutline,
+  addSharp
 } from 'ionicons/icons';
 import {AuthService} from "../services/auth.service";
 import {ModuleService} from "../services/module.service";
 import {AlertController, ToastController, IonSearchbar} from "@ionic/angular/standalone";
 import {NgStyle} from "@angular/common";
-import {ModuleModule} from "../module/module.module";
 import {FooterComponent} from "../footer/footer.component";
 import {Share} from '@capacitor/share';
 import {FormsModule} from "@angular/forms";
+import {AchievementsService} from "../services/achievements.service";
 
 @Component({
   selector: 'app-home',
@@ -46,17 +48,15 @@ export class HomeComponent implements OnInit {
   filterServermodule: any[] = [];
   filterUsermodule: any[] = [];
 
-
-  @ViewChild('cardContent', {read: ElementRef}) cardContent!: ElementRef;
   @ViewChild('searchbar') searchbar!: IonSearchbar;
 
   constructor(private router: Router,
               public navCtrl: NavController,
               private authService: AuthService,
-              private gestureCtrl: GestureController,
               private moduleService: ModuleService,
               private toastController: ToastController,
-              private alertController: AlertController) {
+              private alertController: AlertController,
+              private achievements: AchievementsService,) {
     addIcons({
       personOutline,
       shareSocialOutline,
@@ -67,30 +67,31 @@ export class HomeComponent implements OnInit {
       codeSlashOutline,
       pencilSharp,
       trashSharp,
-      searchOutline
+      searchOutline,
+      telescopeOutline,
+      addSharp
     });
     this.isLoggedIn = this.isAuth();
   }
 
   ngOnInit() {
     this.checkLoginStatus();
-    this.loadModules();
-    this.loadUserModules();
+    this.loadInitialData()
     this.checkForUpdates();
-    console.log(this.filterServermodule)
-    console.log(this.filterUsermodule)
   }
 
-  toggleSearchBar() {
-    this.showSearchBar = !this.showSearchBar;
-  }
-
-  updateModule(module: { category: any; }) {
-    this.router.navigate(['/card-detail'], {queryParams: {category: module.category, edit: 'true'}});
+  async loadInitialData() {
+    await this.loadModules();
+    await this.loadUserModules();
   }
 
 
-  async presentDeleteConfirm(module: { category: any; }) {
+  updateModule(module: { category: string; }) {
+    this.router.navigate(['/card-detail'], {queryParams: {category: module, edit: 'true'}});
+  }
+
+
+  async presentDeleteConfirm(module: { category: string; }) {
     const alert = await this.alertController.create({
       header: 'Löschen',
       message: 'Möchten Sie dieses Modul wirklich löschen?',
@@ -135,7 +136,7 @@ export class HomeComponent implements OnInit {
     this.filterUsermodule = [...this.filterUsermodule]
   }
 
-  filterModule() {
+  async filterModule() {
     if (this.searchText.trim() === '') {
       this.filterServermodule = [...this.categories];
       this.filterUsermodule = [...this.filterUsermodule]
@@ -149,15 +150,20 @@ export class HomeComponent implements OnInit {
       this.filterServermodule = [...this.filterServermodule];
       this.filterUsermodule = [...this.filterUsermodule]
     }
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      await this.achievements.setIndexAchievement(user.uid, 9);
+    }
   }
 
 
-  async deleteModule(module: { category: any; }) {
+  async deleteModule(module: { category: string; }) {
     const user = await this.authService.getCurrentUser();
     if (user) {
-      this.moduleService.deleteUserModule(module.category).then(() => {
+      this.moduleService.deleteUserModule(module).then(() => {
         this.presentToast('Modul erfolgreich gelöscht', 'middle');
         this.loadUserModules();  // Reload the modules after deletion
+        this.achievements.setIndexAchievement(user.uid, 5);
       });
     }
   }
@@ -166,6 +172,10 @@ export class HomeComponent implements OnInit {
     let msgText = "Hallo, \ndas sind meine Module:\nKategorien:\n";
 
     this.userModules = await this.moduleService.renderUserCategories();
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      await this.achievements.setIndexAchievement(user.uid, 8);
+    };
 
     this.userModules.forEach(mod => {
       msgText += `${mod.category}\n`;
@@ -194,20 +204,14 @@ export class HomeComponent implements OnInit {
     const user = await this.authService.getCurrentUser();
     if (user) {
       const savedModules = await this.moduleService.renderUserCategories();
-      console.log(savedModules)
       if (savedModules) {
-        this.userModules = savedModules;
+        this.userModules = savedModules.sort();
       } else {
         this.userModules = []; // Fallback to empty array if savedModules is undefined
       }
     } else {
       this.userModules = []; // Fallback to empty array if user is not logged in
     }
-  }
-
-  async addModule(module: any) {
-    await this.moduleService.saveUserModulesToFirestore(module);
-    this.loadUserModules();
   }
 
 
@@ -262,7 +266,7 @@ export class HomeComponent implements OnInit {
         if (response.updatesAvailable) {
           console.log('Updates available, reloading modules...');
         } else {
-          console.log('No updates available');
+          console.info('No updates available');
         }
       },
       (error) => {
@@ -272,45 +276,41 @@ export class HomeComponent implements OnInit {
   }
 
   async loadModules() {
-    this.moduleService.loadExternalModule().subscribe(
-      response => {
-        console.log('Modules loaded:', response);
+    this.moduleService.loadExternalModule().subscribe({
+      next: response => {
         this.modules = response;
         this.extractCategories(response);
       },
-      error => {
+      error: error => {
         console.error('Error loading modules:', error);
-        this.presentToast('No Connection to External Server! :cry:', 'middle');
+        this.presentToast('No Connection to External Server! :(', 'middle');
       }
-    );
+    });
   }
 
   extractCategories(modules: any): void {
-    this.categories = Object.keys(modules).map(key => modules[key].category);
+    this.categories = Object.keys(modules).map(key => modules[key].category).sort();
   }
 
   getCategoryIcon(category: string): string {
     const icons: { [key: string]: string } = {
       'Mathematics': 'calculator-outline',
       'TypeScript': 'code-slash-outline',
-      // Füge hier weitere Kategorien und entsprechende Icons hinzu
+      'Science': 'telescope-outline'
+      // More....
     };
     return icons[category] || 'help-outline'; // Standardicon, wenn keine Kategorie übereinstimmt
   }
 
-  getCategoryBackground(category: string): string {
-    const backgrounds: { [key: string]: string } = {
-      'Mathematics': '#2D496B',
-      'TypeScript': '#5A7699',
-      // Füge hier weitere Kategorien und entsprechende Hintergründe hinzu
-    };
-    return backgrounds[category] || 'var(--ion-color-light)'; // Standardhintergrund, wenn keine Kategorie übereinstimmt
+  getCategoryBackground(index: number) {
+    return index % 2 === 0 ? '#2D496B': '#5A7699';
   }
 
 
   ionViewDidEnter() {
     this.authService.getCurrentUser()
     this.isLoggedIn = this.authService.isAuth();
+    this.loadInitialData();
   }
 
 
@@ -324,14 +324,13 @@ export class HomeComponent implements OnInit {
   }
 
   async logout() {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      await this.achievements.setIndexAchievement(user.uid, 7);
+    };
     await this.authService.logout();
     this.isLoggedIn = false;
     await this.navCtrl.navigateRoot(['/landingpage']);
-  }
-
-  openLoginForm(): void {
-    this.router.navigate(['/login']);
-    this.navCtrl.pop();
   }
 
 

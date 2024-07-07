@@ -9,3 +9,26 @@ ion-button{
 .k2 {
   margin-bottom: 50px;
 }
+
+ion-toolbar{
+  --background: #5A7699;
+  color: white;
+}
+
+ion-back-button{
+  --color:  #CEDBEB;
+}
+
+#weiter, #save{
+  color: black;
+}
+
+ion-icon{
+  color: black;
+}
+
+ion-fab-button{
+  --background: #CEDBEB;
+  color: black;
+
+}

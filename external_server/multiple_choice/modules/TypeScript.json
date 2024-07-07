@@ -8,7 +8,8 @@
       "answeredCorrectlyCount": 0,
       "answeredIncorrectlyCount": 0,
       "answers": ["A type of script","A superset of JavaScript","A styling language","A database query language"],
-      "correctAnswer": "A superset of JavaScript"
+      "correctAnswer": "A superset of JavaScript",
+      "correctStreak": 0
     },
     {
       "name": "Module 2",
@@ -17,7 +18,8 @@
       "answeredCorrectlyCount": 0,
       "answeredIncorrectlyCount": 0,
       "answers": ["1995","2005","2012","2010"],
-      "correctAnswer": "2012"
+      "correctAnswer": "2012",
+      "correctStreak": 0
     }
   ]
 }

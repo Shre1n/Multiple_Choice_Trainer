@@ -1,6 +1,5 @@
 import {RouterModule, Routes} from '@angular/router';
 import {NgModule} from "@angular/core";
-import {CardComponent} from "./card/card.component";
 import {StatistikComponent} from "./statistik/statistik.component";
 import {HomeComponent} from "./home/home.component";
 import {AchivementsComponent} from "./achivements/achivements.component";
