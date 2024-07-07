@@ -8,11 +8,10 @@ import {addIcons} from "ionicons";
 import {close, trashSharp, addSharp} from "ionicons/icons";
 import {AchievementsService} from "../../services/achievements.service";
 
-
 interface Question {
   question: string;
   answers: string[];
-  correctAnswer: string | null;
+  correctAnswers: string[];
   answeredCorrectlyCount: number;
   answeredIncorrectlyCount: number;
   correctStreak: number;
@@ -37,7 +36,7 @@ export class CardDetailComponent implements OnInit{
   currentQuestion: Question = {
     question: '',
     answers: ['', '', '', ''],
-    correctAnswer: null,
+    correctAnswers: [],
     answeredCorrectlyCount: 0,
     answeredIncorrectlyCount: 0,
     correctStreak: 0
@@ -48,6 +47,7 @@ export class CardDetailComponent implements OnInit{
   currentQuestionIndex: number | null = null;
   showQuestionList: boolean = true;
   questionCount: number = 0;
+  isChecked: boolean[] = [];
 
 
   #IonInput: IonInput | undefined;
@@ -86,7 +86,6 @@ export class CardDetailComponent implements OnInit{
         this.loadDataForCategory(this.category);
       }
     });
-
   }
 
   // Funktion zum Laden der Daten für die angegebene Kategorie
@@ -109,6 +108,10 @@ export class CardDetailComponent implements OnInit{
       });
       toast.present();
     }
+  }
+
+  toogleCheckbox(index: number): boolean{
+    return this.isChecked[index];
   }
 
 
@@ -151,7 +154,7 @@ export class CardDetailComponent implements OnInit{
   resetAnswers() {
     this.currentQuestion.question = '';
     this.currentQuestion.answers = ['', '', '', ''];
-    this.currentQuestion.correctAnswer = null;
+    this.currentQuestion.correctAnswers = [];
   }
 
   clearAnswer(index: number){
@@ -174,8 +177,37 @@ export class CardDetailComponent implements OnInit{
     }
   }
 
-  setCorrectAnswer(index: number) {
-    this.currentQuestion.correctAnswer = this.currentQuestion.answers[index];
+  onCheckboxChange(event: any, answer: string, index: number): boolean {
+    const isChecked = event.detail.checked;
+    this.isChecked.push(isChecked);
+    console.log(this.isChecked)
+    if (isChecked) {
+      this.currentQuestion.correctAnswers.push(answer);
+    } else {
+      const index = this.currentQuestion.correctAnswers.indexOf(answer);
+
+      if (index > -1) {
+        this.currentQuestion.correctAnswers.splice(index, 1);
+      }
+    }
+    return isChecked;
+  }
+
+  isCheckerReset(index: number){
+    if(!this.isChecked[index])
+    this.isChecked.splice(index,1)
+  }
+
+
+  uncheck(event: any, answer: string){
+    const isChecked = event.detail.checked;
+    if (isChecked) {
+      const index = this.currentQuestion.correctAnswers.indexOf(answer);
+      if (index > -1) {
+        event.detail.default;
+        this.currentQuestion.correctAnswers.splice(index, 1);
+      }
+    }
   }
 
   async saveModule() {

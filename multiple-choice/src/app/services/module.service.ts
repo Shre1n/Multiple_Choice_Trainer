@@ -258,6 +258,7 @@ export class ModuleService {
         }
 
         let categoryFound = false;
+        console.log("Data:", moduleData)
         for (let i = 0; i < existingData.selfmademodules.length; i++) {
           if (existingData.selfmademodules[i].category === moduleData.category) {
             existingData.selfmademodules[i].modules.push(...moduleData.modules);
@@ -268,6 +269,7 @@ export class ModuleService {
 
         if (!categoryFound) {
           existingData.selfmademodules.push(moduleData);
+          console.log(moduleData);
         }
 
         await setDoc(userRef, existingData, { merge: true });

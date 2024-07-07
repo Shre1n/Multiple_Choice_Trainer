@@ -94,9 +94,7 @@
           <ion-row>
             <ion-col size="12">
               <ion-item lines="none" class="answer-item">
-                <ion-radio-group slot="start" value="default" (ionChange)="setCorrectAnswer(i)">
-                  <ion-radio [(ngModel)]="currentQuestion.correctAnswer" name="answer" [value]="answer"></ion-radio>
-                </ion-radio-group>
+                <ion-checkbox slot="end" [checked]="toogleCheckbox(i)" (ionChange)="onCheckboxChange($event,answer,i)"></ion-checkbox>
                 <ion-label position="floating">Antwort {{ i + 1 }}</ion-label>
                 <ion-input
                   [(ngModel)]="currentQuestion.answers[i]"
@@ -104,6 +102,7 @@
                   required
                   maxlength="50"
                   clearInput
+                  (ionChange)="isCheckerReset(i)"
                   [counter]="true">
                 </ion-input>
               </ion-item>
