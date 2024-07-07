@@ -72,36 +72,19 @@ export class SessionComponent  implements OnInit {
       this.modules.splice(this.currentIndex, correctStreakModules.length);
     }
 
-    if (this.modules.length === 0) {
+    if (this.modules.every(module => module.correctStreak >= 6)) {
+      console.log('All modules correctly learned for this category:', this.category);
+      this.allModulesLearned = true;
+      this.sessionCompleted = true;
+
+    }else if (this.modules.length === 0) {
       console.error('No modules found for this category:', this.category);
     }
   }
 
   async goBack(): Promise<void> {
-
-      const alert = await this.alertController.create({
-        header: 'Beenden',
-        message: 'Möchten Sie die Lernsession wirklich beenden?',
-        buttons: [
-          {
-            text: 'Nein',
-            role: 'cancel',
-            cssClass: 'secondary',
-            handler: () => {
-              console.log('Confirm Cancel');
-            }
-          },
-          {
-            text: 'Ja',
-            handler: () => {
-              this.router.navigate(['/home'])
-            }
-          }
-        ]
-      });
-
-      await alert.present();
-
+    this.navCtrl.pop();
+    this.router.navigate(['/home']);
   }
 
   shareMyStats(category: string){
@@ -272,7 +255,6 @@ export class SessionComponent  implements OnInit {
     this.sessionCompleted = false;
     this.progress = 0;
     this.correctStreakModules = [];
-    this.allModulesLearned = false;
     this.rate = 0;
     this.kartenInsgesammt = 0;
     this.kartenRichtig = 0;
