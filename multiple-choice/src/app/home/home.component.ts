@@ -24,6 +24,7 @@ import {FooterComponent} from "../footer/footer.component";
 import {Share} from '@capacitor/share';
 import {FormsModule} from "@angular/forms";
 import {AchievementsService} from "../services/achievements.service";
+import {interval} from "rxjs";
 
 @Component({
   selector: 'app-home',
@@ -218,7 +219,7 @@ export class HomeComponent implements OnInit {
   async presentToast(message: string, position: 'middle') {
     const toast = await this.toastController.create({
       message: message,
-      duration: 10000,
+      duration: 5000,
       position: position,
     });
 
@@ -274,6 +275,7 @@ export class HomeComponent implements OnInit {
       }
     );
   }
+
 
   async loadModules() {
     this.moduleService.loadExternalModule().subscribe({

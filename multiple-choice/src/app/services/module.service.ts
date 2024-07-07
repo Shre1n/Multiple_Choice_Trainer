@@ -163,6 +163,7 @@ export class ModuleService {
       let savedModules: any[] = [];
       existingData.selfmademodules.forEach((module: any) => {
         savedModules.push(module);
+        console.log(module.correctAnswers);
       });
       return savedModules;
     } else {
