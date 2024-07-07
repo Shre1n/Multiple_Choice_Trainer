@@ -1,15 +1,15 @@
 <ion-header>
   <ion-toolbar>
-    <ion-button slot="start" (click)="goBack()">
-      <ion-icon id="iconBack" slot="icon-only" name="close"></ion-icon>
-    </ion-button>
     @if (!sessionCompleted) {
+      <ion-buttons slot="start">
+      <ion-back-button  (click)="goBack()"></ion-back-button>
+      </ion-buttons>
       <ion-title class="sessionTitle" slot="start">{{ category }}</ion-title>
     }
     @if (sessionCompleted) {
       <ion-title class="sessionTitle" slot="start">Lern Session beendet</ion-title>
       <ion-buttons slot="end">
-        <ion-button slot="end" (click)="shareMyStats(category)">
+        <ion-button id="share" slot="end" (click)="shareMyStats(category)">
           <ion-icon name="share-social-outline"></ion-icon>
         </ion-button>
       </ion-buttons>
@@ -109,6 +109,8 @@
       </ion-col>
     </ion-row>
 
+
+
     <!--
     <ion-row>
       <ion-col size="12" class="ion-text-center">
@@ -126,4 +128,6 @@
     </ion-row>
     -->
   }
+
 </ion-content>
+
