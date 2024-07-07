@@ -276,16 +276,16 @@ export class HomeComponent implements OnInit {
   }
 
   async loadModules() {
-    this.moduleService.loadExternalModule().subscribe(
-      response => {
+    this.moduleService.loadExternalModule().subscribe({
+      next: response => {
         this.modules = response;
         this.extractCategories(response);
       },
-      error => {
+      error: error => {
         console.error('Error loading modules:', error);
         this.presentToast('No Connection to External Server! :(', 'middle');
       }
-    );
+    });
   }
 
   extractCategories(modules: any): void {
