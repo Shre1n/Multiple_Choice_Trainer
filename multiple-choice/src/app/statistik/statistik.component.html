@@ -4,7 +4,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content fullscreen>
 
   <ion-list>
     <ion-text class="ion-margin-vertical ion-text-center ion-align-self-center">
@@ -13,35 +13,85 @@
     <ion-text class="ion-margin-vertical ion-text-center ion-align-self-center">
       <h2 >Abgeschlossene Karten: {{ counter6 }} </h2>
     </ion-text>
-    <ion-text class="ion-margin-vertical ion-text-center ion-align-self-center">
-      <h2> Müssen noch geübt werden {{ anzNotDoneCards }} </h2>
-    </ion-text>
 
     <ion-text class="ion-margin-vertical ion-text-center ion-align-self-center">
-      <h2 >erungene Achievements: {{ anzAchievements }} von {{anzMaxAchievements}}</h2>
+        @if(abgeschlosseneModule.length>0){
+          <h2> Abgeschlossene Module: {{ abgeschlosseneModule }} </h2>
+
+        }
+
+
     </ion-text>
-    <div class="chart-container">
-      <canvas  id="MyChart" >{{ chart }}</canvas>
-    </div>
     <ion-text class="ion-margin-vertical ion-text-center ion-align-self-center">
-      <h2>0 mal richtig: {{counter0}}</h2>
+      <h2>Fortschritt: {{fortschrittProzent}}%</h2>
     </ion-text>
-    <ion-button expand="block" (click)="share()">
+
+    <ion-card>
+      <canvas id="myCanvas0"></canvas>
+    </ion-card>
+
+
+    <ion-button expand="block" (click)="shareALL()">
       teilen
-    <!--  <ion-icon slot="icon-only" name="share-outline"></ion-icon>
+    </ion-button>
+    <!--
+    <ion-text class="ion-margin-vertical ion-text-center ion-align-self-center">
+      <h2 >Karten 0 mal geschafft: {{ counter0 }} </h2>
+    </ion-text>
+    <ion-text class="ion-margin-vertical ion-text-center ion-align-self-center">
+      <h2 >Karten 1 mal geschafft: {{ counter1 }} </h2>
+    </ion-text>
+    <ion-text class="ion-margin-vertical ion-text-center ion-align-self-center">
+      <h2 >Karten 2 mal geschafft: {{ counter2 }} </h2>
+    </ion-text>
+    <ion-text class="ion-margin-vertical ion-text-center ion-align-self-center">
+      <h2 >Karten 3 mal geschafft: {{ counter3 }} </h2>
+    </ion-text>
+    <ion-text class="ion-margin-vertical ion-text-center ion-align-self-center">
+      <h2 >Karten 4 mal geschafft: {{ counter4 }} </h2>
+    </ion-text>
+    <ion-text class="ion-margin-vertical ion-text-center ion-align-self-center">
+      <h2 >Karten 5 mal geschafft: {{ counter5 }} </h2>
+    </ion-text>
+    <ion-text class="ion-margin-vertical ion-text-center ion-align-self-center">
+      <h2 >Karten abgeschlossen: {{ counter6 }} </h2>
+    </ion-text>
+    <ion-text>
+      <h2>hi</h2>
+    </ion-text>
     -->
-    </ion-button>
-    <ion-button expand="block" (click)="shareTest()">
-      Test Test
-      <!--  <ion-icon slot="icon-only" name="share-outline"></ion-icon>
-      -->
-    </ion-button>
-
   </ion-list>
 </ion-content>
 
+<!--
+  @for(mod of chartsName; track anzModule; let ibl = $index){
+    <canvas id="myCanvas{{ibl}}"></canvas>
+    <h2>{{ibl}}</h2>
+  }
+-->
+    <!-- Füge weitere Canvas-Elemente entsprechend der Anzahl der Sessions hinzu -->
 
 
 
-<app-footer>
-</app-footer>
+    <!--
+    @for(element of manyChartsName;let i = $index; track element){
+      <ion-item>{{ manyChartsName[i] }}</ion-item>
+    }
+    @for(element of manyCharts;let i = $index; track element){
+      <div class="chart-container">
+        <canvas  #chartCanvas id="chartCanvas{{ i }}">{{ manyCharts[i] }}</canvas>
+      </div>
+    }
+-->
+
+
+
+
+
+
+
+
+<ion-footer>
+  <app-footer>
+  </app-footer>
+</ion-footer>

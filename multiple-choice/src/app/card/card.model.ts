@@ -9,6 +9,5 @@ export class Card {
     this.question = question;
     this.answers = answers;
   }
-
 }
 

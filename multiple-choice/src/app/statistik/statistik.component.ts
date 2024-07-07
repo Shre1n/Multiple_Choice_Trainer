@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, ElementRef, OnInit, QueryList, ViewChildren} from '@angular/core';
 import {GestureController, GestureDetail, IonicModule} from "@ionic/angular";
 import {Router} from "@angular/router";
 import {FooterComponent} from "../footer/footer.component";
@@ -6,15 +6,17 @@ import {FooterComponent} from "../footer/footer.component";
 import {ModuleModule} from "../module/module.module";
 import {CardComponent} from "../card/card.component";
 import {Card} from "../card/card.model";
-import { Chart, registerables  } from 'chart.js';
+import { Chart, PieController, ArcElement, Tooltip, Legend } from 'chart.js';
 import {Share} from '@capacitor/share';
 import {ModuleService} from "../services/module.service";
 import {ToastController} from "@ionic/angular/standalone";
-//import * as module from "node:module";
+import {AuthService} from "../services/auth.service";
+import {NgForOf, NgIf} from "@angular/common";
 
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
+Chart.register(PieController, ArcElement, Tooltip, Legend, ChartDataLabels);
 
-//import {AnyComponentStyleBudgetChecker} from "@angular-devkit/build-angular/src/tools/webpack/plugins";
 
 @Component({
   selector: 'app-statistik',
@@ -22,13 +24,14 @@ import {ToastController} from "@ionic/angular/standalone";
   styleUrls: ['./statistik.component.scss'],
   imports: [
     IonicModule,
-    FooterComponent
+    FooterComponent,
+    NgForOf,
+    NgIf
   ],
   standalone: true
 })
-export class StatistikComponent implements OnInit{
 
-  myCards: Card[]=[];
+export class StatistikComponent implements OnInit{
 
   counter0: number = 0;
   counter1: number = 0;
@@ -39,89 +42,235 @@ export class StatistikComponent implements OnInit{
   counter6: number = 0;
 
   anzModule: number = 0;
-  anzCards: number = 0;
-  anzAchievements: number = 3;
-  anzMaxAchievements: number = 6;
   anzNotDoneCards: number = 0;
+  isLoading: boolean = false;
+  fortschrittProzent: number = 0;
 
 
   public chart: any;
+  public charts: any[] = [];
+
   i: number = 0;
   answers: string[] = [];
 
   //server
   categories: string[] = [];
   errorMessage: string = 'No Connection to External Server! :cry:';
-  modules: ModuleModule[] = [];
+  modules: any[] = [];
+
+
+  currentIndex: number = 0;
+  kartenInsgesammt: number = 0;
+  kartenRichtig: number = 0;
+  wrongAnswers: number = 0;
+  answeredCorrectlyCount: number = 0;
+  category: string = '';
+
+   totalAnsweredCorrectlyCount: number = 0;
+   totalAnsweredIncorrectlyCount: number = 0;
+   usierIDstring: string = "";
+   sessions: any;
+
+    x: number = 0;
+    placeholder: any;
+    chartsName: string[] = [];
+    abgeschlosseneModule: String[] = [];
 
 
   constructor(private router: Router,
               private gestureCtrl: GestureController,
               private moduleService: ModuleService,
               private toastController: ToastController,
-  ) {
-    Chart.register(...registerables);
+              private authService: AuthService,) {
+  }
 
-  this.counter0=4;
-  this.counter1=6;
-  this.counter2=7;
-  this.counter3=4;
-  this.counter4=5;
-  this.counter5=2;
-  this.counter6=4;
-  this.anzNotDoneCards = this.counter0+ this.counter1+this.counter2+this.counter3+this.counter4+this.counter5;
+  async loadFehler(modulesData: any){
+    const currentModule = this.modules[this.currentIndex];
+    this.kartenInsgesammt = this.kartenRichtig + this.wrongAnswers;
+    console.log("richtig:" + this.kartenRichtig);
+    console.log("falsch: " + this.wrongAnswers);
+
+    for (const category in modulesData) {
+      if (modulesData.hasOwnProperty(category)) {
+        const modulesArray = modulesData[category].modules;
+        for (const module of modulesArray) {
+          this.totalAnsweredCorrectlyCount += module.answeredCorrectlyCount;
+          this.totalAnsweredIncorrectlyCount += module.answeredIncorrectlyCount;
+        }
+      }
+    }
+    console.log('Total answered correctly count:', this.totalAnsweredCorrectlyCount);
+    console.log('Total answered incorrectly count:', this.totalAnsweredIncorrectlyCount);
   }
 
   ngOnInit() {
     this.initializeSwipeGesture();
-    this.createPieChart();
     this.loadModules();
-    this.fillStatisticData
+    this.fillStatisticData()
+    this.loadUserSessions()
+    //this.createPieChart();
+  }
+  reloadPage() {
+    this.router.navigate(['/statistik'], { replaceUrl: true });
   }
 
   shareTest(){
-    console.log(
-      this.modules
-      //'Hey, sieh dir meine Leistung an: ' + '\n' + 'Von meinen ' + this.anzModule + ' Modulen habe ich ' + this.counter6 + ' bereits komplett gelernt!' +'\n'
-    );
+      console.log('Namen: '+this.chartsName)
+    console.log('länge Namens Array: '+this.chartsName.length)
+    console.log(this.charts)
   }
 
   async fillStatisticData(){
     this.anzModule = 0;
   }
 
-  async loadModules(){
+
+  async loadModules() {
     this.moduleService.loadExternalModule().subscribe(
       response => {
-        console.log('Modules loaded:', response);
+        console.log('Modules loaded:', response , '(also aus statistik)');
         this.modules = response;
         this.extractCategories(response);
       },
       error => {
         console.error('Error loading modules:', error);
-        this.presentToast('middle');
       }
     );
   }
+
+
+
+
+  async loadUserSessions() {
+    const user = await this.authService.getCurrentUser();
+    console.log('UserID:',user?.uid);
+    this.usierIDstring = user?.uid as string;
+    this.sessions= await this.moduleService.getUserSessions(this.usierIDstring);
+    console.log('die Sessions:', this.sessions);
+    this.getSessionDatas();
+  }
+
+  async getSessionDatas() {
+    //anz fehlerhafter antworten
+    let index = 0;
+    let totalIncorrectAnswers = 0;
+    this.sessions.forEach((category: any) => {
+      if (category.modules && Array.isArray(category.modules)) {
+        category.modules.forEach((module: any) => {
+          this.kartenInsgesammt++;
+
+          if (module.answeredIncorrectlyCount) {
+            totalIncorrectAnswers += module.answeredIncorrectlyCount;
+          }
+          if(module.answeredCorrectlyCount==0){
+            this.counter0++
+          }else if(module.answeredCorrectlyCount==1){
+            this.counter1++
+          }else if(module.answeredCorrectlyCount==2){
+            this.counter2++
+          }else if(module.answeredCorrectlyCount==3){
+            this.counter3++
+          }else if(module.answeredCorrectlyCount==4){
+            this.counter4++
+          }else if(module.answeredCorrectlyCount==5){
+            this.counter5++
+          }else if(module.answeredCorrectlyCount==6){
+            this.counter6++
+          }else {
+            console.log('module.answeredCorrectlyCount out of border:',module.answeredCorrectlyCount);
+          }
+        });
+      }
+
+    });
+    console.log('Total Incorrect Answers:', totalIncorrectAnswers);
+    console.log('anz Karten instgesammt:', this.kartenInsgesammt);
+    console.log('stufe 0:', this.counter0)
+    console.log('stufe 1 :',this.counter1)
+    console.log('stufe 2:',this.counter2)
+    console.log('stufe 3:',this.counter3)
+    console.log(  'stufe 4:',this.counter4)
+    console.log(  'stufe 5:',this.counter5)
+    console.log(  'stufe 6:',this.counter6)
+
+    this.sessions.forEach((category: any) => {
+      if (category.modules && Array.isArray(category.modules)) {
+        category.modules.forEach((module: any) => {
+          if (module.answeredIncorrectlyCount) {
+            totalIncorrectAnswers += module.answeredIncorrectlyCount;
+          }
+        });
+      }console.log('anz categorys:' + this.categories.length)
+      this.x++;
+
+    });
+      this.sessions.forEach((category: any) => {
+
+        let richtig = 0;
+        let falsch = 0;
+        console.log('category: ' + category.category);
+        this.chartsName[this.i] = category.category;
+        this.anzModule++;
+        let modulKarten:number = 0;
+        let modulKartenAbgeschlossen: number = 0;
+        category.modules.forEach((module: any) => {
+          modulKarten++;
+
+          if(module.answeredCorrectlyCount==0){
+            falsch++
+          }else if(module.answeredCorrectlyCount==1){
+            falsch++
+          }else if(module.answeredCorrectlyCount==2){
+            falsch++
+          }else if(module.answeredCorrectlyCount==3){
+            falsch++
+          }else if(module.answeredCorrectlyCount==4){
+            falsch++
+          }else if(module.answeredCorrectlyCount==5){
+            falsch++
+          }else if(module.answeredCorrectlyCount==6){
+            richtig++
+            modulKartenAbgeschlossen++
+          }else {
+            console.log('module.answeredCorrectlyCount out of border:',module.answeredCorrectlyCount);
+          }
+        });
+        if(modulKarten == modulKartenAbgeschlossen){
+          console.log("modul vollständig!");
+          this.abgeschlosseneModule[index] = category.category;
+          index++;
+        }
+        console.log("ich bin jetzt hier:"+category.category)
+        modulKarten=0;
+        modulKartenAbgeschlossen = 0;
+        console.log('richtig:' + richtig + ', falsch: ' + falsch)
+        //this.createPieChart(richtig,falsch);
+      });
+      //console.log(this.categories[y]);
+    //this.manyPieCharts();
+    //this.createPieChart();
+    this.createPieChart('myCanvas0');
+    let zahl =(this.counter6/this.kartenInsgesammt)*100;
+    this.fortschrittProzent = parseFloat(zahl.toFixed(2))
+  }
+
   extractCategories(modules: any): void {
     this.categories = Object.keys(modules).map(key => modules[key].category);
-    this.anzModule = this.categories.length;
-  }async presentToast(position: 'middle') {
+  }
+  async presentToast(position: 'middle') {
     const toast = await this.toastController.create({
       message: this.errorMessage,
       duration: 10000,
       position: position,
     });
-
     await toast.present();
   }
 
 
-  share(){
+  shareALL(){
     const textBody = //this.modules.map(module => {return 'moin';}).join('\n');
       'Hey, sieh dir meine Leistung an: ' + '\n'
       + 'Von meinen ' + this.anzModule + ' Modulen habe ich ' + this.counter6 + ' bereits komplett gelernt!' +'\n';
-    //let msgText = `Hallo, \n` + textBody;
 
     Share.canShare().then(canShare => {
       if (canShare.value) {
@@ -135,70 +284,95 @@ export class StatistikComponent implements OnInit{
         console.log('Error: Sharing not available!');
       }
     });
+  }
+
+
+  ngOnDestroy() {
+    // Alle Charts zerstören, um Ressourcen freizugeben
+    this.charts.forEach(chart => chart.destroy());
+  }
+  createPieChart(canvasId: string) {
+/*
+    console.log("hier1")
+    const existingChart = this.charts.find(chart => chart.canvas.id === canvasId);
+    console.log("hier2")
+    if (existingChart) {
+      console.log("hier3")
+      existingChart.destroy();
+    }console.log("hier4")
+    */
+    var ctx = (document.getElementById('myCanvas0') as any).getContext('2d');
+    if (ctx) {
+      this.chart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Abgeschlossen: ','noch nicht gemeistert: '],
+          datasets: [{
+            data: [this.counter6, this.counter0+ this.counter1+this.counter3+this.counter2+this.counter4+this.counter5],
+            backgroundColor: [ '#41d91c', '#d90a33','#FFCE56']
+          }]
+
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            datalabels: {
+              color: '#fff',
+              display: true
+            }
+          }
+        }
+      });
+    } else {
+      console.error('Canvas context is not available.');
+    }
+    this.charts.push(this.chart);
 
   }
 
 
-  createPieChart() {
-    this.chart = new Chart('MyChart', {
-      type: 'pie',
-      data: {
-        labels: ['Stufe 0','Stufe 1','Stufe 2','Stufe 3','Stufe 4','Stufe 5','Stufe 6'],
-        datasets: [{
-          label: 'My First Dataset',
-          data: [this.counter0, this.counter1, this.counter2, this.counter3, this.counter4, this.counter5,this.counter6],
-          backgroundColor: [
-            '#a20f0f',
-            '#173356',
-            '#2D496B',
-            '#5A7699',
-            '#91A6C0',
-            '#CEDBEB',
-            '#3dbe19'
-          ],
-          hoverOffset: 4
-        }],
-      },
-      options: {
-        aspectRatio: 2.5,
-        plugins: {
-          tooltip: {
-            callbacks: {
-              label: (tooltipItem) => {
-                const label = tooltipItem.label || '';
-                const value = tooltipItem.raw || '';
-                return `${label}: ${value}`;
+
+  /*
+    createPieChart(richtig: number, falsch: number) {
+      this.chart = new Chart('myCanvas0', { //+this.i,
+        type: 'pie',
+        data: {
+          labels: ['Abgeschlossen: '+richtig,'noch nicht gelernt: '+falsch],
+          datasets: [{
+            label: 'myCanvas0',
+            data: [richtig,falsch],
+            backgroundColor: [
+              '#3dbe19',
+              '#a20f0f'
+            ],
+            hoverOffset: 4
+          }],
+        },
+        options: {
+          aspectRatio: 2.5,
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: (tooltipItem) => {
+                  const label = tooltipItem.label || '';
+                  const value = tooltipItem.raw || '';
+                  return `${label}: ${value}`;
+                }
               }
             }
           }
         }
-      }
-    });
-  }
+      });
+      console.log("Fehler?")
+      this.charts[this.i] = 'myCanvas' + this.i;
+      console.log("Kein fehler!")
+      this.i++;
+    }
 
-    /*
-    var ctx = (document.getElementById('myPieChart') as any).getContext('2d');
-    var myPieChart = new Chart(ctx, {
-    //this.chart = new Chart(ctx, {
-    //this.chart = new Chart("MyChart", {
-      type: 'pie',
-      data: {
-        labels: ['Red', 'Blue', 'Yellow'],
-        datasets: [{
-          data: [300, 50, 100],
-          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-      }
-    });
-  }
-*/
+  */
 
   //Gesture to navigate to neighbor site from footer
-
   initializeSwipeGesture() {
     const content = document.querySelector('ion-content');
     if (content) {
@@ -223,4 +397,7 @@ export class StatistikComponent implements OnInit{
       }
     }
   }
+
 }
+
+
