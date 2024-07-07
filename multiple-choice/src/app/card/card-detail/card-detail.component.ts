@@ -5,7 +5,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {AuthService} from "../../services/auth.service";
 import {ModuleService} from "../../services/module.service";
 import {addIcons} from "ionicons";
-import {close, trashSharp} from "ionicons/icons";
+import {close, trashSharp, addSharp} from "ionicons/icons";
 import {AchievementsService} from "../../services/achievements.service";
 
 
@@ -47,6 +47,7 @@ export class CardDetailComponent implements OnInit{
   addMode = false;
   currentQuestionIndex: number | null = null;
   showQuestionList: boolean = true;
+  questionCount: number = 0;
 
 
   #IonInput: IonInput | undefined;
@@ -70,7 +71,7 @@ export class CardDetailComponent implements OnInit{
               private navCtrl:NavController,
               private route: ActivatedRoute,
               private achievements: AchievementsService,) {
-    addIcons({close,trashSharp})
+    addIcons({close,trashSharp,addSharp})
   }
 
   ngOnInit(): void {
@@ -94,6 +95,7 @@ export class CardDetailComponent implements OnInit{
       const filteredModules = await this.moduleService.getDataForUpdate(category);
       if (filteredModules.length > 0) {
         this.modules = filteredModules[0].modules;
+        this.questionCount = this.modules.length;
         if (this.modules.length > 0) {
           this.currentQuestion = this.modules[0]; // Laden der ersten Frage als Beispiel
         }
@@ -182,7 +184,7 @@ export class CardDetailComponent implements OnInit{
     const user = await this.authService.getCurrentUser();
     if (user) {
       await this.achievements.setIndexAchievement(user.uid, 4);
-    };
+    }
   }
 
   trackByIndex(index: number, obj: any): any {
@@ -257,6 +259,14 @@ export class CardDetailComponent implements OnInit{
     this.showQuestionList = false;
   }
 
+  handleBackButton() {
+    if (this.isEditMode && !this.showQuestionList) {
+      this.backToQuestionList();
+    } else {
+      this.navCtrl.pop();
+    }
+  }
+
   backToQuestionList() {
     this.showQuestionList = true;
   }
@@ -275,6 +285,7 @@ export class CardDetailComponent implements OnInit{
           text: 'Ja',
           handler: async () => {
             this.modules.splice(index, 1);
+            this.questionCount--;
             await this.moduleService.deleteQuestion(this.category, index);
             await this.presentToast("Frage erfolgreich gelöscht!", "bottom");
           }

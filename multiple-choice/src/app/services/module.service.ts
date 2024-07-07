@@ -3,7 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {
   collection,
-  CollectionReference,
+  CollectionReference, deleteDoc,
   doc,
   DocumentData,
   Firestore, getDoc,
@@ -67,8 +67,6 @@ export class ModuleService {
       const userDoc = await getDoc(userRef);
       if (!userDoc.exists()) throw new Error('User document not found');
       const userData = userDoc.data();
-
-      console.log(userData['sessions'].length);
       if (userData['sessions'].length == 5) {
         await this.achievements.setIndexAchievement(user.uid, 10);
       }
@@ -89,7 +87,6 @@ export class ModuleService {
 
       // Filtern der Module nach der angegebenen Kategorie
       const filteredModules = modulesData.filter((module: any) => module.category === category);
-      console.log(filteredModules);
       return filteredModules;
 
 
@@ -174,7 +171,7 @@ export class ModuleService {
     }
   }
 
-  async deleteUserModule(category: string): Promise<void> {
+  async deleteUserModule(category: { category: string }): Promise<void> {
     const user = await this.authService.getCurrentUser();
     if (user) {
       const userRef = doc(this.firestore, `users/${user.uid}`);
@@ -189,7 +186,7 @@ export class ModuleService {
         }
 
         existingData.selfmademodules = existingData.selfmademodules.filter((selfmademodule: any) => selfmademodule.category !== category);
-        await setDoc(userRef, existingData, { merge: true });
+        await updateDoc(userRef, { selfmademodules: existingData.selfmademodules });
         console.log('Module deleted successfully');
       } catch (error) {
         console.error('Error saving module:', error);
@@ -494,6 +491,10 @@ export class ModuleService {
     });
     this.saveLocal();
   return  this.modules;
+  }
+
+  getAllCategories(){
+
   }
 
 

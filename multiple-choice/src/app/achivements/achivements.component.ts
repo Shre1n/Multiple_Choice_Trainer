@@ -19,7 +19,7 @@ import {FooterComponent} from "../footer/footer.component";
   ],
   standalone: true
 })
-export class AchivementsComponent implements OnInit{
+export class AchivementsComponent{
 
   achievements: Achievement[] = [];
   notAchieved: Achievement[] = [];
@@ -28,18 +28,11 @@ export class AchivementsComponent implements OnInit{
 
 
   constructor(private achievementsService: AchievementsService,
-              private router: Router,
               private authService: AuthService,
               private toastCtrl: ToastController,
               private navCtrl: NavController,
-              private gestureCtrl: GestureController,
-
               ) {
     addIcons({logOutOutline,footstepsOutline,golfOutline,rocketOutline,thumbsUpOutline,ribbonOutline,sparklesOutline,bodyOutline,shareSocialOutline,trophyOutline,schoolOutline});
-
-  }
-
-  ngOnInit() {
 
   }
 
@@ -106,6 +99,16 @@ export class AchivementsComponent implements OnInit{
     });
 
     await toast.present();
+  }
+
+  async logout() {
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      await this.achievementsService.setIndexAchievement(user.uid, 7);
+    }
+    await this.authService.logout();
+    this.isLoggedIn = false;
+    await this.navCtrl.navigateRoot(['/landingpage']);
   }
 
 }
