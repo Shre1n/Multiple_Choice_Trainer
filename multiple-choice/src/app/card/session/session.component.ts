@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { IonicModule, AlertController, ToastController } from "@ionic/angular";
+import {IonicModule, AlertController, ToastController, NavController} from "@ionic/angular";
 import { ModuleService } from "../../services/module.service";
 import { ActivatedRoute, Router } from "@angular/router";
 import { FormsModule } from "@angular/forms";
@@ -36,6 +36,7 @@ export class SessionComponent  implements OnInit {
     private authService: AuthService,
     private alertController: AlertController,
     private achievements: AchievementsService,
+    private navCtrl: NavController
 
   ) {addIcons({arrowBack,addSharp,close,shareSocialOutline, checkmark})}
 
@@ -48,10 +49,6 @@ export class SessionComponent  implements OnInit {
 
 
   async loadFehler(){
-    const currentModule = this.modules[this.currentIndex];
-
-    //this.kartenRichtig = currentModule.answeredCorrectlyCount;
-    //this.wrongAnswers = currentModule.answeredIncorrectlyCount;
     this.kartenInsgesammt = this.kartenRichtig + this.wrongAnswers;
 
     this.rate = (this.kartenRichtig / this.kartenInsgesammt) * 100;
@@ -59,7 +56,7 @@ export class SessionComponent  implements OnInit {
 
   ngOnInit() {
     this.route.params.subscribe(params => {
-      this.category = params['category']; // assuming category is passed as a parameter
+      this.category = params['category'];
       this.loadModules();
     });
   }
@@ -67,21 +64,17 @@ export class SessionComponent  implements OnInit {
   async loadModules() {
     await Promise.all([this.loadUserSavedModules(), this.loadAllCategoryModules()]);
 
+
     // Load correct streak modules after loading the user saved and category modules
-    this.correctStreakModules = await this.moduleService.getCorrectStreakOfModule(this.category);
-    if (this.correctStreakModules.some(module => module.index === this.currentIndex)) {
-      this.modules.splice(this.currentIndex, 1);
+    const correctStreakModules = await this.moduleService.getCorrectStreakOfModule(this.category);
+    console.log(correctStreakModules);
+    if (correctStreakModules.some(module => module.index === this.currentIndex)) {
+      this.modules.splice(this.currentIndex, correctStreakModules.length);
     }
 
-    if (this.modules.every(module => module.correctStreak >= 6)) {
-      this.allModulesLearned = true;
-      this.sessionCompleted = true;
-
-    }else if (this.modules.length === 0) {
+    if (this.modules.length === 0) {
       console.error('No modules found for this category:', this.category);
     }
-
-
   }
 
   async goBack(): Promise<void> {
@@ -130,6 +123,7 @@ export class SessionComponent  implements OnInit {
 
 
   goToHome() {
+    this.resetSession();
     this.router.navigate(['/card-list']);
   }
 
@@ -237,10 +231,6 @@ export class SessionComponent  implements OnInit {
     }
   }
 
-  get currentModule() {
-    return this.modules[this.currentIndex];
-  }
-
 
   async nextQuestion() {
     this.showCorrectAnswers = false;
@@ -274,9 +264,19 @@ export class SessionComponent  implements OnInit {
     this.progress = this.currentIndex / this.modules.length;
   }
 
-  isChecked(answer:any){
-    return answer === this.selectedAnswer;
-
+  resetSession() {
+    this.modules = [];
+    this.currentIndex = 0;
+    this.showCorrectAnswers = false;
+    this.selectedAnswer = '';
+    this.sessionCompleted = false;
+    this.progress = 0;
+    this.correctStreakModules = [];
+    this.allModulesLearned = false;
+    this.rate = 0;
+    this.kartenInsgesammt = 0;
+    this.kartenRichtig = 0;
+    this.wrongAnswers = 0;
   }
 }
 
