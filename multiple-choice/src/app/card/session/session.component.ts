@@ -48,7 +48,7 @@ export class SessionComponent  implements OnInit {
   wrongAnswers: number = 0;
 
 
-  async loadFehler(){
+  async loadStats(){
     this.kartenInsgesammt = this.kartenRichtig + this.wrongAnswers;
 
     this.rate = (this.kartenRichtig / this.kartenInsgesammt) * 100;
@@ -237,7 +237,7 @@ export class SessionComponent  implements OnInit {
       this.currentIndex++;
     } else {
       this.sessionCompleted = true;
-      this.loadFehler();
+      this.loadStats();
       await this.saveSessionProgress();
     }
     this.updateProgress();
