@@ -261,7 +261,7 @@ export class StatistikComponent implements OnInit{
           labels: ['Abgeschlossen: ','noch nicht gemeistert: '],
           datasets: [{
             data: [this.counter6, this.counter0+ this.counter1+this.counter3+this.counter2+this.counter4+this.counter5],
-            backgroundColor: [ '#41d91c', '#d90a33','#FFCE56']
+            backgroundColor: [ '#91A6C0', '#5A7699','#2D496B']
           }]
         },
         options: {
