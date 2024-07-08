@@ -97,15 +97,25 @@
                 <ion-checkbox slot="end" [checked]="setChecked(answer,i)" (ionChange)="onCheckboxChange($event, i)"></ion-checkbox>
                 <ion-label position="floating">Antwort {{ i + 1 }}</ion-label>
                 <ion-input
+                  #answer{{i}}
                   [(ngModel)]="currentQuestion.answers[i]"
                   name="answer{{ i }}"
                   required
                   maxlength="50"
                   clearInput
+                  (ionChange)="onInputChanged(i)"
                   [counter]="true"
                 >
                 </ion-input>
               </ion-item>
+              @if (errors.get('answer' + i)) {
+                <ion-text color="danger">
+                  <p class="ion-text-end ion-no-margin ion-padding-end">
+                    {{errors.get('answer'+i)}}
+                  </p>
+                </ion-text>
+              }
+
             </ion-col>
           </ion-row>
         }

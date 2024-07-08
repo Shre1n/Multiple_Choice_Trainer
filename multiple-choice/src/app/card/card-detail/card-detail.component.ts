@@ -42,6 +42,12 @@ export class CardDetailComponent implements OnInit{
     correctStreak: 0
   };
 
+  errors = new Map<string, string>();
+
+  @ViewChild('answer')
+  private answer!: IonInput;
+
+
   isEditMode: boolean = false;
   addMode = false;
   currentQuestionIndex: number | null = null;
@@ -174,6 +180,16 @@ export class CardDetailComponent implements OnInit{
     }
   }
 
+  onInputChanged(index: number) {
+    // Wenn der Input gelöscht wird, entferne den Index aus correctIndex
+    if (this.currentQuestion.answers[index] === '') {
+      const foundIndex = this.correctIndex.indexOf(index);
+      if (foundIndex !== -1) {
+        this.correctIndex.splice(foundIndex, 1);
+      }
+    }
+  }
+
   setChecked(answer: string, index: number) {
     if (this.currentQuestion.correctAnswers.includes(answer)) {
       if(!this.settedIndex.includes(index)) {
@@ -216,7 +232,11 @@ export class CardDetailComponent implements OnInit{
   }
 
   async save(answers: string[]) {
-
+    answers.forEach((answer, i) => {
+      if (!answer.trim()) {
+        this.errors.set('answer' + i, 'Antwort darf nicht leer sein!');
+      }
+    });
     this.currentQuestion.correctAnswers = [];
     console.log(this.correctIndex);
     this.correctIndex.forEach(index => {
@@ -227,17 +247,20 @@ export class CardDetailComponent implements OnInit{
     this.settedIndex = []
 
 
-    if (this.isEditMode) {
-      await this.updateModuleInFirebase();
-      await this.presentToast("Modul erfolgreich Aktualisiert!", "bottom");
-      await this.navCtrl.pop();
-    } else {
-      await this.saveModuleToFirebase();
-      const user = await this.authService.getCurrentUser();
-      if (user) {
-        await this.achievements.setIndexAchievement(user.uid, 6);
+    if (this.errors.size === 0) {
+      if (this.isEditMode) {
+        await this.updateModuleInFirebase();
+        await this.presentToast("Modul erfolgreich Aktualisiert!", "bottom");
+        await this.navCtrl.pop();
+      } else {
+        await this.saveModuleToFirebase();
+        const user = await this.authService.getCurrentUser();
+        if (user) {
+          await this.achievements.setIndexAchievement(user.uid, 6);
+        }
+        this.resetAnswers();
       }
-      this.resetAnswers();
+      await this.navCtrl.pop();
     }
 
   }
