@@ -22,7 +22,7 @@ export class SessionComponent  implements OnInit {
   modules: any[] = [];
   currentIndex: number = 0;
   showCorrectAnswers: boolean = false;
-  selectedAnswer: string = '';
+  selectedAnswers: string[] = [];
   sessionCompleted: boolean = false;
   progress: number = 0;
   correctStreakModules:  { index: number; question: string; }[] = [];
@@ -154,7 +154,7 @@ export class SessionComponent  implements OnInit {
         this.modules = foundModule.modules.map((module: any) => ({
           question: module.question,
           answers: this.shuffleArray([...module.answers]), // Use spread operator to clone array
-          correctAnswer: module.correctAnswer,
+          correctAnswers: module.correctAnswers,
           answeredCorrectlyCount: module.answeredCorrectlyCount,
           answeredIncorrectlyCount: module.answeredIncorrectlyCount,
           correctStreak: module.correctStreak
@@ -178,7 +178,7 @@ export class SessionComponent  implements OnInit {
           .map((module: any) => ({
             question: module.question,
             answers: this.shuffleArray(module.answers),
-            correctAnswer: module.correctAnswer,
+            correctAnswers: module.correctAnswers.sort(),
             answeredCorrectlyCount: module.answeredCorrectlyCount,
             answeredIncorrectlyCount: module.answeredIncorrectlyCount,
             correctStreak: module.correctStreak
@@ -203,7 +203,13 @@ export class SessionComponent  implements OnInit {
   async checkAnswer() {
     this.showCorrectAnswers = true;
     const currentModule = this.modules[this.currentIndex];
-    if (this.selectedAnswer === currentModule.correctAnswer) {
+
+    console.log("selectedAnswers", this.selectedAnswers);
+    console.log("currentModule", currentModule.correctAnswers)
+
+    console.log("dsds", JSON.stringify(this.selectedAnswers.sort())==JSON.stringify(currentModule.correctAnswers));
+
+    if (JSON.stringify(this.selectedAnswers.sort())==JSON.stringify(currentModule.correctAnswers)) {
       currentModule.answeredCorrectlyCount++;
       this.kartenRichtig++;
       this.moduleService.setStreak(currentModule.correctStreak++);
@@ -214,10 +220,21 @@ export class SessionComponent  implements OnInit {
     }
   }
 
+  onCheckboxChange(event: any, answer: string) {
+    const isChecked = event.detail.checked;
+    if (isChecked) {
+      this.selectedAnswers.push(answer);
+    } else {
+      const index = this.selectedAnswers.indexOf(answer);
+      if (index > -1) {
+        this.selectedAnswers.splice(index, 1);
+      }
+    }
+  }
 
   async nextQuestion() {
     this.showCorrectAnswers = false;
-    this.selectedAnswer = '';
+    this.selectedAnswers = [];
     const correctStreakModules = await this.moduleService.getCorrectStreakOfModule(this.category);
 
     if (!this.category) {
@@ -251,7 +268,7 @@ export class SessionComponent  implements OnInit {
     this.modules = [];
     this.currentIndex = 0;
     this.showCorrectAnswers = false;
-    this.selectedAnswer = '';
+    this.selectedAnswers = [];
     this.sessionCompleted = false;
     this.progress = 0;
     this.correctStreakModules = [];
