@@ -9,6 +9,7 @@ import {addIcons} from "ionicons";
 import {AchievementsService} from "../../services/achievements.service";
 import {arrowBack,addSharp,close, shareSocialOutline, checkmark} from "ionicons/icons";
 import {Share} from "@capacitor/share";
+import {load} from "@angular-devkit/build-angular/src/utils/server-rendering/esm-in-memory-loader/loader-hooks";
 
 @Component({
   selector: 'app-session',
@@ -36,7 +37,8 @@ export class SessionComponent  implements OnInit {
     private authService: AuthService,
     private alertController: AlertController,
     private achievements: AchievementsService,
-    private navCtrl: NavController
+    private navCtrl: NavController,
+    private toastController: ToastController,
 
   ) {addIcons({arrowBack,addSharp,close,shareSocialOutline, checkmark})}
 
@@ -57,8 +59,20 @@ export class SessionComponent  implements OnInit {
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.category = params['category'];
+      if (this.category === "") this.presentToast("No category found! :(", "middle")
+
       this.loadModules();
     });
+  }
+
+  async presentToast(message: string, position: 'middle') {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 5000,
+      position: position,
+    });
+
+    await toast.present();
   }
 
   async loadModules() {
@@ -67,19 +81,19 @@ export class SessionComponent  implements OnInit {
 
     // Load correct streak modules after loading the user saved and category modules
     const correctStreakModules = await this.moduleService.getCorrectStreakOfModule(this.category);
-    console.log(correctStreakModules);
+    if (this.modules.length === correctStreakModules.length){
+      this.allModulesLearned = true;
+      this.sessionCompleted = true;
+    }
+
     if (correctStreakModules.some(module => module.index === this.currentIndex)) {
       this.modules.splice(this.currentIndex, correctStreakModules.length);
     }
 
-    if (this.modules.every(module => module.correctStreak >= 6)) {
-      console.log('All modules correctly learned for this category:', this.category);
-      this.allModulesLearned = true;
-      this.sessionCompleted = true;
-
-    }else if (this.modules.length === 0) {
+    if (this.modules.length === 0) {
       console.error('No modules found for this category:', this.category);
     }
+
   }
 
   async goBack(): Promise<void> {
@@ -178,7 +192,7 @@ export class SessionComponent  implements OnInit {
           .map((module: any) => ({
             question: module.question,
             answers: this.shuffleArray(module.answers),
-            correctAnswers: module.correctAnswers.sort(),
+            correctAnswers: module.correctAnswers,
             answeredCorrectlyCount: module.answeredCorrectlyCount,
             answeredIncorrectlyCount: module.answeredIncorrectlyCount,
             correctStreak: module.correctStreak

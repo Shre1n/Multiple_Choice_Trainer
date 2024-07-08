@@ -8,7 +8,7 @@
       "answeredCorrectlyCount": 0,
       "answeredIncorrectlyCount": 0,
       "answers": ["A type of script","A superset of JavaScript","A styling language","A database query language"],
-      "correctAnswers": ["A superset of JavaScript", "A type of script"],
+      "correctAnswers": "A superset of JavaScript",
       "correctStreak": 0
     },
     {
@@ -18,7 +18,25 @@
       "answeredCorrectlyCount": 0,
       "answeredIncorrectlyCount": 0,
       "answers": ["1995","2005","2012","2010"],
-      "correctAnswers": ["2012"],
+      "correctAnswers": "2012",
+      "correctStreak": 0
+    },
+    {
+      "name": "Module 3",
+      "question": "What are some advantages of using TypeScript?",
+      "description": "This is TypeScript module 3",
+      "answeredCorrectlyCount": 0,
+      "answeredIncorrectlyCount": 0,
+      "answers": [
+        "Type safety",
+        "Better tooling support",
+        "Faster execution time",
+        "Built-in unit testing framework"
+      ],
+      "correctAnswers": [
+        "Type safety",
+        "Better tooling support"
+      ],
       "correctStreak": 0
     }
   ]
