@@ -47,8 +47,8 @@ export class CardDetailComponent implements OnInit{
   currentQuestionIndex: number | null = null;
   showQuestionList: boolean = true;
   questionCount: number = 0;
-  isChecked: boolean[] = [];
-
+  correctIndex: number[] = [];
+  settedIndex: number[] = [];
 
   #IonInput: IonInput | undefined;
   @ViewChild( IonInput)
@@ -110,9 +110,6 @@ export class CardDetailComponent implements OnInit{
     }
   }
 
-  toogleCheckbox(index: number): boolean{
-    return this.isChecked[index];
-  }
 
 
   addCategory() {
@@ -177,38 +174,33 @@ export class CardDetailComponent implements OnInit{
     }
   }
 
-  onCheckboxChange(event: any, answer: string, index: number): boolean {
-    const isChecked = event.detail.checked;
-    this.isChecked.push(isChecked);
-    console.log(this.isChecked)
-    if (isChecked) {
-      this.currentQuestion.correctAnswers.push(answer);
-    } else {
-      const index = this.currentQuestion.correctAnswers.indexOf(answer);
-
-      if (index > -1) {
-        this.currentQuestion.correctAnswers.splice(index, 1);
+  setChecked(answer: string, index: number) {
+    if (this.currentQuestion.correctAnswers.includes(answer)) {
+      if(!this.settedIndex.includes(index)) {
+        console.log("Push setted", index)
+        this.correctIndex.push(index);
+        this.settedIndex.push(index);
       }
+      return true;
     }
+    return false;
+  }
+
+  onCheckboxChange(event: any,  index: number): boolean {
+    const isChecked = event.detail.checked;
+
+    if (isChecked) {
+      console.log("Push",index)
+      this.correctIndex.push(index);
+    } else {
+      console.log("Splice",index)
+      this.correctIndex.splice(this.correctIndex.indexOf(index), 1);
+      console.log("Spliced correct",this.correctIndex)
+    }
+
     return isChecked;
   }
 
-  isCheckerReset(index: number){
-    if(!this.isChecked[index])
-    this.isChecked.splice(index,1)
-  }
-
-
-  uncheck(event: any, answer: string){
-    const isChecked = event.detail.checked;
-    if (isChecked) {
-      const index = this.currentQuestion.correctAnswers.indexOf(answer);
-      if (index > -1) {
-        event.detail.default;
-        this.currentQuestion.correctAnswers.splice(index, 1);
-      }
-    }
-  }
 
   async saveModule() {
     this.moduleData.category = this.category;
@@ -223,10 +215,21 @@ export class CardDetailComponent implements OnInit{
     return index;
   }
 
-  async save() {
+  async save(answers: string[]) {
+
+    this.currentQuestion.correctAnswers = [];
+    console.log(this.correctIndex);
+    this.correctIndex.forEach(index => {
+      this.currentQuestion.correctAnswers.push(answers[index]);
+      console.log(this.currentQuestion.correctAnswers);
+    })
+    this.correctIndex = []
+    this.settedIndex = []
+
+
     if (this.isEditMode) {
       await this.updateModuleInFirebase();
-      await this.presentToast("Modul erfolgreich Aktualisiert!", "bottom")
+      await this.presentToast("Modul erfolgreich Aktualisiert!", "bottom");
       await this.navCtrl.pop();
     } else {
       await this.saveModuleToFirebase();
