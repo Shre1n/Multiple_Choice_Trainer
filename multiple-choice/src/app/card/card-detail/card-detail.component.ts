@@ -8,6 +8,7 @@ import {addIcons} from "ionicons";
 import {close, trashSharp, addSharp} from "ionicons/icons";
 import {AchievementsService} from "../../services/achievements.service";
 
+
 interface Question {
   question: string;
   answers: string[];
@@ -81,20 +82,21 @@ export class CardDetailComponent implements OnInit{
   }
 
   ngOnInit(): void {
-    // Empfangen der Parameter aus der URL
+    // Receive parameters from the URL
     this.route.queryParams.subscribe(params => {
       this.category = params['category'];
       this.isEditMode = params['edit'] === 'true';
-      // Laden der Daten für die angegebene Kategorie, falls nicht im Edit-Modus
+      // Load data for the specified category if not in edit mode
       if (!params['edit']) {
         this.resetAnswers();
       } else {
         this.loadDataForCategory(this.category);
       }
     });
+
   }
 
-  // Funktion zum Laden der Daten für die angegebene Kategorie
+  // Load data for the specified category
   async loadDataForCategory(category: string): Promise<void> {
     try {
       const filteredModules = await this.moduleService.getDataForUpdate(category);
@@ -116,13 +118,13 @@ export class CardDetailComponent implements OnInit{
     }
   }
 
-
-
+  // Add category
   addCategory() {
     this.moduleData.category = this.category;
     this.categoryAdded = true;
   }
 
+  // Show toast message
   async presentToast(message: string, position: 'middle' | 'top' | 'bottom') {
     const toast = await this.toastController.create({
       message: message,
@@ -133,53 +135,21 @@ export class CardDetailComponent implements OnInit{
     await toast.present();
   }
 
-  async addNewQuestion(category: string) {
-    // Prüfe, ob die Kategorie gesetzt ist
-    if (category && category.trim() !== '') {
-
-      this.moduleData.modules.push({ ...this.currentQuestion });
-
-      // Setze die Anzeige für die Frage-Liste auf false, um das Formular anzuzeigen
-      this.showQuestionList = false;
-
-      // Optional: Setze die Antworten zurück
-      this.resetAnswers();
-    } else {
-      const toast = await this.toastController.create({
-        message: 'Bitte geben Sie eine gültige Kategorie ein!',
-        duration: 2000,
-        position: 'top'
-      });
-      toast.present();
-    }
-  }
-
+  // Reset the answers for the current question
   resetAnswers() {
     this.currentQuestion.question = '';
     this.currentQuestion.answers = ['', '', '', ''];
     this.currentQuestion.correctAnswers = [];
   }
 
-  clearAnswer(index: number){
-    this.currentQuestion.answers[index]="";
-  }
-
-  clearCategory(){
-    this.category= "";
-    this.categoryAdded= false;
-    this.moduleData.category ="";
-  }
-
-  clearQuestion(){
-    this.currentQuestion.question="";
-  }
-
+  // Add an additional answer field (up to 6)
   addAnswerField() {
     if (this.currentQuestion.answers.length < 6) {
       this.currentQuestion.answers.push('');
     }
   }
 
+  // Set the correct answer for the current question
   onInputChanged(index: number) {
     // Wenn der Input gelöscht wird, entferne den Index aus correctIndex
     if (this.currentQuestion.answers[index] === '') {
@@ -218,6 +188,7 @@ export class CardDetailComponent implements OnInit{
   }
 
 
+  // Save the module data
   async saveModule() {
     this.moduleData.category = this.category;
     this.moduleData.modules.push({ ...this.currentQuestion });
@@ -227,10 +198,12 @@ export class CardDetailComponent implements OnInit{
     }
   }
 
+  // Track by index for ngFor
   trackByIndex(index: number, obj: any): any {
     return index;
   }
 
+  // Save the module, either updating or creating a new one
   async save(answers: string[]) {
     answers.forEach((answer, i) => {
       if (!answer.trim()) {
@@ -238,20 +211,18 @@ export class CardDetailComponent implements OnInit{
       }
     });
     this.currentQuestion.correctAnswers = [];
-    console.log(this.correctIndex);
     this.correctIndex.forEach(index => {
       this.currentQuestion.correctAnswers.push(answers[index]);
       console.log(this.currentQuestion.correctAnswers);
     })
     this.correctIndex = []
     this.settedIndex = []
-
+    this.handleBackButton();
 
     if (this.errors.size === 0) {
       if (this.isEditMode) {
         await this.updateModuleInFirebase();
         await this.presentToast("Modul erfolgreich Aktualisiert!", "bottom");
-        await this.navCtrl.pop();
       } else {
         await this.saveModuleToFirebase();
         const user = await this.authService.getCurrentUser();
@@ -265,16 +236,19 @@ export class CardDetailComponent implements OnInit{
 
   }
 
+  // Save module to Firebase
   async saveModuleToFirebase() {
     await this.moduleService.saveUserModulesToFirestore(this.moduleData);
   }
 
+  // Update module in Firebase
   async updateModuleInFirebase() {
     if (this.currentQuestionIndex !== null) {
       await this.moduleService.updateUserModuleInFirestore(this.currentQuestion, this.category, this.currentQuestionIndex);
     }
   }
 
+  // Alert to confirm canceling the current action
   async alertCancel() {
     const user = await this.authService.getCurrentUser();
     if (user) {
@@ -311,12 +285,14 @@ export class CardDetailComponent implements OnInit{
     }
   }
 
+  // Select a question from the list
   selectQuestion(question: Question, index: number) {
     this.currentQuestion = question;
     this.currentQuestionIndex = index;
     this.showQuestionList = false;
   }
 
+  // Handle the back button action
   handleBackButton() {
     if (this.isEditMode && !this.showQuestionList) {
       this.backToQuestionList();
@@ -325,15 +301,17 @@ export class CardDetailComponent implements OnInit{
     }
   }
 
+  // Return to the question list
   backToQuestionList() {
     this.showQuestionList = true;
   }
-
+  // Navigate to self with specified category
   navigateSelf(category:string){
     this.addMode = true;
     this.router.navigate(['/card-detail'], {queryParams: {category: category}});
   }
 
+  // Delete a question with confirmation
   async deleteQuestion(index: number) {
     const alert = await this.alertController.create({
       header: 'Frage löschen',

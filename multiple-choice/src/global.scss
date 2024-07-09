@@ -44,6 +44,10 @@ ion-item {
   margin-bottom: 16px;
 }
 
+ion-title{
+  font-size: 1em;
+}
+
 ion-button {
   --border-radius: 10px;
 }
@@ -69,6 +73,10 @@ ion-button {
 
 .global_blue{
   background-color: #2d496b;
+}
+
+.checkbox{
+  --background-checked: #CEDBEB ;
 }
 
 
