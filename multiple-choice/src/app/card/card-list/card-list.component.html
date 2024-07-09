@@ -1,18 +1,18 @@
 <ion-header>
   <ion-toolbar>
     <ion-title slot="start">
-      Angefangene Module
+      Meine Module
     </ion-title>
     <ion-buttons slot="end">
       @if (isLoggedIn) {
-        <ion-button (click)="shareLearnedModules()">
+        <ion-button  id="shareB" (click)="shareLearnedModules()">
           <ion-icon name="share-social-outline"></ion-icon>
         </ion-button>
-        <ion-button class="ion-color" slot="end" (click)="logout()">
-          <ion-icon name="log-out-outline" style="color: #CEDBEB"></ion-icon>
-        </ion-button>
-        <ion-button (click)="search()">
+        <ion-button id="searchB" (click)="search()">
           <ion-icon slot="icon-only" name="search-outline"></ion-icon>
+        </ion-button>
+        <ion-button id="backB" class="ion-color" slot="end" (click)="logout()">
+          <ion-icon name="log-out-outline" style="color: #CEDBEB"></ion-icon>
         </ion-button>
       }
     </ion-buttons>
