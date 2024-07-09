@@ -22,42 +22,14 @@ import {AchievementsService} from "./achievements.service";
 })
 export class ModuleService {
 
-  private modules: ModuleModule[];
-  private nextId: number;
   private correctSteak!: number;
-
-  modulesCollectionRef: CollectionReference<DocumentData>;
 
   private baseUrl = "http://localhost:8888";
 
   constructor(private http: HttpClient,
               private firestore: Firestore,
               private authService: AuthService,
-              private achievements: AchievementsService,) {
-    this.modulesCollectionRef = collection(firestore, 'modules');
-    const modulesJSON: string | null = localStorage.getItem('modules');
-    if (modulesJSON) {
-      this.modules = JSON.parse(modulesJSON);
-      this.nextId = parseInt(localStorage.getItem('nextId') ?? "1", 10);
-    } else {
-      this.modules = [];
-      this.nextId = 1;
-      if (!environment.production) {
-        this.persist(new ModuleModule(8, "Design", "GASM1", "Grundlagen und Anwendungen",0));
-      }
-    }
-  }
-
-  persist(module: ModuleModule) {
-    module.id = this.nextId++;
-    this.modules.push(module);
-    this.saveModulesToFirestore(module);
-    this.saveLocal();
-  }
-
-  private saveLocal() {
-    localStorage.setItem('records', JSON.stringify(this.modules));
-    localStorage.setItem('nextId', this.nextId.toString());
+              private achievements: AchievementsService) {
   }
 
   async checkForSessions () {
@@ -75,6 +47,7 @@ export class ModuleService {
 
 
   async getDataForUpdate(category: string): Promise<any> {
+    // Fetch user data and filter modules based on category
     const user = await this.authService.getCurrentUser();
     if (user) {
       const userRef = doc(this.firestore, `users/${user.uid}`);
@@ -82,10 +55,10 @@ export class ModuleService {
       if (!userDoc.exists()) throw new Error('User document not found');
       const userData = userDoc.data();
 
-      // Überprüfen, ob das Feld selfmademodules im Benutzerdokument existiert und ein Array ist
+      // Check if the field 'selfmademodules' exists in the user document and is an array.
       const modulesData = userData && Array.isArray(userData['selfmademodules']) ? userData['selfmademodules'] : [];
 
-      // Filtern der Module nach der angegebenen Kategorie
+      //Filtering the modules based on the specified category
       const filteredModules = modulesData.filter((module: any) => module.category === category);
       return filteredModules;
 
@@ -94,6 +67,7 @@ export class ModuleService {
   }
 
   async sortModulesByLastStudied(userSessions: any[]): Promise<void> {
+    // Sort user sessions by last studied date in descending order
     userSessions.forEach(session => {
       session.modules.sort((a: { lastStudied: string | number | Date; }, b: { lastStudied: string | number | Date; }) => {
         const dateA = new Date(a.lastStudied);
@@ -103,42 +77,26 @@ export class ModuleService {
     });
   }
 
-  private async saveModulesToFirestore(module: ModuleModule): Promise<void> {
-    if (module.id == null) {
-      console.error('There is nothing to save');
-      return;
-    }
-    try {
-      const moduleRef = doc(this.modulesCollectionRef, module.id.toString());
-      await setDoc(moduleRef, {
-        category: module.category,
-        name: module.name,
-        description: module.description
-      });
-      console.log('saved to Firestore:', module);
-    } catch (error) {
-      console.log('Error saving to Firestore', error);
-    }
-  }
-
   async renderUserCategories(): Promise<string[]> {
+    // Render categories of user-made modules sorted alphabetically
     const user = await this.authService.getCurrentUser();
     if (user) {
+
       const userRef = doc(this.firestore, `users/${user.uid}`);
       const userDoc = await getDoc(userRef);
       let existingData: any = {};
       if (userDoc.exists()) {
-        existingData = userDoc.data();
+        const userData = userDoc.data();
+        if (userData['selfmademodules']) {
+          // Extract only the categories of the modules and sort them alphabetically.
+          let categories = userData['selfmademodules']
+            .map((module: any) => module.category)
+            //new Intl.Collator is used to compare large amounts of strings which is possible in app
+            .sort(new Intl.Collator('de').compare);
+          return categories;
+        }
       }
-
-      if (!existingData.selfmademodules) {
-        existingData.selfmademodules = [];
-      }
-
-      // Extrahiere nur die Kategorien der Module
-      let categories = existingData.selfmademodules.map((module: any) => module.category);
-
-      return categories;
+      return [];
     } else {
       // Return an empty array if user is not logged in
       return [];
@@ -146,6 +104,7 @@ export class ModuleService {
   }
 
   async getSavedModulesForUser(): Promise<any[]> {
+    // Fetch saved modules for the logged-in user
     const user = await this.authService.getCurrentUser();
     if (user) {
       const userRef = doc(this.firestore, `users/${user.uid}`);
@@ -173,6 +132,7 @@ export class ModuleService {
   }
 
   async deleteUserModule(category: { category: string }): Promise<void> {
+    // Delete user module based on category
     const user = await this.authService.getCurrentUser();
     if (user) {
       const userRef = doc(this.firestore, `users/${user.uid}`);
@@ -195,55 +155,8 @@ export class ModuleService {
     }
   }
 
-  async saveModule(moduleData: any) {
-    const user = await this.authService.getCurrentUser();
-    if (user){
-      const userRef = doc(this.firestore, `users/${user.uid}`);
-      try {
-        const userDoc = await getDoc(userRef);
-        let existingData: any = {};
-        if (userDoc.exists()) {
-          existingData = userDoc.data();
-        }
-        if (!existingData.selfmademodules) {
-          existingData.selfmademodules = [];
-        }
-
-        // Prüfe, ob die Kategorie bereits existiert
-        const existingCategoryIndex = existingData.selfmademodules.findIndex((selfmademodule: any) => selfmademodule.category === moduleData.category);
-
-        if (existingCategoryIndex !== -1) {
-          // Kategorie existiert bereits, füge die neuen Module hinzu oder aktualisiere bestehende Module
-          moduleData.modules.forEach((newModule: any) => {
-            const existingModuleIndex = existingData.selfmademodules[existingCategoryIndex].modules.findIndex((module: any) => module.question === newModule.question);
-            if (existingModuleIndex !== -1) {
-              // Modul existiert bereits, aktualisiere answeredCorrectlyCount und answeredIncorrectlyCount
-              existingData.selfmademodules[existingCategoryIndex].modules[existingModuleIndex].answeredCorrectlyCount += newModule.answeredCorrectlyCount;
-              existingData.selfmademodules[existingCategoryIndex].modules[existingModuleIndex].answeredIncorrectlyCount += newModule.answeredIncorrectlyCount;
-              existingData.selfmademodules[existingCategoryIndex].modules[existingModuleIndex].correctStreak = newModule.correctStreak;
-            } else {
-              // Modul existiert noch nicht, füge es hinzu
-              existingData.selfmademodules[existingCategoryIndex].modules.push(newModule);
-            }
-          });
-        } else {
-          // Füge die neue Kategorie hinzu, da sie noch nicht existiert
-          existingData.selfmademodules.push(moduleData);
-        }
-
-        await setDoc(userRef, existingData, { merge: true });
-        console.log('Module saved successfully');
-
-      } catch (error) {
-        console.error('Error saving module:', error);
-      }
-    }
-  }
-
-
-
-
   async saveUserModulesToFirestore(moduleData: any): Promise<void> {
+    // Save user modules to Firestore
     const user = await this.authService.getCurrentUser();
     if (user) {
       const userRef = doc(this.firestore, `users/${user.uid}`);
@@ -280,6 +193,7 @@ export class ModuleService {
   }
 
   async updateUserModuleInFirestore(updatedQuestion: any, category: string, questionIndex: number): Promise<void> {
+    // Update user module in Firestore
     const user = await this.authService.getCurrentUser();
     if (user) {
       const userRef = doc(this.firestore, `users/${user.uid}`);
@@ -311,6 +225,7 @@ export class ModuleService {
   }
 
   async deleteQuestion(category: string, questionIndex: number): Promise<void> {
+    // Delete question from user module in Firestore
     const user = await this.authService.getCurrentUser();
     if (user) {
       const userRef = doc(this.firestore, `users/${user.uid}`);
@@ -346,6 +261,7 @@ export class ModuleService {
 
 
   async saveSession(userID: string, sessionData: any) {
+    // Save Session in firestore
     const user = await this.authService.getCurrentUser();
     if (user) {
       const userRef = doc(this.firestore, `users/${userID}`);
@@ -361,11 +277,11 @@ export class ModuleService {
           existingData.sessions = [];
         }
 
-        // Prüfe, ob die Kategorie bereits existiert
+        // Category already exists, update answeredCorrectlyCount and answeredIncorrectlyCount.
         const existingSessionIndex = existingData.sessions.findIndex((session: any) => session.category === sessionData.category);
 
         if (existingSessionIndex !== -1) {
-          // Kategorie existiert bereits, aktualisiere answeredCorrectlyCount und answeredIncorrectlyCount
+          // Category exists already, update answeredCorrectlyCount and answeredIncorrectlyCount.
           sessionData.modules.forEach((newModule: any) => {
             const existingModuleIndex = existingData.sessions[existingSessionIndex].modules.findIndex((module: any) => module.question === newModule.question);
             if (existingModuleIndex !== -1) {
@@ -399,6 +315,7 @@ export class ModuleService {
   }
 
   async getCorrectStreakOfModule(category: string) {
+    // get Streak of user module
     const modulesInfo: {index: number; question: string;}[] = [];
     const user = await this.authService.getCurrentUser();
     if (user) {
@@ -438,11 +355,14 @@ export class ModuleService {
     return modulesInfo;
   }
 
+  //Sets the streak to 0 if necessary
+  //Basically a methode to control Streak
   setStreak(streak: number) {
     this.correctSteak = streak;
   }
 
   async getUserSessions(userID: string): Promise<any[]> {
+    // get all sessions
     const userRef = doc(this.firestore, `users/${userID}`);
     const userDoc = await getDoc(userRef);
     let existingData: any = {};
@@ -458,7 +378,8 @@ export class ModuleService {
     return existingData.sessions;
   }
 
-  async getSavedSessionModulesForUser(userID: string): Promise<any[]> {
+  async getSavedSessionModulesForUser(userID: string){
+    // collect saved modules for sorting timeStamp
     const userRef = doc(this.firestore, `users/${userID}`);
     const userDoc = await getDoc(userRef);
     let existingData: any = {};
@@ -471,7 +392,7 @@ export class ModuleService {
       existingData.sessions = [];
     }
 
-    // Sortiere die Sitzungen nach dem letzten Studiumsdatum absteigend
+    // Sort sessions by the last study date in descending order.
     existingData.sessions.sort((a: any, b: any) => {
       const dateA = new Date(a.lastStudied);
       const dateB = new Date(b.lastStudied);
@@ -481,25 +402,6 @@ export class ModuleService {
     return existingData.sessions;
   }
 
-  async findAll(): Promise<ModuleModule[]> {
-    const filterQuery = query(this.modulesCollectionRef)
-    const moduleDocs = await getDocs(filterQuery);
-
-    this.modules = moduleDocs.docs.map(doc => {
-      const data = doc.data() as Omit<ModuleModule,'id'>;
-      return {
-        id: parseInt(doc.id, 10),
-        ...data
-      }as ModuleModule;
-    });
-    this.saveLocal();
-  return  this.modules;
-  }
-
-  getAllCategories(){
-
-  }
-
 
   //Loads External Modules
   loadExternalModule(): Observable<any> {
@@ -507,6 +409,7 @@ export class ModuleService {
     return this.http.get<any>(url);
   }
 
+  //check for updates in External Server Modules
   checkForUpdates(): Observable<{ updatesAvailable: boolean }> {
     const url = `${this.baseUrl}/check-updates`;
     return this.http.get<{ updatesAvailable: boolean }>(url);

@@ -206,7 +206,7 @@ export class HomeComponent implements OnInit {
     if (user) {
       const savedModules = await this.moduleService.renderUserCategories();
       if (savedModules) {
-        this.userModules = savedModules.sort();
+        this.userModules = savedModules;
       } else {
         this.userModules = []; // Fallback to empty array if savedModules is undefined
       }
