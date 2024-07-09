@@ -211,20 +211,18 @@ export class CardDetailComponent implements OnInit{
       }
     });
     this.currentQuestion.correctAnswers = [];
-    console.log(this.correctIndex);
     this.correctIndex.forEach(index => {
       this.currentQuestion.correctAnswers.push(answers[index]);
       console.log(this.currentQuestion.correctAnswers);
     })
     this.correctIndex = []
     this.settedIndex = []
-
+    this.handleBackButton();
 
     if (this.errors.size === 0) {
       if (this.isEditMode) {
         await this.updateModuleInFirebase();
         await this.presentToast("Modul erfolgreich Aktualisiert!", "bottom");
-        await this.navCtrl.pop();
       } else {
         await this.saveModuleToFirebase();
         const user = await this.authService.getCurrentUser();
