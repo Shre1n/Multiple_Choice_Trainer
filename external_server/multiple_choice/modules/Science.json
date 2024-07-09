@@ -8,7 +8,7 @@
       "answeredCorrectlyCount": 0,
       "answeredIncorrectlyCount": 0,
       "answers": ["H2O", "O2", "CO2", "H2"],
-      "correctAnswers": "H2O",
+      "correctAnswers": ["H2O"],
       "correctStreak": 0
     },
     {
@@ -18,7 +18,7 @@
       "answeredCorrectlyCount": 0,
       "answeredIncorrectlyCount": 0,
       "answers": ["Mars", "Earth", "Jupiter", "Venus"],
-      "correctAnswers": "Mars",
+      "correctAnswers": ["Mars"],
       "correctStreak": 0
     },
     {
@@ -28,7 +28,7 @@
       "answeredCorrectlyCount": 0,
       "answeredIncorrectlyCount": 0,
       "answers": ["Carbon Dioxide", "Oxygen", "Nitrogen", "Hydrogen"],
-      "correctAnswers": "Carbon Dioxide",
+      "correctAnswers": ["Carbon Dioxide"],
       "correctStreak": 0
     },
     {
@@ -38,7 +38,7 @@
       "answeredCorrectlyCount": 0,
       "answeredIncorrectlyCount": 0,
       "answers": ["Nucleus", "Electron", "Proton", "Neutron"],
-      "correctAnswers": "Nucleus",
+      "correctAnswers": ["Nucleus"],
       "correctStreak": 0
     },
     {
@@ -48,7 +48,7 @@
       "answeredCorrectlyCount": 0,
       "answeredIncorrectlyCount": 0,
       "answers": ["Gravity", "Magnetism", "Electromagnetism", "Friction"],
-      "correctAnswers": "Gravity",
+      "correctAnswers": ["Gravity"],
       "correctStreak": 0
     },
     {
@@ -58,7 +58,7 @@
       "answeredCorrectlyCount": 0,
       "answeredIncorrectlyCount": 0,
       "answers": ["Diamond", "Gold", "Iron", "Platinum"],
-      "correctAnswers": "Diamond",
+      "correctAnswers": ["Diamond"],
       "correctStreak": 0
     }
   ]
