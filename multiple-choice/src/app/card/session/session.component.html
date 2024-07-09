@@ -104,8 +104,9 @@
               <ion-card id="cardBg2">falsche Antworten: {{ wrongAnswers }}</ion-card>
               <ion-card id="cardBg3" class="ion-text-center">
                 <p>{{ successRate() }}</p>
-                <ion-button shape="round" (click)="goToHome()">Zur Karten ansicht</ion-button>
+                <p>{{ rateText }}</p>
               </ion-card>
+              <ion-button shape="round" (click)="goToHome()">Zur Karten ansicht</ion-button>
             </ion-card-content>
           }
         </ion-card>

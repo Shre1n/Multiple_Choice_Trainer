@@ -39,6 +39,10 @@ export class SessionComponent  implements OnInit {
   // Success rate
   rate: number = 0;
 
+
+  rateText: string = "";
+
+
   constructor(
     private moduleService: ModuleService,
     private router: Router,
@@ -138,18 +142,17 @@ export class SessionComponent  implements OnInit {
 
   // Determine the success rate message
   successRate(): string {
+    this.rateText = '\t'+`Erfolgsrate: ${this.rate.toFixed(2)}%`;
     if (this.rate < 30) {
       return "Da musst du wohl noch etwas üben :(";
     } else if (this.rate >= 30 && this.rate < 60) {
       return "Da geht doch noch mehr..";
     } else if (this.rate >= 60 && this.rate < 90) {
-      return "Gut gemacht, beim nächsten Mal schaffst du bestimmt die 100%?";
+      return "Gut gemacht, beim nächsten Mal schaffst du bestimmt die 100%!";
     } else if (this.rate === 100) {
       return "Was für eine Runde! Teile deinen Erfolg mit anderen, um zu zeigen, was für eine Leistung du erbracht hast!";
     }
-
-    // Standardnachricht zurückgeben, falls keine der obigen Bedingungen erfüllt ist
-    return `Erfolgsrate: ${this.rate.toFixed(2)}%`;
+    return "Erfolgsrate konnte nicht berechnet werden.";
   }
 
 
@@ -245,6 +248,8 @@ export class SessionComponent  implements OnInit {
     } else {
       currentModule.answeredIncorrectlyCount++;
       this.wrongAnswers++;
+      console.log("anz falsche antworten:" + this.wrongAnswers)
+
       this.moduleService.setStreak(0);
     }
   }
