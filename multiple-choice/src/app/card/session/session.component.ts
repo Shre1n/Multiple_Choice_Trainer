@@ -310,6 +310,22 @@ export class SessionComponent  implements OnInit {
     this.kartenRichtig = 0;
     this.wrongAnswers = 0;
   }
+
+
+
+  toggleCheckbox(answer: string) {
+    if (this.selectedAnswers.includes(answer)) {
+      this.selectedAnswers = this.selectedAnswers.filter(a => a !== answer);
+    } else {
+      this.selectedAnswers.push(answer);
+    }
+  }
+
+  isSelected(answer: string): boolean {
+    return this.selectedAnswers.includes(answer);
+  }
+
+
 }
 
 

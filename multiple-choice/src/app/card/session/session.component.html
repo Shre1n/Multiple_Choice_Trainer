@@ -38,11 +38,11 @@
                 <ion-card-title id="Question">{{ modules[currentIndex].question }}</ion-card-title>
               </ion-card>
               @if (!showCorrectAnswers) {
-                <ion-radio-group [(ngModel)]="selectedAnswers">
-                  @for (answer of modules[currentIndex].answers; track modules[currentIndex];) {
-                    <ion-item id="answerItem">
-                      <ion-label>{{ answer }}</ion-label>
-                      <ion-checkbox slot="end" (ionChange)="onCheckboxChange($event, answer)" [value]="answer"></ion-checkbox>
+                <ion-radio-group [(ngModel)]="selectedAnswers" >
+                  @for (answer of modules[currentIndex].answers;track modules[currentIndex];) {
+                    <ion-item   id="answerItem" >
+                      <ion-label (click)="toggleCheckbox(answer)" >{{ answer }}</ion-label>
+                      <ion-checkbox slot="end"  [checked]="isSelected(answer)" (ionChange)="onCheckboxChange($event, answer)" [value]="answer"></ion-checkbox>
                     </ion-item>
                   }
                 </ion-radio-group>
