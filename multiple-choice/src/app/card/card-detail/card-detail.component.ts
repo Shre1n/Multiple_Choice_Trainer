@@ -12,7 +12,7 @@ import {AchievementsService} from "../../services/achievements.service";
 interface Question {
   question: string;
   answers: string[];
-  correctAnswer: string | null;
+  correctAnswers: string[];
   answeredCorrectlyCount: number;
   answeredIncorrectlyCount: number;
   correctStreak: number;
@@ -37,18 +37,25 @@ export class CardDetailComponent implements OnInit{
   currentQuestion: Question = {
     question: '',
     answers: ['', '', '', ''],
-    correctAnswer: null,
+    correctAnswers: [],
     answeredCorrectlyCount: 0,
     answeredIncorrectlyCount: 0,
     correctStreak: 0
   };
+
+  errors = new Map<string, string>();
+
+  @ViewChild('answer')
+  private answer!: IonInput;
+
 
   isEditMode: boolean = false;
   addMode = false;
   currentQuestionIndex: number | null = null;
   showQuestionList: boolean = true;
   questionCount: number = 0;
-
+  correctIndex: number[] = [];
+  settedIndex: number[] = [];
 
   #IonInput: IonInput | undefined;
   @ViewChild( IonInput)
@@ -132,7 +139,7 @@ export class CardDetailComponent implements OnInit{
   resetAnswers() {
     this.currentQuestion.question = '';
     this.currentQuestion.answers = ['', '', '', ''];
-    this.currentQuestion.correctAnswer = null;
+    this.currentQuestion.correctAnswers = [];
   }
 
   // Add an additional answer field (up to 6)
@@ -141,10 +148,45 @@ export class CardDetailComponent implements OnInit{
       this.currentQuestion.answers.push('');
     }
   }
+
   // Set the correct answer for the current question
-  setCorrectAnswer(index: number) {
-    this.currentQuestion.correctAnswer = this.currentQuestion.answers[index];
+  onInputChanged(index: number) {
+    // Wenn der Input gelöscht wird, entferne den Index aus correctIndex
+    if (this.currentQuestion.answers[index] === '') {
+      const foundIndex = this.correctIndex.indexOf(index);
+      if (foundIndex !== -1) {
+        this.correctIndex.splice(foundIndex, 1);
+      }
+    }
   }
+
+  setChecked(answer: string, index: number) {
+    if (this.currentQuestion.correctAnswers.includes(answer)) {
+      if(!this.settedIndex.includes(index)) {
+        console.log("Push setted", index)
+        this.correctIndex.push(index);
+        this.settedIndex.push(index);
+      }
+      return true;
+    }
+    return false;
+  }
+
+  onCheckboxChange(event: any,  index: number): boolean {
+    const isChecked = event.detail.checked;
+
+    if (isChecked) {
+      console.log("Push",index)
+      this.correctIndex.push(index);
+    } else {
+      console.log("Splice",index)
+      this.correctIndex.splice(this.correctIndex.indexOf(index), 1);
+      console.log("Spliced correct",this.correctIndex)
+    }
+
+    return isChecked;
+  }
+
 
   // Save the module data
   async saveModule() {
@@ -162,19 +204,38 @@ export class CardDetailComponent implements OnInit{
   }
 
   // Save the module, either updating or creating a new one
-  async save() {
-    if (this.isEditMode) {
-      await this.updateModuleInFirebase();
-      await this.presentToast("Modul erfolgreich Aktualisiert!", "bottom")
-      await this.navCtrl.pop();
-    } else {
-      await this.saveModuleToFirebase();
-      const user = await this.authService.getCurrentUser();
-      if (user) {
-        await this.achievements.setIndexAchievement(user.uid, 6);
+  async save(answers: string[]) {
+    answers.forEach((answer, i) => {
+      if (!answer.trim()) {
+        this.errors.set('answer' + i, 'Antwort darf nicht leer sein!');
       }
-      this.resetAnswers();
+    });
+    this.currentQuestion.correctAnswers = [];
+    console.log(this.correctIndex);
+    this.correctIndex.forEach(index => {
+      this.currentQuestion.correctAnswers.push(answers[index]);
+      console.log(this.currentQuestion.correctAnswers);
+    })
+    this.correctIndex = []
+    this.settedIndex = []
+
+
+    if (this.errors.size === 0) {
+      if (this.isEditMode) {
+        await this.updateModuleInFirebase();
+        await this.presentToast("Modul erfolgreich Aktualisiert!", "bottom");
+        await this.navCtrl.pop();
+      } else {
+        await this.saveModuleToFirebase();
+        const user = await this.authService.getCurrentUser();
+        if (user) {
+          await this.achievements.setIndexAchievement(user.uid, 6);
+        }
+        this.resetAnswers();
+      }
+      await this.navCtrl.pop();
     }
+
   }
 
   // Save module to Firebase

@@ -24,6 +24,7 @@ import {FooterComponent} from "../footer/footer.component";
 import {Share} from '@capacitor/share';
 import {FormsModule} from "@angular/forms";
 import {AchievementsService} from "../services/achievements.service";
+import {interval} from "rxjs";
 
 @Component({
   selector: 'app-home',
@@ -181,6 +182,7 @@ export class HomeComponent implements OnInit {
   async shareMyModules() {
     let msgText = "Hallo, \ndas sind meine Module:\nKategorien:\n";
 
+    this.userModules = await this.moduleService.renderUserCategories();
     const user = await this.authService.getCurrentUser();
     if (user) {
       await this.achievements.setIndexAchievement(user.uid, 8);
@@ -229,7 +231,7 @@ export class HomeComponent implements OnInit {
   async presentToast(message: string, position: 'middle') {
     const toast = await this.toastController.create({
       message: message,
-      duration: 10000,
+      duration: 5000,
       position: position,
     });
 

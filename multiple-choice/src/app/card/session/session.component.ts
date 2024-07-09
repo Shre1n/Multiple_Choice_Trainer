@@ -9,6 +9,7 @@ import {addIcons} from "ionicons";
 import {AchievementsService} from "../../services/achievements.service";
 import {arrowBack,addSharp,close, shareSocialOutline, checkmark} from "ionicons/icons";
 import {Share} from "@capacitor/share";
+import {load} from "@angular-devkit/build-angular/src/utils/server-rendering/esm-in-memory-loader/loader-hooks";
 
 @Component({
   selector: 'app-session',
@@ -26,7 +27,7 @@ export class SessionComponent  implements OnInit {
   // Whether to show correct answers
   showCorrectAnswers: boolean = false;
   // The answer selected by the user
-  selectedAnswer: string = '';
+  selectedAnswers: string[] = [];
   // Whether the session is completed
   sessionCompleted: boolean = false;
   // Progress of the session
@@ -45,7 +46,8 @@ export class SessionComponent  implements OnInit {
     private authService: AuthService,
     private alertController: AlertController,
     private achievements: AchievementsService,
-    private navCtrl: NavController
+    private navCtrl: NavController,
+    private toastController: ToastController,
 
   ) {addIcons({arrowBack,addSharp,close,shareSocialOutline, checkmark})}
 
@@ -67,27 +69,39 @@ export class SessionComponent  implements OnInit {
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.category = params['category'];
+      if (this.category === "") this.presentToast("No category found! :(", "middle")
+
       this.loadModules();
     });
   }
 
   // Load modules for the session
+  async presentToast(message: string, position: 'middle') {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 5000,
+      position: position,
+    });
+
+    await toast.present();
+  }
+
   async loadModules() {
     await Promise.all([this.loadUserSavedModules(), this.loadAllCategoryModules()]);
 
 
     // Load correct streak modules after loading the user saved and category modules
     const correctStreakModules = await this.moduleService.getCorrectStreakOfModule(this.category);
-    console.log(correctStreakModules);
+    if (this.modules.length === correctStreakModules.length){
+      this.allModulesLearned = true;
+      this.sessionCompleted = true;
+    }
+
     if (correctStreakModules.some(module => module.index === this.currentIndex)) {
       this.modules.splice(this.currentIndex, correctStreakModules.length);
     }
 
-    if (this.modules.every(module => module.correctStreak >= 6)) {
-      console.log('All modules correctly learned for this category:', this.category);
-      this.allModulesLearned = true;
-      this.sessionCompleted = true;
-    }else if (this.modules.length === 0) {
+    if (this.modules.length === 0) {
       console.error('No modules found for this category:', this.category);
     }
   }
@@ -168,7 +182,7 @@ export class SessionComponent  implements OnInit {
         this.modules = foundModule.modules.map((module: any) => ({
           question: module.question,
           answers: this.shuffleArray([...module.answers]), // Use spread operator to clone array
-          correctAnswer: module.correctAnswer,
+          correctAnswers: module.correctAnswers,
           answeredCorrectlyCount: module.answeredCorrectlyCount,
           answeredIncorrectlyCount: module.answeredIncorrectlyCount,
           correctStreak: module.correctStreak
@@ -192,7 +206,7 @@ export class SessionComponent  implements OnInit {
           .map((module: any) => ({
             question: module.question,
             answers: this.shuffleArray(module.answers),
-            correctAnswer: module.correctAnswer,
+            correctAnswers: module.correctAnswers,
             answeredCorrectlyCount: module.answeredCorrectlyCount,
             answeredIncorrectlyCount: module.answeredIncorrectlyCount,
             correctStreak: module.correctStreak
@@ -218,7 +232,13 @@ export class SessionComponent  implements OnInit {
   async checkAnswer() {
     this.showCorrectAnswers = true;
     const currentModule = this.modules[this.currentIndex];
-    if (this.selectedAnswer === currentModule.correctAnswer) {
+
+    console.log("selectedAnswers", this.selectedAnswers);
+    console.log("currentModule", currentModule.correctAnswers)
+
+    console.log("dsds", JSON.stringify(this.selectedAnswers.sort())==JSON.stringify(currentModule.correctAnswers));
+
+    if (JSON.stringify(this.selectedAnswers.sort())==JSON.stringify(currentModule.correctAnswers)) {
       currentModule.answeredCorrectlyCount++;
       this.kartenRichtig++;
       this.moduleService.setStreak(currentModule.correctStreak++);
@@ -229,10 +249,23 @@ export class SessionComponent  implements OnInit {
     }
   }
 
+  // sets checked box boolean for answer
+  onCheckboxChange(event: any, answer: string) {
+    const isChecked = event.detail.checked;
+    if (isChecked) {
+      this.selectedAnswers.push(answer);
+    } else {
+      const index = this.selectedAnswers.indexOf(answer);
+      if (index > -1) {
+        this.selectedAnswers.splice(index, 1);
+      }
+    }
+  }
+
   // Load the next question
   async nextQuestion() {
     this.showCorrectAnswers = false;
-    this.selectedAnswer = '';
+    this.selectedAnswers = [];
     const correctStreakModules = await this.moduleService.getCorrectStreakOfModule(this.category);
 
     if (!this.category) {
@@ -268,7 +301,7 @@ export class SessionComponent  implements OnInit {
     this.modules = [];
     this.currentIndex = 0;
     this.showCorrectAnswers = false;
-    this.selectedAnswer = '';
+    this.selectedAnswers = [];
     this.sessionCompleted = false;
     this.progress = 0;
     this.correctStreakModules = [];
