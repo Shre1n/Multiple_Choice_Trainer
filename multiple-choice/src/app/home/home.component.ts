@@ -45,9 +45,10 @@ export class HomeComponent implements OnInit {
   categories: string[] = [];
   showSearchBar: boolean = false;
   searchText: string = "";
-  filterServermodule: any[] = [];
-  filterUsermodule: any[] = [];
+  filterServermodule: string[] = [];
+  filterUsermodule: string[] = [];
 
+  // search text 'observer'
   @ViewChild('searchbar') searchbar!: IonSearchbar;
 
   constructor(private router: Router,
@@ -74,23 +75,27 @@ export class HomeComponent implements OnInit {
     this.isLoggedIn = this.isAuth();
   }
 
+  // lifecycle Method
   ngOnInit() {
     this.checkLoginStatus();
     this.loadInitialData()
     this.checkForUpdates();
   }
 
+  // Method to load Data
   async loadInitialData() {
     await this.loadModules();
     await this.loadUserModules();
   }
 
 
+  //update card navigation
   updateModule(module: { category: string; }) {
+    // Simplified with param passing
     this.router.navigate(['/card-detail'], {queryParams: {category: module, edit: 'true'}});
   }
 
-
+  // present Delete
   async presentDeleteConfirm(module: { category: string; }) {
     const alert = await this.alertController.create({
       header: 'Löschen',
@@ -116,6 +121,7 @@ export class HomeComponent implements OnInit {
     await alert.present();
   }
 
+  // show searchbar to search things
   search() {
     this.showSearchBar = !this.showSearchBar;
     if (this.showSearchBar) {
@@ -125,17 +131,20 @@ export class HomeComponent implements OnInit {
     }
   }
 
+  // Method to close the searchbar
   closeSearch() {
     this.searchText = '';
     this.filterModule();
   }
 
+  // Method to clear searchbar
   clear() {
     this.searchText = "";
     this.filterServermodule = [...this.categories];
     this.filterUsermodule = [...this.filterUsermodule]
   }
 
+  // Method to filter searched Modules and render them after search change
   async filterModule() {
     if (this.searchText.trim() === '') {
       this.filterServermodule = [...this.categories];
@@ -156,7 +165,7 @@ export class HomeComponent implements OnInit {
     }
   }
 
-
+  // Method to delete a Module
   async deleteModule(module: { category: string; }) {
     const user = await this.authService.getCurrentUser();
     if (user) {
@@ -168,14 +177,14 @@ export class HomeComponent implements OnInit {
     }
   }
 
+  // Method to share user Modules
   async shareMyModules() {
     let msgText = "Hallo, \ndas sind meine Module:\nKategorien:\n";
 
-    this.userModules = await this.moduleService.renderUserCategories();
     const user = await this.authService.getCurrentUser();
     if (user) {
       await this.achievements.setIndexAchievement(user.uid, 8);
-    };
+    }
 
     this.userModules.forEach(mod => {
       msgText += `${mod.category}\n`;
@@ -196,10 +205,12 @@ export class HomeComponent implements OnInit {
     });
   }
 
+  //Method navigates to card-list
   navigateToCardDetail() {
     this.router.navigate(['/card-detail']);
   }
 
+  //Loads all self made user Modules from firestore
   async loadUserModules() {
     const user = await this.authService.getCurrentUser();
     if (user) {
@@ -214,7 +225,7 @@ export class HomeComponent implements OnInit {
     }
   }
 
-
+  // Present Toast Function
   async presentToast(message: string, position: 'middle') {
     const toast = await this.toastController.create({
       message: message,
@@ -225,6 +236,7 @@ export class HomeComponent implements OnInit {
     await toast.present();
   }
 
+  // Navigation to Session from category with a alertController
   async navSession(category: string) {
     if (this.isLoggedIn) {
       const alert = await this.alertController.create({
@@ -259,22 +271,23 @@ export class HomeComponent implements OnInit {
     }
   }
 
-
+  // checks for Update from External Server
   checkForUpdates(): void {
-    this.moduleService.checkForUpdates().subscribe(
-      (response) => {
+    this.moduleService.checkForUpdates().subscribe({
+      next: response => {
         if (response.updatesAvailable) {
           console.log('Updates available, reloading modules...');
         } else {
           console.info('No updates available');
         }
       },
-      (error) => {
+      error: error => {
         console.error('Error checking for updates:', error);
       }
-    );
+    });
   }
 
+  // Loads Modules from Server
   async loadModules() {
     this.moduleService.loadExternalModule().subscribe({
       next: response => {
@@ -288,10 +301,12 @@ export class HomeComponent implements OnInit {
     });
   }
 
+  // Extract Category from server Modules
   extractCategories(modules: any): void {
     this.categories = Object.keys(modules).map(key => modules[key].category).sort();
   }
 
+  // Set Icon Method for Basic Modules
   getCategoryIcon(category: string): string {
     const icons: { [key: string]: string } = {
       'Mathematics': 'calculator-outline',
@@ -302,32 +317,35 @@ export class HomeComponent implements OnInit {
     return icons[category] || 'help-outline'; // Standardicon, wenn keine Kategorie übereinstimmt
   }
 
+  //Sets the Background color of Item/Card
   getCategoryBackground(index: number) {
     return index % 2 === 0 ? '#2D496B': '#5A7699';
   }
 
-
+  // Loads on enter site to check Auth and load Data
   ionViewDidEnter() {
     this.authService.getCurrentUser()
     this.isLoggedIn = this.authService.isAuth();
     this.loadInitialData();
   }
 
-
+  //checks Auth state of User
   isAuth(): boolean {
     return this.authService.isAuth();
   }
 
+  // Check if user is logged in
   checkLoginStatus() {
     const user = this.authService.getCurrentUser();
     this.isLoggedIn = user !== null;
   }
 
+  // logout User
   async logout() {
     const user = await this.authService.getCurrentUser();
     if (user) {
       await this.achievements.setIndexAchievement(user.uid, 7);
-    };
+    }
     await this.authService.logout();
     this.isLoggedIn = false;
     await this.navCtrl.navigateRoot(['/landingpage']);

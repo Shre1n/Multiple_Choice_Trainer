@@ -37,9 +37,6 @@
         minlength="6"
         clearInput
         [counter]="true">
-        <ion-button (click)="clearPasswort()" slot="end" type="button">
-          <ion-icon slot="icon-only" name="close"></ion-icon>
-        </ion-button>
       </ion-input>
     </ion-item>
 
@@ -58,6 +55,7 @@
     <ion-item>
       <ion-label position="floating">Name</ion-label>
       <ion-input
+        #name
         [(ngModel)]="additionalData.name"
         name="name"
         required
@@ -68,10 +66,12 @@
       </ion-input>
     </ion-item>
 
-    @if (registerForm.submitted && additionalData.name.length < nameMinLength){
-      <ion-note color="danger">
-        Name must be 2 characters long!
-      </ion-note>
+    @if (errors.get('name')) {
+      <ion-text color="danger">
+        <p class="ion-text-end ion-no-margin ion-padding-end">
+          {{errors.get('name')}}
+        </p>
+      </ion-text>
     }
 
     @if (registerForm.submitted && !additionalData.name) {

@@ -27,6 +27,11 @@ export class RegisterComponent implements OnInit {
   additionalData: any = { name: '', otherData: '' };
   errorMessage: string = '';
   isToastOpen = false;
+  errors = new Map<string, string>();
+
+  @ViewChild('name')
+  private name!: IonInput;
+
 
   #IonInput: IonInput | undefined;
   @ViewChild( IonInput)
@@ -47,21 +52,12 @@ export class RegisterComponent implements OnInit {
     addIcons({close})
   }
 
-  clearPasswort(){
-    this.password="";
-  }
-
-  clearName(){
-    this.additionalData="";
-  }
-
-  clearEmail() {
-    this.email="";
-  }
+  // Lifecycle Method to reset form if something went wrong
   ngOnInit() {
     this.resetForm();
   }
 
+  // reset form
   resetForm() {
     this.email = '';
     this.password = '';
@@ -70,11 +66,12 @@ export class RegisterComponent implements OnInit {
     this.isToastOpen = false;
   }
 
+  // set open to toast
   setOpen(isOpen: boolean) {
     this.isToastOpen = isOpen;
   }
 
-  // MARKIERT: Geänderte Methode, um benutzerdefinierte Nachrichten zu akzeptieren
+  // present Toast with Message
   async presentToast(message: string, duration: number) {
     const toast = await this.toastController.create({
       message: message,
@@ -85,18 +82,27 @@ export class RegisterComponent implements OnInit {
     await toast.present();
   }
 
+  // Method to pass a data to firestore
   async register() {
     if (!this.email || !this.password || !this.additionalData.name) {
       this.setOpen(false);
       return;
     }
+
+    if (this.name.value!.toString().length < 2) {
+      this.errors.set('name', 'Name muss mindestens 2 zeichen enthalten!');
+    } else {
+      this.errors.clear();
+    }
+
     try {
-      const user = await this.authService.register(this.email, this.password, this.additionalData);
-      await this.authService.login(this.email, this.password);
-      await this.achievements.initAchivements(user.uid);
-      // MARKIERT: Zeige Erfolgsnachricht bei erfolgreicher Registrierung
-      await this.presentToast('Sie haben sich erfolgreich registriert!', 2000);
-      await this.navController.navigateRoot(['/home']);
+      if(this.errors.size === 0) {
+        const user = await this.authService.register(this.email, this.password, this.additionalData);
+        await this.authService.login(this.email, this.password);
+        await this.achievements.initAchivements(user.uid);
+        await this.presentToast('Sie haben sich erfolgreich registriert!', 2000);
+        await this.navController.navigateRoot(['/home']);
+      }
     } catch (error: unknown) {
       if (typeof error === 'object' && error !== null && 'code' in error) {
         if ((error as any).code === 'auth/email-already-in-use') {
@@ -108,10 +114,7 @@ export class RegisterComponent implements OnInit {
         this.errorMessage = error.message;
       }
       this.setOpen(true);
-      // MARKIERT: Zeige Fehlermeldung bei fehlgeschlagener Registrierung
       await this.presentToast(this.errorMessage, 5000);
     }
   }
-
-  protected readonly name = name;
 }
