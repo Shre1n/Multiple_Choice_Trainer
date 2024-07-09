@@ -76,7 +76,6 @@ export class SessionComponent  implements OnInit {
       console.log('All modules correctly learned for this category:', this.category);
       this.allModulesLearned = true;
       this.sessionCompleted = true;
-
     }else if (this.modules.length === 0) {
       console.error('No modules found for this category:', this.category);
     }
