@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
-import { map } from 'rxjs/operators';
-import {collection, doc, Firestore, getDoc, setDoc, updateDoc} from "@angular/fire/firestore";
-import {user} from "@angular/fire/auth";
-import {logoFacebook} from "ionicons/icons";
+import { doc, Firestore, getDoc, setDoc, updateDoc} from "@angular/fire/firestore";
 
+// Interface to define the structure of an Achievement
 export interface Achievement {
   id: string;
   name: string;
@@ -15,9 +13,11 @@ export interface Achievement {
 }
 
 @Injectable({
+  // The service is available throughout the application
   providedIn: 'root'
 })
 export class AchievementsService {
+  // Base URL for server requests
   private baseUrl = 'http://localhost:8888/achievements';
   private achievements: Achievement[] = [];
 
@@ -30,13 +30,16 @@ export class AchievementsService {
     return this.http.get<Achievement[]>(url);
   }
 
+  // Load the achievements of a specific user
   async getUserAchievements(userID: string): Promise<Achievement[]> {
     try {
+      // Reference to the user document
       const docRef = await getDoc(doc(this.firestore, `users/${userID}`));
       if (docRef.exists()) {
         const data = docRef.data();
         this.achievements = data['serverAchievements']['achievements'] || [];
         return Object.values(this.achievements)
+          // Filter only achieved achievements
           .filter((achievement: Achievement) => achievement.achieved)
           .map((achievement: Achievement) => ({
             id: achievement.id,
@@ -56,7 +59,7 @@ export class AchievementsService {
     }
   }
 
-
+// Load the unachieved achievements of a specific user
   async getAchievements(userID: string): Promise<Achievement[]> {
     try {
       const docRef = await getDoc(doc(this.firestore, `users/${userID}`));
@@ -83,6 +86,7 @@ export class AchievementsService {
     }
   }
 
+  // Set the status of a specific achievement to 'achieved'
   async initAchivements(userID: string){
     const serverAchievements = await this.getAllServerAchievements().toPromise();
     const userRef = doc(this.firestore, `users/${userID}`);
@@ -105,7 +109,7 @@ export class AchievementsService {
       if (userData) {
         const serverAchievements = userData['serverAchievements'] || {};
 
-        // Überprüfen, ob das Achievement bereits erreicht wurde
+        // Check if the achievement has already been achieved
         if (serverAchievements.achievements[index].achieved) {
           return;
         }
@@ -120,21 +124,17 @@ export class AchievementsService {
             }
           }
         };
+        // Update the user document with the new achievements
         await updateDoc(userRef, {
           serverAchievements: updatedAchievements
         });
 
       } else {
+        // No user found, maybe throw an error to the frontend
         console.error(`Benutzer ${userID} nicht gefunden.`);
-        // No User found maybe throw error to frontend
       }
     } catch (error){
       console.log(error)
     }
-  }
-
-  // Get a specific achievement by ID
-  getAchievementById(id: string): Achievement | undefined {
-    return this.achievements.find(a => a.id === id);
   }
 }

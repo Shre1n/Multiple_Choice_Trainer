@@ -37,23 +37,24 @@ export class ForgetPasswordComponent implements OnInit {
     addIcons({close})
   }
 
-  cleanEmail(){
-    this.email="";
-  }
-
+  //Lifecycle Method
   ngOnInit() {
     this.resetForm();
   }
+
+  // reset Form
   resetForm() {
     this.email = '';
     this.errorMessage = '';
     this.isToastOpen = false;
   }
 
+  // Set open toast
   setOpen(isOpen: boolean) {
     this.isToastOpen = isOpen;
   }
 
+  // Present Toast
   async presentToast(message: string, color: string) {
     const toast = await this.toastController.create({
       message: message,
@@ -64,6 +65,7 @@ export class ForgetPasswordComponent implements OnInit {
     await toast.present();
   }
 
+  // Email Check in Firestore to reset password
   async resetPassword() {
     if (!this.email){
       if (!this.email) {
@@ -71,14 +73,10 @@ export class ForgetPasswordComponent implements OnInit {
       }
       return;
     }
-
-
     try {
       await this.authService.resetPassword(this.email);
-      await this.navController.pop()
       this.successMessage = 'Password reset email sent. Check your inbox.';
       await this.presentToast(this.successMessage, 'success');
-      await this.navController.pop();
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.errorMessage = `Password reset failed: ${error.message}`;
@@ -86,7 +84,7 @@ export class ForgetPasswordComponent implements OnInit {
         this.errorMessage = 'An unknown error occurred during password reset.';
       }
       await this.presentToast(this.errorMessage, 'danger');
-
+      this.navController.pop();
     }
   }
 

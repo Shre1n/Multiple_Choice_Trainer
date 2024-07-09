@@ -18,16 +18,25 @@ import {load} from "@angular-devkit/build-angular/src/utils/server-rendering/esm
   imports: [IonicModule, FormsModule, NgClass],standalone:true
 })
 export class SessionComponent  implements OnInit {
-
+  // The category of the current session
   category: string = '';
+  // List of modules in the session
   modules: any[] = [];
+  // Index of the current module being displayed
   currentIndex: number = 0;
+  // Whether to show correct answers
   showCorrectAnswers: boolean = false;
+  // The answer selected by the user
   selectedAnswers: string[] = [];
+  // Whether the session is completed
   sessionCompleted: boolean = false;
+  // Progress of the session
   progress: number = 0;
+  // Modules with correct streak
   correctStreakModules:  { index: number; question: string; }[] = [];
+  // Whether all modules are learned
   allModulesLearned: boolean = false;
+  // Success rate
   rate: number = 0;
 
   constructor(
@@ -44,18 +53,19 @@ export class SessionComponent  implements OnInit {
 
 
 
-  //Übergang
+  // Transition variables
   kartenInsgesammt: number = 0;
   kartenRichtig: number = 0;
   wrongAnswers: number = 0;
 
-
+  // Load statistics
   async loadStats(){
     this.kartenInsgesammt = this.kartenRichtig + this.wrongAnswers;
 
     this.rate = (this.kartenRichtig / this.kartenInsgesammt) * 100;
   }
 
+  // Initialize the component
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.category = params['category'];
@@ -65,6 +75,7 @@ export class SessionComponent  implements OnInit {
     });
   }
 
+  // Load modules for the session
   async presentToast(message: string, position: 'middle') {
     const toast = await this.toastController.create({
       message: message,
@@ -93,14 +104,15 @@ export class SessionComponent  implements OnInit {
     if (this.modules.length === 0) {
       console.error('No modules found for this category:', this.category);
     }
-
   }
 
+  // Go back to the previous page
   async goBack(): Promise<void> {
     this.navCtrl.pop();
     this.router.navigate(['/home']);
   }
 
+  // Share the user's stats
   shareMyStats(category: string){
     let msgText = `Hallo,\ndas ist meine Statistik zu ${category}:\nKarten Insgeammt: ${this.kartenInsgesammt}\nflasche Karten: ${this.wrongAnswers}\nErfolgsrate: ${this.rate}%`;
     Share.canShare().then(canShare => {
@@ -118,12 +130,13 @@ export class SessionComponent  implements OnInit {
     });
   }
 
-
+  // Navigate to the home page
   goToHome() {
     this.resetSession();
     this.router.navigate(['/card-list']);
   }
 
+  // Determine the success rate message
   successRate(): string {
     if (this.rate < 30) {
       return "Da musst du wohl noch etwas üben :(";
@@ -140,7 +153,7 @@ export class SessionComponent  implements OnInit {
   }
 
 
-
+  // Save the session progress
   async saveSessionProgress() {
     const user = await this.authService.getCurrentUser();
     if (user) {
@@ -161,6 +174,7 @@ export class SessionComponent  implements OnInit {
     }
   }
 
+  // Load user saved modules
   loadUserSavedModules() {
     this.moduleService.getSavedModulesForUser().then((data: any[]) => {
       const foundModule = data.find(module => module.category === this.category);
@@ -181,7 +195,7 @@ export class SessionComponent  implements OnInit {
     });
   }
 
-
+  // Load all category modules from the server
   //This Category loader Only loads from Server Modules
   //Must include the loading of user saved categories for card-list
   loadAllCategoryModules() {
@@ -205,7 +219,7 @@ export class SessionComponent  implements OnInit {
     });
   }
 
-
+  // Shuffle the array of answers
   shuffleArray(array: object[]): object[] {
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -214,6 +228,7 @@ export class SessionComponent  implements OnInit {
     return array;
   }
 
+  // Shuffle the array of answers
   async checkAnswer() {
     this.showCorrectAnswers = true;
     const currentModule = this.modules[this.currentIndex];
@@ -234,6 +249,7 @@ export class SessionComponent  implements OnInit {
     }
   }
 
+  // sets checked box boolean for answer
   onCheckboxChange(event: any, answer: string) {
     const isChecked = event.detail.checked;
     if (isChecked) {
@@ -246,6 +262,7 @@ export class SessionComponent  implements OnInit {
     }
   }
 
+  // Load the next question
   async nextQuestion() {
     this.showCorrectAnswers = false;
     this.selectedAnswers = [];
@@ -274,10 +291,12 @@ export class SessionComponent  implements OnInit {
     this.updateProgress();
   }
 
+  // Update the session progress
   updateProgress() {
     this.progress = this.currentIndex / this.modules.length;
   }
 
+  // Reset the session
   resetSession() {
     this.modules = [];
     this.currentIndex = 0;

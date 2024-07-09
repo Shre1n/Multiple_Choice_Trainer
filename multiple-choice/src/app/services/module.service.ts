@@ -2,17 +2,10 @@ import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {
-  collection,
-  CollectionReference, deleteDoc,
   doc,
-  DocumentData,
   Firestore, getDoc,
-  getDocs, orderBy,
-  query,
   setDoc, updateDoc
 } from "@angular/fire/firestore";
-import {ModuleModule} from "../module/module.module";
-import {environment} from "../../environments/environment.prod";
 import {AuthService} from "./auth.service";
 import {AchievementsService} from "./achievements.service";
 

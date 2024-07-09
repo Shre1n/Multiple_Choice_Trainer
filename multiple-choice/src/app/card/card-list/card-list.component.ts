@@ -24,13 +24,19 @@ import {AchievementsService} from "../../services/achievements.service";
 })
 export class CardListComponent  implements OnInit {
 
+  // Indicates if the user is logged in
   isLoggedIn!: boolean;
+  // List of saved modules
   savedModules: any[] = [];
+  // Indicates if the search bar is shown
   userSessions: any[] = [];
   showSearchBar: boolean = false;
+  // Text entered in the search bar
   searchText: string = "";
+  // Filtered list of user modules
   filterUsermodule: any[] = [];
 
+  // List of categories
   categories: string[] = [];
 
 
@@ -48,11 +54,13 @@ export class CardListComponent  implements OnInit {
     this.isLoggedIn = this.isAuth();
   }
 
+  // Initialize the component
   async ngOnInit() {
     this.fetchSessionSavedModules();
     await this.moduleService.checkForSessions();
   }
 
+  // Toggle the search bar visibility and set focus on it
   search() {
     this.showSearchBar = !this.showSearchBar;
     if (this.showSearchBar) {
@@ -62,21 +70,25 @@ export class CardListComponent  implements OnInit {
     }
   }
 
+  // Check if the user is authenticated
   isAuth(): boolean {
     return this.authService.isAuth();
   }
 
+  // Close the search bar
   closeSearch() {
     this.searchText = '';
     this.filterModule();
   }
 
+  // Clear the search text and reset the filtered modules
   clear() {
     this.searchText = "";
     this.filterUsermodule = [...this.savedModules]
   }
 
-  filterModule() {
+  // Filter modules based on the search text
+  async filterModule() {
     if (this.searchText.trim() === '') {
       this.filterUsermodule = [...this.savedModules]
     } else {
@@ -86,8 +98,13 @@ export class CardListComponent  implements OnInit {
       this.filterUsermodule = [...this.filterUsermodule]
       console.log(this.filterUsermodule)
     }
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      await this.achievements.setIndexAchievement(user.uid, 9);
+    }
   }
 
+  // Show a toast message
   async presentToast(message: string, position: 'middle') {
     const toast = await this.toastController.create({
       message: message,
@@ -98,9 +115,11 @@ export class CardListComponent  implements OnInit {
     await toast.present();
   }
 
+  // Load external modules
   async loadModules() {
     this.moduleService.loadExternalModule().subscribe(
       response => {
+        // Extract categories from the response
        this.extractCategories(response);
       },
       error => {
@@ -110,24 +129,12 @@ export class CardListComponent  implements OnInit {
     );
   }
 
+  // Extract categories from the modules
   extractCategories(modules: any): void {
     this.categories = Object.keys(modules).map(key => modules[key].category);
   }
 
-  async loadAndSortUserSessions() {
-    const user = await this.authService.getCurrentUser();
-    if (user) {
-      try {
-        this.userSessions = await this.moduleService.getUserSessions(user.uid);
-        await this.moduleService.sortModulesByLastStudied(this.userSessions);
-      } catch (error) {
-        console.error('Error loading and sorting user sessions:', error);
-      }
-    } else {
-      console.error('No user is logged in');
-    }
-  }
-
+  // Share the user's learned modules
   shareLearnedModules() {
     let msgText = "Hallo, \ndas sind meine Angefangenen Module:\n";
 
@@ -149,9 +156,9 @@ export class CardListComponent  implements OnInit {
         console.log('Error: Sharing not available!');
       }
     });
-
   }
 
+  // Fetch saved modules for the current session
   async fetchSessionSavedModules() {
     const user = await this.authService.getCurrentUser();
     if (user) {
@@ -165,6 +172,7 @@ export class CardListComponent  implements OnInit {
     }
   }
 
+  // Navigate to the session page for the selected category
   async navSession(category: string) {
     const user = await this.authService.getCurrentUser();
     if (user) {
@@ -200,6 +208,7 @@ export class CardListComponent  implements OnInit {
     }
   }
 
+  // Start a random session
   async startRandomSession() {
     await this.loadModules();
     if (this.savedModules.length === 0) {
@@ -210,10 +219,12 @@ export class CardListComponent  implements OnInit {
 
   }
 
+  // Fetch saved modules when the view is entered
   ionViewDidEnter(){
     this.fetchSessionSavedModules();
   }
 
+  // Logout the user
   async logout() {
     const user = await this.authService.getCurrentUser();
     if (user) {
