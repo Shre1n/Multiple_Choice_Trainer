@@ -13,22 +13,21 @@ import {doc, Firestore, setDoc} from "@angular/fire/firestore";
 import {initializeApp} from "@angular/fire/app";
 import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
-import {Achievement} from "./achievements.service";
-
-interface AchievementsResponse {
-  achievements: {
-    [key: string]: Achievement; // Jeder Key ist eine Achievement-ID, Wert ist ein Achievement-Objekt
-  };
-}
+import {Achievement, AchievementsService} from "./achievements.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+
+  // User from firestore
   private currentUser: User | null = null;
+  // is user logged in
   isLoggedIn: boolean = false;
 
-  constructor(private firestore: Firestore, private auth: Auth) {
+  constructor(private firestore: Firestore,
+              private auth: Auth,
+              private achievements: AchievementsService) {
     const firebaseApp = initializeApp(environment.firebaseConfig);
     this.auth = getAuth(firebaseApp);
 
@@ -39,15 +38,13 @@ export class AuthService {
     });
   }
 
-  getAuth(): Auth {
-    return this.auth;
-  }
-
-  async getCurrentUser(): Promise<User | null> {
+  async getCurrentUser(){
     try {
+      // set user to null or this.currentUser after Promise
       this.currentUser = await new Promise<User | null>((resolve) => {
         const unsubscribe = onAuthStateChanged(this.auth, (user) => {
           unsubscribe();
+          // user Object
           resolve(user);
         });
       });
@@ -58,7 +55,8 @@ export class AuthService {
     }
   }
 
-  async getCurrentUserId(): Promise<string | null> {
+  async getCurrentUserId() {
+    // get userID
     if (this.currentUser) {
       return this.currentUser.uid;
     } else {
@@ -66,7 +64,8 @@ export class AuthService {
     }
   }
 
-  async resetPassword(email: string): Promise<void> {
+  async resetPassword(email: string){
+    //resets the Password with mail
     try {
       await sendPasswordResetEmail(this.auth, email);
     } catch (error: unknown) {
@@ -78,7 +77,8 @@ export class AuthService {
     }
   }
 
-  async login(email: string, password: string): Promise<User> {
+  async login(email: string, password: string){
+    // login function for logging in the user
     try {
       const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
       localStorage.setItem('isLoggedIn', 'true');
@@ -86,6 +86,7 @@ export class AuthService {
       this.currentUser = user;
       return user;
     } catch (error) {
+      //in case of error -> message
       if (error instanceof Error) {
         throw new Error(`Login failed: ${error.message}`);
       } else {
@@ -94,12 +95,13 @@ export class AuthService {
     }
   }
 
-  // Methode, um den aktuellen Anmeldestatus abzurufen
+  // check current Auth state of user
   isAuth(): boolean {
     return localStorage.getItem('isLoggedIn') === 'true';
   }
 
-  async register(email: string, password: string, additionalData: any): Promise<User> {
+  async register(email: string, password: string, additionalData: any){
+    //register data to firestore
     try {
       const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
       const user = userCredential.user;
@@ -110,7 +112,8 @@ export class AuthService {
     }
   }
 
-  async logout(): Promise<void> {
+  async logout(){
+    // logout from App and clear storage entry if exist
     try {
       await signOut(this.auth);
       localStorage.removeItem('isLoggedIn');
@@ -125,6 +128,7 @@ export class AuthService {
   }
 
   private async saveUserData(user: User, additionalData: any): Promise<void> {
+    //saves userdata to firestore
     const userRef = doc(this.firestore, `users/${user.uid}`);
     await setDoc(userRef, { email: user.email, ...additionalData });
   }

@@ -88,7 +88,7 @@ export class CardListComponent  implements OnInit {
   }
 
   // Filter modules based on the search text
-  filterModule() {
+  async filterModule() {
     if (this.searchText.trim() === '') {
       this.filterUsermodule = [...this.savedModules]
     } else {
@@ -97,6 +97,10 @@ export class CardListComponent  implements OnInit {
       );
       this.filterUsermodule = [...this.filterUsermodule]
       console.log(this.filterUsermodule)
+    }
+    const user = await this.authService.getCurrentUser();
+    if (user) {
+      await this.achievements.setIndexAchievement(user.uid, 9);
     }
   }
 

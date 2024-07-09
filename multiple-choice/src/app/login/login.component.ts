@@ -45,18 +45,12 @@ export class LoginComponent implements OnInit {
     addIcons({close})
   }
 
+  // Lifecycle Methode
   ngOnInit() {
     this.resetForm();
   }
 
-  clearEmail(){
-    this.email="";
-  }
-
-  clearPassword(){
-    this.password="";
-  }
-
+  // resets login form
   resetForm() {
     if (this.loginForm) {
       this.loginForm.reset();
@@ -67,11 +61,12 @@ export class LoginComponent implements OnInit {
     this.isToastOpen = false;
   }
 
+  // set open to Toast menu
   setOpen(isOpen: boolean) {
     this.isToastOpen = isOpen;
   }
 
-  // MARKIERT: Geänderte Methode, um benutzerdefinierte Nachrichten zu akzeptieren
+  // present Toast to user Method
   async presentToast(message: string, duration: number) {
     const toast = await this.toastController.create({
       message: message,
@@ -82,6 +77,7 @@ export class LoginComponent implements OnInit {
     await toast.present();
   }
 
+  // Checks firestore data with passed data
   async login() {
     if (!this.email || !this.password) {
       this.setOpen(false);
@@ -91,9 +87,9 @@ export class LoginComponent implements OnInit {
     try {
       const user = await this.authService.login(this.email, this.password);
       await this.achievements.setIndexAchievement(user.uid, 2);
-      // MARKIERT: Zeige Erfolgsnachricht bei erfolgreichem Login
       await this.presentToast('Sie haben sich erfolgreich eingeloggt!', 2000);
       await this.navCtrl.navigateRoot(['/home']);
+      await this.navCtrl.pop();
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.errorMessage = 'Login failed: No login found.';
@@ -101,11 +97,11 @@ export class LoginComponent implements OnInit {
         this.errorMessage = 'An unknown error occurred during login.';
       }
       this.setOpen(true);
-      // MARKIERT: Zeige Fehlermeldung bei fehlgeschlagenem Login
       await this.presentToast(this.errorMessage, 5000);
     }
   }
 
+  // redirect to forgot password
   openForgotPassword(): void {
     this.resetForm();
     this.navCtrl.pop();
