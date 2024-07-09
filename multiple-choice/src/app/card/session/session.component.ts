@@ -112,8 +112,27 @@ export class SessionComponent  implements OnInit {
 
   // Go back to the previous page
   async goBack(): Promise<void> {
-    this.navCtrl.pop();
-    this.router.navigate(['/home']);
+    const alert = await this.alertController.create({
+      header: 'Session verlassen',
+      message: 'Möchten Sie die Lernsession wirklich beenden?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {
+            console.log('Confirm Cancel');
+          }
+        },
+        {
+          text: 'Beenden',
+          handler: () => {
+            this.router.navigate(['/home']);
+            this.navCtrl.pop();
+          }
+        }
+      ]});
+    await alert.present();
   }
 
   // Share the user's stats
